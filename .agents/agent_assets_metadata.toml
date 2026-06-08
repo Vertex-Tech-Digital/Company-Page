@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "ZpHadybmUcNO-CXVrjALo"
+uri = "file://artifacts/vertex-tech/public/images/project-saas.png"
+type = "image"
+title = "SaaS platform abstract geometry"
+
+[[generated]]
+id = "iNksm0mijkobfK-i29cHq"
+uri = "file://artifacts/vertex-tech/public/images/project-analytics.png"
+type = "image"
+title = "Analytics dashboard data flow"
+
+[[generated]]
+id = "uKo-SJrn2GhALYp2aSMt9"
+uri = "file://artifacts/vertex-tech/public/images/project-integration.png"
+type = "image"
+title = "System integration abstract link"
