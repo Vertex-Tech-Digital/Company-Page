@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import nodemailer from "nodemailer";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const router: IRouter = Router();
 
