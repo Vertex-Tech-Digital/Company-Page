@@ -3,23 +3,23 @@ import { motion } from "framer-motion";
 const steps = [
   {
     num: "01",
-    title: "Análisis técnico inicial",
-    description: "Evaluación profunda de requerimientos y arquitectura.",
+    title: "Análisis y Estrategia",
+    description: "Definición de requisitos y diseño de la arquitectura técnica.",
   },
   {
     num: "02",
-    title: "Desarrollo ágil por iteraciones",
-    description: "Entregas continuas y validación temprana.",
+    title: "Desarrollo Ágil por Hitos",
+    description: "Entregas funcionales constantes y código revisado en GitHub.",
   },
   {
     num: "03",
-    title: "Control de calidad y testing",
-    description: "Pruebas rigurosas para asegurar estabilidad.",
+    title: "Control de Calidad Riguroso",
+    description: "Pruebas integrales (QA Testing) para garantizar robustez.",
   },
   {
     num: "04",
-    title: "Entrega, documentación y soporte",
-    description: "Despliegue y mantenimiento a largo plazo.",
+    title: "Despliegue Continuo y Soporte",
+    description: "Subida a la nube en servidores optimizados y mantenimiento técnico.",
   },
 ];
 
