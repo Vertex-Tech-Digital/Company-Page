@@ -34,7 +34,6 @@ export function Navbar() {
     { name: "Servicios", href: "#servicios", id: "servicios" },
     { name: "Proyectos", href: "#proyectos", id: "proyectos" },
     { name: "Metodología", href: "#metodologia", id: "metodologia" },
-    { name: "Contacto", href: "#contacto", id: "contacto" },
   ];
 
   const scrollTo = (href: string) => {

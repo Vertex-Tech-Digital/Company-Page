@@ -121,3 +121,9 @@
     scroll-behavior: smooth;
   }
 }
+
+#replit-badge-container,
+[data-replit-badge],
+.replit-badge {
+  display: none !important;
+}

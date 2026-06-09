@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, "El nombre es requerido"),
@@ -18,6 +18,8 @@ const formSchema = z.object({
 
 export function Contact() {
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -29,17 +31,29 @@ export function Contact() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Form submitted:", values);
-    // Simulate API call
-    setTimeout(() => {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    setServerError(null);
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Error al enviar el mensaje");
+      }
       setIsSuccess(true);
-    }, 500);
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : "Error al enviar el mensaje. Inténtalo de nuevo.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <section id="contacto" className="py-24 relative overflow-hidden">
-      {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
 
       <div className="container mx-auto px-6 relative z-10">
@@ -64,7 +78,7 @@ export function Contact() {
             className="bg-card/50 backdrop-blur-md border border-border p-8 rounded-2xl shadow-xl"
           >
             {isSuccess ? (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="h-full flex flex-col items-center justify-center text-center py-12"
@@ -73,8 +87,8 @@ export function Contact() {
                 <CheckCircle2 className="w-16 h-16 text-primary mb-6" />
                 <h3 className="text-2xl font-bold text-white mb-2">¡Solicitud enviada!</h3>
                 <p className="text-muted-foreground">Nos pondremos en contacto contigo a la brevedad.</p>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="mt-8 border-border"
                   onClick={() => { setIsSuccess(false); form.reset(); }}
                 >
@@ -92,7 +106,7 @@ export function Contact() {
                         <FormItem>
                           <FormLabel className="text-white/80">Nombre</FormLabel>
                           <FormControl>
-                            <Input placeholder="Tu nombre" className="bg-background/50 border-border/80 focus-visible:ring-primary/50" {...field} />
+                            <Input placeholder="Tu nombre" className="bg-background/50 border-border/80 focus-visible:ring-primary/50" data-testid="input-name" {...field} />
                           </FormControl>
                           <FormMessage className="text-destructive text-xs" />
                         </FormItem>
@@ -105,7 +119,7 @@ export function Contact() {
                         <FormItem>
                           <FormLabel className="text-white/80">Email</FormLabel>
                           <FormControl>
-                            <Input placeholder="tu@email.com" className="bg-background/50 border-border/80 focus-visible:ring-primary/50" {...field} />
+                            <Input placeholder="tu@email.com" className="bg-background/50 border-border/80 focus-visible:ring-primary/50" data-testid="input-email" {...field} />
                           </FormControl>
                           <FormMessage className="text-destructive text-xs" />
                         </FormItem>
@@ -119,7 +133,7 @@ export function Contact() {
                       <FormItem>
                         <FormLabel className="text-white/80">Empresa (Opcional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="Nombre de tu empresa" className="bg-background/50 border-border/80 focus-visible:ring-primary/50" {...field} />
+                          <Input placeholder="Nombre de tu empresa" className="bg-background/50 border-border/80 focus-visible:ring-primary/50" data-testid="input-company" {...field} />
                         </FormControl>
                         <FormMessage className="text-destructive text-xs" />
                       </FormItem>
@@ -132,18 +146,34 @@ export function Contact() {
                       <FormItem>
                         <FormLabel className="text-white/80">Mensaje</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="Cuéntanos sobre tu proyecto..." 
-                            className="bg-background/50 border-border/80 focus-visible:ring-primary/50 min-h-[120px] resize-none" 
-                            {...field} 
+                          <Textarea
+                            placeholder="Cuéntanos sobre tu proyecto..."
+                            className="bg-background/50 border-border/80 focus-visible:ring-primary/50 min-h-[120px] resize-none"
+                            data-testid="input-message"
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage className="text-destructive text-xs" />
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full bg-primary text-white hover:bg-primary/90 shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] h-12 text-md" data-testid="contact-submit">
-                    Enviar solicitud
+                  {serverError && (
+                    <p className="text-sm text-destructive">{serverError}</p>
+                  )}
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-primary text-white hover:bg-primary/90 shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] h-12 text-md"
+                    data-testid="contact-submit"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Enviando...
+                      </>
+                    ) : (
+                      "Enviar solicitud"
+                    )}
                   </Button>
                 </form>
               </Form>
