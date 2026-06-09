@@ -4,18 +4,18 @@ import { Code2, Link, Database } from "lucide-react";
 const services = [
   {
     icon: <Code2 className="w-10 h-10 text-primary" />,
-    title: "Desarrollo Web Fullstack",
-    description: "Aplicaciones modernas, rápidas y escalables con React, Next.js y arquitecturas frontend de alto rendimiento.",
+    title: "Desarrollo Web Full-Stack",
+    description: "Creamos aplicaciones web modernas, robustas y de carga ultrarrápida. Diseñamos tanto la interfaz visual del usuario (Front-end) como la lógica del servidor (Back-end) utilizando Next.js y React para garantizar un rendimiento óptimo en el mercado europeo.",
   },
   {
     icon: <Link className="w-10 h-10 text-primary" />,
-    title: "APIs e Integraciones",
-    description: "Diseño e implementación de APIs robustas, integraciones con servicios externos, automatizaciones y conexión entre sistemas.",
+    title: "APIs de Alto Rendimiento e Integración",
+    description: "Conectamos tus sistemas con cualquier servicio de terceros de forma segura. Desarrollamos arquitecturas de API eficientes con Node.js y NestJS, permitiendo la sincronización de datos en tiempo real, pasarelas de pago y automatizaciones.",
   },
   {
     icon: <Database className="w-10 h-10 text-primary" />,
-    title: "Arquitectura Node.js",
-    description: "Backends sólidos, seguros y preparados para crecer usando Node.js, bases de datos modernas y buenas prácticas de arquitectura.",
+    title: "Ingeniería de Calidad (QA & Testing)",
+    description: "Protegemos la estabilidad de tu software. Implementamos ciclos rigurosos de control de calidad, pruebas automatizadas y auditorías de código antes del despliegue para asegurar que tu plataforma funcione sin errores desde el primer día.",
   },
 ];
 

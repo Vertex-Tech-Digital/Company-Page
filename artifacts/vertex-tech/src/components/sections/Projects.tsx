@@ -2,21 +2,21 @@ import { motion } from "framer-motion";
 
 const projects = [
   {
-    title: "Plataforma SaaS para Gestión Empresarial",
-    tags: ["React", "Node.js", "PostgreSQL", "Stripe"],
-    description: "Sistema multiusuario con autenticación, pagos, panel administrativo y módulos de gestión interna.",
+    title: "Plataformas de Gestión Empresarial y RRHH (SaaS)",
+    tags: ["React", "Node.js", "PostgreSQL", "Cloud"],
+    description: "Desarrollo de ecosistemas internos en la nube para la administración masiva de activos y personal con arquitectura reactiva.",
     image: "/images/project-saas.png",
   },
   {
-    title: "Dashboard de Analítica en Tiempo Real",
+    title: "Dashboards y Analítica en Tiempo Real",
     tags: ["Next.js", "APIs", "WebSockets", "Charts"],
-    description: "Panel corporativo para visualizar métricas, eventos y datos operativos en tiempo real.",
+    description: "Paneles de control optimizados para el procesamiento de datos a gran escala y visualización de métricas críticas de negocio.",
     image: "/images/project-analytics.png",
   },
   {
-    title: "Integración de Sistemas y Automatización",
-    tags: ["Node.js", "REST APIs", "Cloud", "Cron Jobs"],
-    description: "Automatización de flujos empresariales conectando CRM, pagos, notificaciones y servicios externos.",
+    title: "Automatización e Integración de Sistemas",
+    tags: ["Node.js", "REST APIs", "Cloud", "Mobile"],
+    description: "Migración de software heredado a infraestructuras API modernas y adaptadas para entornos móviles.",
     image: "/images/project-integration.png",
   },
 ];
