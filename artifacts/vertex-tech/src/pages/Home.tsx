@@ -10,7 +10,7 @@ import { ParticleNetwork } from "@/components/sections/ParticleNetwork";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background text-foreground font-sans">
+    <main className="min-h-screen text-foreground font-sans">
       <ParticleNetwork />
       <Navbar />
       <Hero />

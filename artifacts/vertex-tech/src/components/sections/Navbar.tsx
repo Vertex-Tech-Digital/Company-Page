@@ -53,8 +53,13 @@ export function Navbar() {
       }`}
     >
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-        <a href="#inicio" onClick={(e) => { e.preventDefault(); scrollTo("#inicio"); }} className="text-xl font-bold tracking-tight text-white flex items-center gap-2" data-testid="nav-logo">
-          Vertex Tech<span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(59,130,246,0.8)]"></span>
+        <a href="#inicio" onClick={(e) => { e.preventDefault(); scrollTo("#inicio"); }} className="flex items-center gap-2 group" data-testid="nav-logo">
+          <div className="flex flex-col leading-none">
+            <span className="text-lg font-bold tracking-widest uppercase text-white" style={{ fontFamily: "var(--app-font-heading)" }}>
+              Vertex Tech<span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.9)] ml-1 mb-0.5 align-middle"></span>
+            </span>
+            <span className="text-[10px] tracking-[0.2em] uppercase text-primary/70 font-medium">Consultora Tecnológica</span>
+          </div>
         </a>
 
         {/* Desktop Nav */}
