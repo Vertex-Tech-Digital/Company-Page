@@ -4,8 +4,8 @@ import { Code2, Link, Database } from "lucide-react";
 const services = [
   {
     icon: <Code2 className="w-10 h-10 text-primary" />,
-    title: "Desarrollo Web Full-Stack",
-    description: "Creamos aplicaciones web modernas, robustas y de carga ultrarrápida. Diseñamos tanto la interfaz visual del usuario (Front-end) como la lógica del servidor (Back-end) utilizando Next.js y React para garantizar un rendimiento óptimo en el mercado europeo.",
+    title: "Aplicaciones Web a Medida y Sistemas de Gestión (SaaS)",
+    description: "No creamos páginas web estáticas; diseñamos y programamos software empresarial potente que funciona a través de internet. Construimos desde plataformas internas para gestionar tus clientes, ventas y personal en tiempo real, hasta paneles de control inteligentes para automatizar los procesos de tu empresa. Creamos herramientas en la nube robustas, seguras y adaptadas 100% a las necesidades operativas de tu negocio.",
   },
   {
     icon: <Link className="w-10 h-10 text-primary" />,
