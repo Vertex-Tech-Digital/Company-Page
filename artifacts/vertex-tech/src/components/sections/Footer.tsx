@@ -1,4 +1,8 @@
+import { useLanguage } from "@/context/LanguageContext";
+
 export function Footer() {
+  const { t } = useLanguage();
+
   const scrollTo = (href: string) => {
     const el = document.querySelector(href);
     if (el) {
@@ -15,26 +19,26 @@ export function Footer() {
               Vertex Tech<span className="w-2 h-2 rounded-full bg-primary"></span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Desarrollo Fullstack para empresas modernas.
+              {t("footer.tagline")}
             </p>
           </div>
           
           <div className="flex gap-8">
             <a href="#servicios" onClick={(e) => { e.preventDefault(); scrollTo("#servicios"); }} className="text-sm text-muted-foreground hover:text-white transition-colors" data-testid="footer-link-servicios">
-              Servicios
+              {t("nav.servicios")}
             </a>
             <a href="#proyectos" onClick={(e) => { e.preventDefault(); scrollTo("#proyectos"); }} className="text-sm text-muted-foreground hover:text-white transition-colors" data-testid="footer-link-proyectos">
-              Proyectos
+              {t("nav.proyectos")}
             </a>
             <a href="#contacto" onClick={(e) => { e.preventDefault(); scrollTo("#contacto"); }} className="text-sm text-muted-foreground hover:text-white transition-colors" data-testid="footer-link-contacto">
-              Contacto
+              {t("nav.contactar")}
             </a>
           </div>
         </div>
         
         <div className="border-t border-border/50 pt-8 flex justify-between items-center">
           <p className="text-xs text-muted-foreground">
-            &copy; 2026 Vertex Tech. Todos los derechos reservados.
+            &copy; {t("footer.copyright")}
           </p>
         </div>
       </div>

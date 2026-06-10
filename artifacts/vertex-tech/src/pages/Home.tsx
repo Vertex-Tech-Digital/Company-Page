@@ -6,10 +6,12 @@ import { Methodology } from "@/components/sections/Methodology";
 import { WhyUs } from "@/components/sections/WhyUs";
 import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
+import { ParticleNetwork } from "@/components/sections/ParticleNetwork";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
+      <ParticleNetwork />
       <Navbar />
       <Hero />
       <Services />
