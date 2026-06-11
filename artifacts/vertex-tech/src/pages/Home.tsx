@@ -12,6 +12,7 @@ export default function Home() {
   return (
     <main className="min-h-screen text-foreground font-sans">
       <ParticleNetwork />
+      <div className="relative" style={{ zIndex: 1 }}>
       <Navbar />
       <Hero />
       <Services />
@@ -20,6 +21,7 @@ export default function Home() {
       <WhyUs />
       <Contact />
       <Footer />
+      </div>
     </main>
   );
 }

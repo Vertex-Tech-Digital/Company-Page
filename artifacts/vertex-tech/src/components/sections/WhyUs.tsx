@@ -1,17 +1,13 @@
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
-
-const benefits = [
-  "Código limpio y mantenible",
-  "Comunicación clara",
-  "Experiencia Fullstack real",
-  "Enfoque en rendimiento y escalabilidad",
-  "Diseño moderno y profesional"
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 export function WhyUs() {
+  const { t } = useLanguage();
+  const benefits = [0, 1, 2, 3, 4].map((i) => t(`whyus.${i}`));
+
   return (
-    <section className="py-24 bg-card/30 border-y border-border/50">
+    <section className="py-24 bg-card/30 border-y border-border/50 relative z-10">
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mx-auto">
           <motion.div
@@ -20,8 +16,11 @@ export function WhyUs() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" data-testid="whyus-title">
-              ¿Por qué Vertex Tech?
+            <h2
+              className="text-3xl md:text-4xl font-bold text-white mb-4"
+              data-testid="whyus-title"
+            >
+              {t("whyus.title")}
             </h2>
           </motion.div>
 
