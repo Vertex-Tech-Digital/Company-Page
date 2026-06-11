@@ -8,33 +8,151 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-const translations = {
+const translations: Record<Language, Record<string, string>> = {
   es: {
+    // Nav
     "nav.inicio": "Inicio",
     "nav.servicios": "Servicios",
     "nav.proyectos": "Proyectos",
     "nav.metodologia": "Metodología",
     "nav.contactar": "Contactar",
-    "hero.headline": "Transformamos ideas en aplicaciones web de alto rendimiento",
+    // Hero
     "hero.subheadline": "Desarrollo Fullstack, APIs e integración de sistemas con React, Next.js y Node.js para empresas que buscan velocidad, escalabilidad y calidad técnica.",
     "hero.cta.primary": "Solicitar consulta",
     "hero.cta.secondary": "Ver proyectos",
+    // Services
+    "services.title": "Nuestros Servicios",
+    "services.0.title": "Aplicaciones Web a Medida y Sistemas de Gestión (SaaS)",
+    "services.0.desc": "No creamos páginas web estáticas; diseñamos y programamos software empresarial potente que funciona a través de internet. Construimos desde plataformas internas para gestionar tus clientes, ventas y personal en tiempo real, hasta paneles de control inteligentes para automatizar los procesos de tu empresa.",
+    "services.1.title": "Desarrollo y Conexión de APIs (Integración de Sistemas)",
+    "services.1.desc": "Conectamos tus sistemas con cualquier servicio de terceros de forma segura. Desarrollamos arquitecturas de API eficientes con Node.js y NestJS, permitiendo la sincronización de datos en tiempo real, pasarelas de pago y automatizaciones.",
+    "services.2.title": "Ingeniería de Calidad, QA & Testing",
+    "services.2.desc": "Protegemos la estabilidad de tu software. Implementamos ciclos rigurosos de control de calidad, pruebas automatizadas y auditorías de código antes del despliegue para asegurar que tu plataforma funcione sin errores desde el primer día.",
+    "services.3.title": "Aumento de Equipo y Soporte Técnico (Staff Augmentation)",
+    "services.3.desc": "Refuerza tu equipo técnico con desarrolladores senior especializados que se integran a tu flujo de trabajo. Flexibilidad total: desde un sprint puntual hasta colaboración continua a largo plazo, con comunicación directa y entrega ágil.",
+    // Projects
+    "projects.title": "Proyectos Destacados",
+    "projects.subtitle": "Una muestra del tipo de soluciones de software que desarrollamos y auditamos para nuestros clientes",
+    "projects.0.title": "Plataformas de Gestión Empresarial y RRHH (SaaS)",
+    "projects.0.desc": "Desarrollo de ecosistemas internos en la nube para la administración masiva de activos y personal con arquitectura reactiva.",
+    "projects.1.title": "Dashboards y Analítica en Tiempo Real",
+    "projects.1.desc": "Paneles de control optimizados para el procesamiento de datos a gran escala y visualización de métricas críticas de negocio.",
+    "projects.2.title": "Automatización e Integración de Sistemas",
+    "projects.2.desc": "Migración de software heredado a infraestructuras API modernas y adaptadas para entornos móviles.",
+    // Methodology
+    "methodology.title": "Nuestra Metodología",
+    "methodology.desc": "En Vertex Tech trabajamos con una metodología ágil orientada a resultados. Dividimos cada proyecto en etapas claras, priorizamos comunicación constante, control de calidad riguroso y entregas puntuales. Nuestro objetivo no es solo construir software, sino crear soluciones estables, mantenibles y preparadas para escalar.",
+    "methodology.0.title": "Análisis y Estrategia",
+    "methodology.0.desc": "Definición de requisitos y diseño de la arquitectura técnica.",
+    "methodology.1.title": "Desarrollo Ágil por Hitos",
+    "methodology.1.desc": "Entregas funcionales constantes y código revisado en GitHub.",
+    "methodology.2.title": "Control de Calidad Riguroso",
+    "methodology.2.desc": "Pruebas integrales (QA Testing) para garantizar robustez.",
+    "methodology.3.title": "Despliegue Continuo y Soporte",
+    "methodology.3.desc": "Subida a la nube en servidores optimizados y mantenimiento técnico.",
+    // WhyUs
+    "whyus.title": "¿Por qué Vertex Tech?",
+    "whyus.0": "Código limpio y mantenible",
+    "whyus.1": "Comunicación clara",
+    "whyus.2": "Experiencia Fullstack real",
+    "whyus.3": "Enfoque en rendimiento y escalabilidad",
+    "whyus.4": "Diseño moderno y profesional",
+    // Contact
+    "contact.title": "¿Listo para construir tu próxima",
+    "contact.titleHighlight": "plataforma?",
+    "contact.subtitle": "Cuéntanos qué necesitas y te ayudamos a convertirlo en una solución web sólida, moderna y escalable.",
+    "contact.label.name": "Nombre",
+    "contact.label.email": "Email",
+    "contact.label.company": "Empresa (Opcional)",
+    "contact.label.message": "Mensaje",
+    "contact.placeholder.name": "Tu nombre",
+    "contact.placeholder.company": "Nombre de tu empresa",
+    "contact.placeholder.message": "Cuéntanos sobre tu proyecto...",
+    "contact.submit": "Enviar solicitud",
+    "contact.submitting": "Enviando...",
+    "contact.success.title": "¡Solicitud enviada!",
+    "contact.success.desc": "Nos pondremos en contacto contigo a la brevedad.",
+    "contact.success.another": "Enviar otro mensaje",
+    "contact.error.name": "El nombre es requerido",
+    "contact.error.email": "Email inválido",
+    "contact.error.message": "El mensaje debe tener al menos 10 caracteres",
+    "contact.error.server": "Error al enviar el mensaje",
+    // Footer
     "footer.tagline": "Desarrollo Fullstack para empresas modernas.",
     "footer.copyright": "2026 Vertex Tech. Todos los derechos reservados.",
   },
   en: {
+    // Nav
     "nav.inicio": "Home",
     "nav.servicios": "Services",
     "nav.proyectos": "Projects",
     "nav.metodologia": "Methodology",
     "nav.contactar": "Contact",
-    "hero.headline": "We transform ideas into high-performance web applications",
+    // Hero
     "hero.subheadline": "Fullstack Development, APIs, and systems integration with React, Next.js, and Node.js for companies that demand speed, scalability, and technical excellence.",
     "hero.cta.primary": "Request a consultation",
     "hero.cta.secondary": "View projects",
+    // Services
+    "services.title": "Our Services",
+    "services.0.title": "Custom Web Applications & Management Systems (SaaS)",
+    "services.0.desc": "We don't build static websites; we design and develop powerful business software that runs through the internet. We build everything from internal platforms to manage your clients, sales, and staff in real time, to intelligent dashboards to automate your company's processes.",
+    "services.1.title": "High-Performance APIs & Systems Integration",
+    "services.1.desc": "We connect your systems with any third-party service securely. We develop efficient API architectures with Node.js and NestJS, enabling real-time data synchronization, payment gateways, and automations.",
+    "services.2.title": "Quality Engineering, QA & Testing",
+    "services.2.desc": "We protect the stability of your software. We implement rigorous quality control cycles, automated testing, and code audits before deployment to ensure your platform works flawlessly from day one.",
+    "services.3.title": "Team Augmentation & Technical Support (Staff Augmentation)",
+    "services.3.desc": "Reinforce your technical team with specialized senior developers who integrate into your workflow. Total flexibility: from a one-time sprint to ongoing long-term collaboration, with direct communication and agile delivery.",
+    // Projects
+    "projects.title": "Featured Projects",
+    "projects.subtitle": "A sample of the software solutions we develop and audit for our clients",
+    "projects.0.title": "Enterprise Management & HR Platforms (SaaS)",
+    "projects.0.desc": "Development of cloud-based internal ecosystems for large-scale asset and personnel management with reactive architecture.",
+    "projects.1.title": "Real-Time Dashboards & Analytics",
+    "projects.1.desc": "Control panels optimized for large-scale data processing and critical business metrics visualization.",
+    "projects.2.title": "Systems Automation & Integration",
+    "projects.2.desc": "Migration of legacy software to modern API infrastructures adapted for mobile environments.",
+    // Methodology
+    "methodology.title": "Our Methodology",
+    "methodology.desc": "At Vertex Tech we work with an agile, results-oriented methodology. We divide each project into clear stages, prioritize constant communication, rigorous quality control, and on-time deliveries. Our goal is not just to build software, but to create stable, maintainable, and scalable solutions.",
+    "methodology.0.title": "Analysis & Strategy",
+    "methodology.0.desc": "Requirements definition and technical architecture design.",
+    "methodology.1.title": "Agile Milestone Development",
+    "methodology.1.desc": "Constant functional deliveries and code reviewed on GitHub.",
+    "methodology.2.title": "Rigorous Quality Control",
+    "methodology.2.desc": "Comprehensive testing (QA Testing) to ensure robustness.",
+    "methodology.3.title": "Continuous Deployment & Support",
+    "methodology.3.desc": "Cloud deployment on optimized servers and ongoing technical maintenance.",
+    // WhyUs
+    "whyus.title": "Why Vertex Tech?",
+    "whyus.0": "Clean, maintainable code",
+    "whyus.1": "Clear communication",
+    "whyus.2": "Real Fullstack experience",
+    "whyus.3": "Focus on performance and scalability",
+    "whyus.4": "Modern and professional design",
+    // Contact
+    "contact.title": "Ready to build your next",
+    "contact.titleHighlight": "platform?",
+    "contact.subtitle": "Tell us what you need and we'll help you turn it into a solid, modern, and scalable web solution.",
+    "contact.label.name": "Name",
+    "contact.label.email": "Email",
+    "contact.label.company": "Company (Optional)",
+    "contact.label.message": "Message",
+    "contact.placeholder.name": "Your name",
+    "contact.placeholder.company": "Your company name",
+    "contact.placeholder.message": "Tell us about your project...",
+    "contact.submit": "Send request",
+    "contact.submitting": "Sending...",
+    "contact.success.title": "Request sent!",
+    "contact.success.desc": "We'll get back to you shortly.",
+    "contact.success.another": "Send another message",
+    "contact.error.name": "Name is required",
+    "contact.error.email": "Invalid email",
+    "contact.error.message": "Message must be at least 10 characters",
+    "contact.error.server": "Error sending message",
+    // Footer
     "footer.tagline": "Fullstack development for modern enterprises.",
     "footer.copyright": "2026 Vertex Tech. All rights reserved.",
-  }
+  },
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -44,9 +162,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const savedLang = localStorage.getItem("vertex-tech-lang") as Language;
-    if (savedLang === "es" || savedLang === "en") {
-      setLangState(savedLang);
-    }
+    if (savedLang === "es" || savedLang === "en") setLangState(savedLang);
   }, []);
 
   const setLang = (newLang: Language) => {
@@ -54,10 +170,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("vertex-tech-lang", newLang);
   };
 
-  const t = (key: string): string => {
-    // @ts-ignore
-    return translations[lang][key] || key;
-  };
+  const t = (key: string): string => translations[lang][key] ?? key;
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>
@@ -68,8 +181,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error("useLanguage must be used within a LanguageProvider");
-  }
+  if (context === undefined) throw new Error("useLanguage must be used within a LanguageProvider");
   return context;
 }

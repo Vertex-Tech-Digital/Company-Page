@@ -1,36 +1,25 @@
 import { motion } from "framer-motion";
 import { Code2, Link, ShieldCheck, Users } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
-const services = [
-  {
-    icon: <Code2 className="w-10 h-10 text-primary" />,
-    title: "Aplicaciones Web a Medida y Sistemas de Gestión (SaaS)",
-    description:
-      "No creamos páginas web estáticas; diseñamos y programamos software empresarial potente que funciona a través de internet. Construimos desde plataformas internas para gestionar tus clientes, ventas y personal en tiempo real, hasta paneles de control inteligentes para automatizar los procesos de tu empresa.",
-  },
-  {
-    icon: <Link className="w-10 h-10 text-primary" />,
-    title: "Desarrollo y Conexión de APIs (Integración de Sistemas)",
-    description:
-      "Conectamos tus sistemas con cualquier servicio de terceros de forma segura. Desarrollamos arquitecturas de API eficientes con Node.js y NestJS, permitiendo la sincronización de datos en tiempo real, pasarelas de pago y automatizaciones.",
-  },
-  {
-    icon: <ShieldCheck className="w-10 h-10 text-primary" />,
-    title: "Ingeniería de Calidad, QA & Testing",
-    description:
-      "Protegemos la estabilidad de tu software. Implementamos ciclos rigurosos de control de calidad, pruebas automatizadas y auditorías de código antes del despliegue para asegurar que tu plataforma funcione sin errores desde el primer día.",
-  },
-  {
-    icon: <Users className="w-10 h-10 text-primary" />,
-    title: "Aumento de Equipo y Soporte Técnico (Staff Augmentation)",
-    description:
-      "Refuerza tu equipo técnico con desarrolladores senior especializados que se integran a tu flujo de trabajo. Flexibilidad total: desde un sprint puntual hasta colaboración continua a largo plazo, con comunicación directa y entrega ágil.",
-  },
+const icons = [
+  <Code2 className="w-10 h-10 text-primary" />,
+  <Link className="w-10 h-10 text-primary" />,
+  <ShieldCheck className="w-10 h-10 text-primary" />,
+  <Users className="w-10 h-10 text-primary" />,
 ];
 
 export function Services() {
+  const { t } = useLanguage();
+
+  const services = [0, 1, 2, 3].map((i) => ({
+    icon: icons[i],
+    title: t(`services.${i}.title`),
+    description: t(`services.${i}.desc`),
+  }));
+
   return (
-    <section id="servicios" className="py-24 relative">
+    <section id="servicios" className="py-24 relative z-10">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -42,8 +31,8 @@ export function Services() {
             className="text-3xl md:text-4xl font-bold text-white inline-block relative"
             data-testid="services-title"
           >
-            Nuestros Servicios
-            <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary rounded-full"></span>
+            {t("services.title")}
+            <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary rounded-full" />
           </h2>
         </motion.div>
 

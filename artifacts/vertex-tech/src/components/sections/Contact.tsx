@@ -6,29 +6,33 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { CheckCircle2, Loader2 } from "lucide-react";
-
-const formSchema = z.object({
-  name: z.string().min(2, "El nombre es requerido"),
-  email: z.string().email("Email inválido"),
-  company: z.string().optional(),
-  message: z.string().min(10, "El mensaje debe tener al menos 10 caracteres"),
-});
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Contact() {
+  const { t } = useLanguage();
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
+  const formSchema = z.object({
+    name: z.string().min(2, t("contact.error.name")),
+    email: z.string().email(t("contact.error.email")),
+    company: z.string().optional(),
+    message: z.string().min(10, t("contact.error.message")),
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      company: "",
-      message: "",
-    },
+    defaultValues: { name: "", email: "", company: "", message: "" },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -42,19 +46,19 @@ export function Contact() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Error al enviar el mensaje");
+        throw new Error(data.error || t("contact.error.server"));
       }
       setIsSuccess(true);
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Error al enviar el mensaje. Inténtalo de nuevo.");
+      setServerError(err instanceof Error ? err.message : t("contact.error.server"));
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <section id="contacto" className="py-24 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+    <section id="contacto" className="py-24 relative z-10 overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-16">
@@ -63,11 +67,15 @@ export function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight" data-testid="contact-title">
-              ¿Listo para construir tu próxima <span className="text-primary">plataforma?</span>
+            <h2
+              className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight"
+              data-testid="contact-title"
+            >
+              {t("contact.title")}{" "}
+              <span className="text-primary">{t("contact.titleHighlight")}</span>
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Cuéntanos qué necesitas y te ayudamos a convertirlo en una solución web sólida, moderna y escalable.
+              {t("contact.subtitle")}
             </p>
           </motion.div>
 
@@ -85,28 +93,41 @@ export function Contact() {
                 data-testid="contact-success"
               >
                 <CheckCircle2 className="w-16 h-16 text-primary mb-6" />
-                <h3 className="text-2xl font-bold text-white mb-2">¡Solicitud enviada!</h3>
-                <p className="text-muted-foreground">Nos pondremos en contacto contigo a la brevedad.</p>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  {t("contact.success.title")}
+                </h3>
+                <p className="text-muted-foreground">{t("contact.success.desc")}</p>
                 <Button
                   variant="outline"
                   className="mt-8 border-border"
                   onClick={() => { setIsSuccess(false); form.reset(); }}
                 >
-                  Enviar otro mensaje
+                  {t("contact.success.another")}
                 </Button>
               </motion.div>
             ) : (
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="contact-form">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                  data-testid="contact-form"
+                >
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white/80">Nombre</FormLabel>
+                          <FormLabel className="text-white/80">
+                            {t("contact.label.name")}
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="Tu nombre" className="bg-background/50 border-border/80 focus-visible:ring-primary/50" data-testid="input-name" {...field} />
+                            <Input
+                              placeholder={t("contact.placeholder.name")}
+                              className="bg-background/50 border-border/80 focus-visible:ring-primary/50"
+                              data-testid="input-name"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage className="text-destructive text-xs" />
                         </FormItem>
@@ -117,9 +138,16 @@ export function Contact() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-white/80">Email</FormLabel>
+                          <FormLabel className="text-white/80">
+                            {t("contact.label.email")}
+                          </FormLabel>
                           <FormControl>
-                            <Input placeholder="tu@email.com" className="bg-background/50 border-border/80 focus-visible:ring-primary/50" data-testid="input-email" {...field} />
+                            <Input
+                              placeholder="tu@email.com"
+                              className="bg-background/50 border-border/80 focus-visible:ring-primary/50"
+                              data-testid="input-email"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage className="text-destructive text-xs" />
                         </FormItem>
@@ -131,9 +159,16 @@ export function Contact() {
                     name="company"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white/80">Empresa (Opcional)</FormLabel>
+                        <FormLabel className="text-white/80">
+                          {t("contact.label.company")}
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="Nombre de tu empresa" className="bg-background/50 border-border/80 focus-visible:ring-primary/50" data-testid="input-company" {...field} />
+                          <Input
+                            placeholder={t("contact.placeholder.company")}
+                            className="bg-background/50 border-border/80 focus-visible:ring-primary/50"
+                            data-testid="input-company"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage className="text-destructive text-xs" />
                       </FormItem>
@@ -144,10 +179,12 @@ export function Contact() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-white/80">Mensaje</FormLabel>
+                        <FormLabel className="text-white/80">
+                          {t("contact.label.message")}
+                        </FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Cuéntanos sobre tu proyecto..."
+                            placeholder={t("contact.placeholder.message")}
                             className="bg-background/50 border-border/80 focus-visible:ring-primary/50 min-h-[120px] resize-none"
                             data-testid="input-message"
                             {...field}
@@ -169,10 +206,10 @@ export function Contact() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Enviando...
+                        {t("contact.submitting")}
                       </>
                     ) : (
-                      "Enviar solicitud"
+                      t("contact.submit")
                     )}
                   </Button>
                 </form>
