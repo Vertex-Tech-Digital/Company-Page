@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
+import { VertexLogo } from "@/components/VertexLogo";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -53,7 +54,8 @@ export function Navbar() {
       }`}
     >
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-        <a href="#inicio" onClick={(e) => { e.preventDefault(); scrollTo("#inicio"); }} className="flex items-center gap-2 group" data-testid="nav-logo">
+        <a href="#inicio" onClick={(e) => { e.preventDefault(); scrollTo("#inicio"); }} className="flex items-center gap-3 group" data-testid="nav-logo">
+          <VertexLogo size={44} />
           <div className="flex flex-col leading-none">
             <span className="text-lg font-bold tracking-widest uppercase text-white" style={{ fontFamily: "var(--app-font-heading)" }}>
               Vertex Tech<span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.9)] ml-1 mb-0.5 align-middle"></span>
