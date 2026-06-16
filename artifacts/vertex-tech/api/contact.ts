@@ -33,9 +33,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     auth: { user: gmailUser, pass: gmailPass },
   });
 
-  await transporter.sendMail({
+  try {
+    await transporter.sendMail({
     from: `"Vertex Tech Contact" <${gmailUser}>`,
-    to: "robealain97@gmail.com",
+    to: "vertextechcontact@gmail.com",
     replyTo: email,
     subject: `Nueva consulta de ${name}${company ? ` (${company})` : ""}`,
     html: `
@@ -51,7 +52,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         <p style="line-height:1.7;margin:0;">${message.replace(/\n/g, "<br>")}</p>
       </div>
     `,
-  });
+    });
+  } catch (err) {
+    console.error("Email send error:", err);
+    return res.status(500).json({ error: "Failed to send email" });
+  }
 
   return res.status(200).json({ success: true });
 }
