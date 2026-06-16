@@ -91,6 +91,10 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies.title": "Política de Cookies",
     "footer.cookies.body": "Esta web ha sido diseñada bajo principios de privacidad y rendimiento técnico. No utilizamos cookies de rastreo, analítica o marketing. Únicamente se emplean cookies técnicas esenciales para garantizar una navegación fluida y segura por el sitio.",
     "footer.close": "Cerrar",
+    // WhatsApp
+    "whatsapp.cta": "Contáctanos por WhatsApp",
+    "whatsapp.aria": "Contactar por WhatsApp",
+    "whatsapp.message": "Hola, me gustaría obtener más información sobre sus servicios.",
   },
   en: {
     // Nav
@@ -168,12 +172,16 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies": "Cookies",
     "footer.github": "GitHub",
     "footer.legal.title": "Legal Notice",
-    "footer.legal.body": "In compliance with Article 10 of Law 34/2002 (LSSI-CE), please be advised that this website is a commercial presentation platform provisionally operated by its founder, ***REMOVED***, residing in ***REMOVED***, Canary Islands, Spain. For any inquiries, please reach out to our official contact email: ***REMOVED***.",
+    "footer.legal.body": "In compliance with Article 10 of Law 34/2002 (LSSI-CE), please be advised that this website is a commercial presentation platform provisionally operated by its founder, ***REMOVED***, with tax identification number ***REMOVED***, residing in ***REMOVED***, Canary Islands, Spain. For any inquiries, please reach out to our official contact email: ***REMOVED***.",
     "footer.privacy.title": "Privacy Policy",
     "footer.privacy.body": "In accordance with the General Data Protection Regulation (GDPR), we inform you that any personal data provided through our contact form will be processed solely to respond to your requests for information or service quotes. Your data will never be shared with third parties. You may exercise your rights to access, rectify, or delete your data by contacting us at: ***REMOVED***.",
     "footer.cookies.title": "Cookie Policy",
     "footer.cookies.body": "This website has been designed under principles of privacy and technical performance. We do not use tracking, analytics, or marketing cookies. Only essential technical cookies are used to ensure smooth and secure navigation throughout the site.",
     "footer.close": "Close",
+    // WhatsApp
+    "whatsapp.cta": "Contact us on WhatsApp",
+    "whatsapp.aria": "Contact via WhatsApp",
+    "whatsapp.message": "Hello, I'd like to get more information about your services.",
   },
 };
 

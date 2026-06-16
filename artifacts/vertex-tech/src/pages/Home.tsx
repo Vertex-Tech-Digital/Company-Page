@@ -7,6 +7,7 @@ import { WhyUs } from "@/components/sections/WhyUs";
 import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
 import { ParticleNetwork } from "@/components/sections/ParticleNetwork";
+import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
       <Contact />
       <Footer />
       </div>
+      <WhatsAppButton />
     </main>
   );
 }
