@@ -133,7 +133,7 @@ export function Footer() {
                   key={href}
                   href={href}
                   onClick={(e) => { e.preventDefault(); scrollTo(href); }}
-                  className="text-sm text-muted-foreground hover:text-white transition-colors"
+                  className="cursor-pointer text-sm text-muted-foreground hover:text-white transition-colors"
                 >
                   {label}
                 </a>
@@ -164,7 +164,7 @@ export function Footer() {
                 <button
                   key={key}
                   onClick={() => setModal(key)}
-                  className="text-xs text-muted-foreground hover:text-white transition-colors underline-offset-2 hover:underline"
+                  className="cursor-pointer text-xs text-muted-foreground hover:text-white transition-colors underline-offset-2 hover:underline"
                   data-testid={`footer-${key}`}
                 >
                   {label}
