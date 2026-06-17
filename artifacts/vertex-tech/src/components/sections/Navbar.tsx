@@ -55,9 +55,9 @@ export function Navbar() {
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
         <a href="#inicio" onClick={(e) => { e.preventDefault(); scrollTo("#inicio"); }} className="flex items-center gap-3 group" data-testid="nav-logo">
           <img
-            src="/logo.svg"
+            src="/logo.jpg"
             alt="Vertex Tech"
-            className="h-10 w-10 transition-transform group-hover:scale-105 drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]"
+            className="h-11 w-11 rounded-xl object-cover transition-transform group-hover:scale-105 drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]"
           />
           <div className="flex flex-col leading-none">
             <span className="text-lg font-bold tracking-widest uppercase text-white" style={{ fontFamily: "var(--app-font-heading)" }}>
