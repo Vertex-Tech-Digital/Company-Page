@@ -17,12 +17,12 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.metodologia": "Metodología",
     "nav.contactar": "Contactar",
     // Hero
-    "hero.subheadline": "Desarrollo Fullstack, APIs e integración de sistemas con React, Next.js y Node.js para empresas que buscan velocidad, escalabilidad y calidad técnica.",
+    "hero.subheadline": "Consultoría tecnológica y soluciones digitales a medida: te ayudamos a automatizar procesos y optimizar tus sistemas con React, Next.js y Node.js, con velocidad, escalabilidad y calidad técnica.",
     "hero.cta.primary": "Solicitar consulta",
     "hero.cta.secondary": "Ver proyectos",
     // Services
-    "services.title": "Nuestros Servicios",
-    "services.0.title": "Aplicaciones Web a Medida y Sistemas de Gestión (SaaS)",
+    "services.title": "Servicios de Consultoría y Desarrollo Tecnológico",
+    "services.0.title": "Aplicaciones Web a Medida y Optimización de Procesos (SaaS)",
     "services.0.desc": "No creamos páginas web estáticas; diseñamos y programamos software empresarial potente que funciona a través de internet. Construimos desde plataformas internas para gestionar tus clientes, ventas y personal en tiempo real, hasta paneles de control inteligentes para automatizar los procesos de tu empresa.",
     "services.1.title": "Desarrollo y Conexión de APIs (Integración de Sistemas)",
     "services.1.desc": "Conectamos tus sistemas con cualquier servicio de terceros de forma segura. Desarrollamos arquitecturas de API eficientes con Node.js y NestJS, permitiendo la sincronización de datos en tiempo real, pasarelas de pago y automatizaciones.",
@@ -104,12 +104,12 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.metodologia": "Methodology",
     "nav.contactar": "Contact",
     // Hero
-    "hero.subheadline": "Fullstack Development, APIs, and systems integration with React, Next.js, and Node.js for companies that demand speed, scalability, and technical excellence.",
+    "hero.subheadline": "Technology consulting and custom digital solutions: we help you automate processes and optimize your systems with React, Next.js, and Node.js, with speed, scalability, and technical excellence.",
     "hero.cta.primary": "Request a consultation",
     "hero.cta.secondary": "View projects",
     // Services
-    "services.title": "Our Services",
-    "services.0.title": "Custom Web Applications & Management Systems (SaaS)",
+    "services.title": "Technology Consulting & Development Services",
+    "services.0.title": "Custom Web Applications & Process Optimization (SaaS)",
     "services.0.desc": "We don't build static websites; we design and develop powerful business software that runs through the internet. We build everything from internal platforms to manage your clients, sales, and staff in real time, to intelligent dashboards to automate your company's processes.",
     "services.1.title": "High-Performance APIs & Systems Integration",
     "services.1.desc": "We connect your systems with any third-party service securely. We develop efficient API architectures with Node.js and NestJS, enabling real-time data synchronization, payment gateways, and automations.",
