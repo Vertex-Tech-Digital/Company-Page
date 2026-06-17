@@ -15,7 +15,7 @@ export function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t("whatsapp.aria")}
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-3 group"
+      className="fixed bottom-6 right-6 z-50 flex items-center gap-3 group pointer-events-none"
     >
       {/* Tooltip label */}
       <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-[#1a1a2e]/90 text-white text-sm font-medium px-3 py-1.5 rounded-lg whitespace-nowrap border border-white/10 shadow-lg">
@@ -23,7 +23,7 @@ export function WhatsAppButton() {
       </span>
 
       {/* Button circle */}
-      <div className="relative w-14 h-14 flex items-center justify-center rounded-full bg-[#25D366] shadow-[0_4px_24px_0_rgba(37,211,102,0.45)] hover:shadow-[0_4px_32px_0_rgba(37,211,102,0.7)] transition-all duration-300 hover:scale-110">
+      <div className="pointer-events-auto relative w-14 h-14 flex items-center justify-center rounded-full bg-[#25D366] shadow-[0_4px_24px_0_rgba(37,211,102,0.45)] hover:shadow-[0_4px_32px_0_rgba(37,211,102,0.7)] transition-all duration-300 hover:scale-110">
         {/* Pulse ring */}
         <span className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-30" />
         {/* WhatsApp SVG icon */}
