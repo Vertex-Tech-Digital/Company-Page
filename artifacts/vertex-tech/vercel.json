@@ -2,6 +2,9 @@
   "buildCommand": "pnpm run build",
   "outputDirectory": "dist/public",
   "installCommand": "pnpm install --no-frozen-lockfile",
+  "redirects": [
+    { "source": "/tarjeta", "destination": "/servicios", "permanent": false }
+  ],
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
