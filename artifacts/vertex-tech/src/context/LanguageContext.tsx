@@ -28,8 +28,8 @@ const translations: Record<Language, Record<string, string>> = {
     "services.1.desc": "Conectamos tus sistemas con cualquier servicio de terceros de forma segura. Desarrollamos arquitecturas de API eficientes con Node.js y NestJS, permitiendo la sincronización de datos en tiempo real, pasarelas de pago y automatizaciones.",
     "services.2.title": "Ingeniería de Calidad, QA & Testing",
     "services.2.desc": "Protegemos la estabilidad de tu software. Implementamos ciclos rigurosos de control de calidad, pruebas automatizadas y auditorías de código antes del despliegue para asegurar que tu plataforma funcione sin errores desde el primer día.",
-    "services.3.title": "Aumento de Equipo y Soporte Técnico (Staff Augmentation)",
-    "services.3.desc": "Refuerza tu equipo técnico con desarrolladores senior especializados que se integran a tu flujo de trabajo. Flexibilidad total: desde un sprint puntual hasta colaboración continua a largo plazo, con comunicación directa y entrega ágil.",
+    "services.3.title": "Automatización Inteligente e Integración de Procesos (IA)",
+    "services.3.desc": "Optimizamos las operaciones de tu empresa eliminando tareas manuales repetitivas. Diseñamos e integramos flujos de trabajo automatizados, conectores de APIs avanzados, pasarelas de pago seguras (Stripe/Bizum), sistemas de mensajería automatizada por WhatsApp y soluciones de Inteligencia Artificial para reducir costes y multiplicar la eficiencia de tu equipo.",
     // Projects
     "projects.title": "Proyectos Destacados",
     "projects.subtitle": "Una muestra del tipo de soluciones de software que desarrollamos y auditamos para nuestros clientes",
@@ -115,8 +115,8 @@ const translations: Record<Language, Record<string, string>> = {
     "services.1.desc": "We connect your systems with any third-party service securely. We develop efficient API architectures with Node.js and NestJS, enabling real-time data synchronization, payment gateways, and automations.",
     "services.2.title": "Quality Engineering, QA & Testing",
     "services.2.desc": "We protect the stability of your software. We implement rigorous quality control cycles, automated testing, and code audits before deployment to ensure your platform works flawlessly from day one.",
-    "services.3.title": "Team Augmentation & Technical Support (Staff Augmentation)",
-    "services.3.desc": "Reinforce your technical team with specialized senior developers who integrate into your workflow. Total flexibility: from a one-time sprint to ongoing long-term collaboration, with direct communication and agile delivery.",
+    "services.3.title": "Smart Automation & AI Process Integration",
+    "services.3.desc": "We optimize your company's operations by eliminating repetitive manual tasks. We design and integrate automated workflows, advanced API connectors, secure payment gateways (Stripe/Bizum), automated WhatsApp messaging systems, and Artificial Intelligence solutions to reduce costs and multiply your team's efficiency.",
     // Projects
     "projects.title": "Featured Projects",
     "projects.subtitle": "A sample of the software solutions we develop and audit for our clients",
