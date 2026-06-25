@@ -23,7 +23,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Services
     "services.title": "Servicios de Consultoría y Desarrollo Tecnológico",
     "services.0.title": "Aplicaciones Web a Medida y Optimización de Procesos (SaaS)",
-    "services.0.desc": "Desarrollamos soluciones web adaptadas exactamente a la escala de tu negocio. Desde sitios corporativos y páginas de aterrizaje optimizadas para captar clientes, hasta plataformas internas complejas para gestionar ventas, personal, automatización de flujos y paneles de control inteligentes según las necesidades específicas de tu empresa.",
+    "services.0.desc": "Desarrollamos web adaptadas a la escala de tu negocio. Desde sitios corporativos y páginas de aterrizaje optimizadas para captar clientes, hasta plataformas internas complejas para gestionar ventas, personal, automatización de flujos y paneles de control inteligentes según las necesidades específicas de tu empresa.",
     "services.1.title": "Desarrollo y Conexión de APIs (Integración de Sistemas)",
     "services.1.desc": "Conectamos tus sistemas con cualquier servicio de terceros de forma segura. Desarrollamos arquitecturas de API eficientes con Node.js y NestJS, permitiendo la sincronización de datos en tiempo real, pasarelas de pago y automatizaciones.",
     "services.2.title": "Ingeniería de Calidad, QA & Testing",
