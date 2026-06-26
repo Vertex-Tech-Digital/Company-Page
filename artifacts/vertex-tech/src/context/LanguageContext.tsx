@@ -15,6 +15,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.servicios": "Servicios",
     "nav.proyectos": "Proyectos",
     "nav.metodologia": "Metodología",
+    "nav.blog": "Blog",
     "nav.contactar": "Contactar",
     // Hero
     "hero.subheadline": "Consultoría tecnológica y soluciones digitales a medida: te ayudamos a automatizar procesos y optimizar tus sistemas con React, Next.js y Node.js, con velocidad, escalabilidad y calidad técnica.",
@@ -102,6 +103,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.servicios": "Services",
     "nav.proyectos": "Projects",
     "nav.metodologia": "Methodology",
+    "nav.blog": "Blog",
     "nav.contactar": "Contact",
     // Hero
     "hero.subheadline": "Technology consulting and custom digital solutions: we help you automate processes and optimize your systems with React, Next.js, and Node.js, with speed, scalability, and technical excellence.",
