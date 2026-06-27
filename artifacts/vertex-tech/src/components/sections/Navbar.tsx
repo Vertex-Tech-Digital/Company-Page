@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { Link as WouterLink } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -83,6 +83,14 @@ export function Navbar() {
             </a>
           ))}
           
+          <WouterLink
+            href="/blog"
+            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            data-testid="nav-link-blog"
+          >
+            {t("nav.blog")}
+          </WouterLink>
+
           <div className="flex items-center gap-1 text-xs tracking-widest uppercase">
             <button 
               onClick={() => setLang("es")} 
@@ -158,6 +166,14 @@ export function Navbar() {
                 {t(`nav.${link.id}`)}
               </a>
             ))}
+            <WouterLink
+              href="/blog"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors"
+              data-testid="nav-link-blog-mobile"
+            >
+              {t("nav.blog")}
+            </WouterLink>
             <Button onClick={() => scrollTo("#contacto")} className="bg-primary w-full text-white">
               {t("nav.contactar")}
             </Button>
