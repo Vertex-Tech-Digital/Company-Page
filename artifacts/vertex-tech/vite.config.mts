@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { devApiPlugin } from "./dev-api-plugin.mjs";
 
 const isReplit = process.env.REPL_ID !== undefined;
 const isVercel = process.env.VERCEL === "1";
@@ -12,7 +13,7 @@ const port = rawPort ? Number(rawPort) : 3000;
 const basePath = process.env.BASE_PATH ?? "/";
 
 export default defineConfig(async () => {
-  const plugins: any[] = [react(), tailwindcss()];
+  const plugins: any[] = [react(), tailwindcss(), devApiPlugin()];
 
   if (isReplit && !isVercel) {
     const { default: runtimeErrorOverlay } = await import(
