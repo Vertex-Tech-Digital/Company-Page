@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link as WouterLink } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Github } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
@@ -72,7 +73,11 @@ export function Footer() {
 
   const scrollTo = (href: string) => {
     const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.location.href = `/${href}`;
+    }
   };
 
   const legalLinks: { key: ModalKey; label: string }[] = [
@@ -123,6 +128,13 @@ export function Footer() {
 
             {/* Nav links */}
             <div className="flex flex-wrap gap-6">
+              <WouterLink
+                href="/blog"
+                className="cursor-pointer text-sm text-muted-foreground hover:text-white transition-colors"
+                data-testid="footer-link-blog"
+              >
+                {t("nav.blog")}
+              </WouterLink>
               {[
                 { href: "#servicios", label: t("nav.servicios") },
                 { href: "#proyectos", label: t("nav.proyectos") },
