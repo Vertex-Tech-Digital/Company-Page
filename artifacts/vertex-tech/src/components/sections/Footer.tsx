@@ -128,6 +128,7 @@ export function Footer() {
 
             {/* Nav links */}
             <div className="flex flex-wrap gap-6">
+              {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
               <WouterLink
                 href="/blog"
                 className="cursor-pointer text-sm text-muted-foreground hover:text-white transition-colors"
@@ -135,6 +136,7 @@ export function Footer() {
               >
                 {t("nav.blog")}
               </WouterLink>
+              */}
               {[
                 { href: "#servicios", label: t("nav.servicios") },
                 { href: "#proyectos", label: t("nav.proyectos") },
