@@ -1,0 +1,6 @@
+# CODEOWNERS
+# GitHub solicitará automáticamente review de estos usuarios en cada PR.
+# Será un reviewer OPCIONAL siempre que la branch protection NO tenga
+# activado "Require review from Code Owners".
+
+* @IngRAE
