@@ -18,7 +18,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.blog": "Blog",
     "nav.contactar": "Contactar",
     // Hero
-    "hero.subheadline": "Consultoría tecnológica y soluciones digitales a medida: te ayudamos a automatizar procesos y optimizar tus sistemas con React, Next.js y Node.js, con velocidad, escalabilidad y calidad técnica.",
+    "hero.subheadline": "Consultoría tecnológica y soluciones a medida: automatizamos procesos, integramos sistemas y auditamos tu software para que tu empresa funcione más rápido, con menos errores y a menor coste.",
     "hero.cta.primary": "Solicitar consulta",
     "hero.cta.secondary": "Ver proyectos",
     // Services
@@ -53,15 +53,15 @@ const translations: Record<Language, Record<string, string>> = {
     "methodology.3.desc": "Subida a la nube en servidores optimizados y mantenimiento técnico.",
     // WhyUs
     "whyus.title": "¿Por qué Vertex Tech?",
-    "whyus.0": "Código limpio y mantenible",
+    "whyus.0": "Código auditable y sin sorpresas",
     "whyus.1": "Comunicación clara",
-    "whyus.2": "Experiencia Fullstack real",
-    "whyus.3": "Enfoque en rendimiento y escalabilidad",
+    "whyus.2": "Ingeniería sólida de principio a fin",
+    "whyus.3": "Soluciones que crecen con tu empresa",
     "whyus.4": "Diseño moderno y profesional",
     // Contact
-    "contact.title": "¿Listo para construir tu próxima",
-    "contact.titleHighlight": "plataforma?",
-    "contact.subtitle": "Cuéntanos qué necesitas y te ayudamos a convertirlo en una solución web sólida, moderna y escalable.",
+    "contact.title": "¿Hablamos de tu próximo",
+    "contact.titleHighlight": "proyecto?",
+    "contact.subtitle": "Cuéntanos qué necesitamos y te ayudamos a diseñar e implementar la solución tecnológica a medida que tu empresa requiere.",
     "contact.label.name": "Nombre",
     "contact.label.email": "Email",
     "contact.label.company": "Empresa (Opcional)",
@@ -106,7 +106,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.blog": "Blog",
     "nav.contactar": "Contact",
     // Hero
-    "hero.subheadline": "Technology consulting and custom digital solutions: we help you automate processes and optimize your systems with React, Next.js, and Node.js, with speed, scalability, and technical excellence.",
+    "hero.subheadline": "Technology consulting and custom solutions: we automate your processes, integrate your systems and audit your software — so your business runs faster, with fewer errors and at lower cost.",
     "hero.cta.primary": "Request a consultation",
     "hero.cta.secondary": "View projects",
     // Services
@@ -141,15 +141,15 @@ const translations: Record<Language, Record<string, string>> = {
     "methodology.3.desc": "Cloud deployment on optimized servers and ongoing technical maintenance.",
     // WhyUs
     "whyus.title": "Why Vertex Tech?",
-    "whyus.0": "Clean, maintainable code",
+    "whyus.0": "Auditable code, no surprises",
     "whyus.1": "Clear communication",
-    "whyus.2": "Real Fullstack experience",
-    "whyus.3": "Focus on performance and scalability",
+    "whyus.2": "Solid engineering from start to finish",
+    "whyus.3": "Solutions that grow with your business",
     "whyus.4": "Modern and professional design",
     // Contact
-    "contact.title": "Ready to build your next",
-    "contact.titleHighlight": "platform?",
-    "contact.subtitle": "Tell us what you need and we'll help you turn it into a solid, modern, and scalable web solution.",
+    "contact.title": "Shall we talk about your next",
+    "contact.titleHighlight": "project?",
+    "contact.subtitle": "Tell us what you need and we'll help you design and implement the custom tech solution your business deserves.",
     "contact.label.name": "Name",
     "contact.label.email": "Email",
     "contact.label.company": "Company (Optional)",
