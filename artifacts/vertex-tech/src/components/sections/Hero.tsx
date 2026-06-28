@@ -24,13 +24,18 @@ export function Hero() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="max-w-2xl"
           >
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-tight" data-testid="hero-title">
-              {lang === "es" ? (
-                <>Transformamos ideas en aplicaciones web de{" "}<span className="text-primary">alto rendimiento</span></>
-              ) : (
-                <>We transform ideas into{" "}<span className="text-primary">high-performance</span> web applications</>
-              )}
-            </h1>
+           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-tight" data-testid="hero-title">
+  {lang === "es" ? (
+    <>Soluciones tecnológicas de alto{" "}
+    <span className="text-primary">impacto</span>{" "}
+    para los problemas de tu empresa</>
+  ) : (
+    <>High-impact tech{" "}
+    <span className="text-primary">solutions</span>{" "}
+    for your business challenges</>
+  )}
+</h1>
+
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed" data-testid="hero-subtitle">
               {t("hero.subheadline")}
             </p>
