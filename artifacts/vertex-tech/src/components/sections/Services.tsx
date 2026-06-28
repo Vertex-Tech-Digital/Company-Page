@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import { Code2, Link, ShieldCheck, Users } from "lucide-react";
+import { Code2, Link, ShieldCheck, Bot } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const icons = [
   <Code2 className="w-10 h-10 text-primary" />,
   <Link className="w-10 h-10 text-primary" />,
   <ShieldCheck className="w-10 h-10 text-primary" />,
-  <Users className="w-10 h-10 text-primary" />,
+  <Bot className="w-10 h-10 text-primary" />,
 ];
 
 export function Services() {
