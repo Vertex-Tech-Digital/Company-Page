@@ -83,6 +83,7 @@ export function Navbar() {
             </a>
           ))}
           
+          {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
           <WouterLink
             href="/blog"
             className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
@@ -90,6 +91,7 @@ export function Navbar() {
           >
             {t("nav.blog")}
           </WouterLink>
+          */}
 
           <div className="flex items-center gap-1 text-xs tracking-widest uppercase">
             <button 
@@ -166,6 +168,7 @@ export function Navbar() {
                 {t(`nav.${link.id}`)}
               </a>
             ))}
+            {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
             <WouterLink
               href="/blog"
               onClick={() => setMobileMenuOpen(false)}
@@ -174,6 +177,7 @@ export function Navbar() {
             >
               {t("nav.blog")}
             </WouterLink>
+            */}
             <Button onClick={() => scrollTo("#contacto")} className="bg-primary w-full text-white">
               {t("nav.contactar")}
             </Button>
