@@ -6,6 +6,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 // import Blog from "@/pages/Blog"; // TODO: Reactivar cuando el blog esté listo
 import Checkout from "@/pages/Checkout";
+import Admin from "@/pages/Admin";
 import { useEffect } from "react";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -19,6 +20,8 @@ function Router() {
       {/* <Route path="/blog" component={Blog} /> */}
       {/* Ruta oculta de pagos: no enlazada en el menú */}
       <Route path="/checkout" component={Checkout} />
+      {/* Panel de administración: no enlazado en el menú */}
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
