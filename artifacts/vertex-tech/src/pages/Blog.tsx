@@ -1,101 +1,103 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Loader2, AlertCircle, FileText } from "lucide-react";
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
 import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 import { BlogCard, type BlogPostPreview } from "@/components/sections/BlogCard";
 import { useLanguage } from "@/context/LanguageContext";
 
-// Datos de prueba (mock). Más adelante se reemplazarán por contenido
-// dinámico desde una base de datos / CMS. Por ahora solo maquetamos
-// la arquitectura visual y los componentes repetitivos.
-const mockPostsEs: BlogPostPreview[] = [
-  {
-    slug: "rendimiento-apps-react-2026",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1200&auto=format&fit=crop",
-    category: "Desarrollo Web",
-    title: "5 estrategias para mejorar el rendimiento de tus aplicaciones React",
-    excerpt: "Analizamos técnicas de code-splitting, memoización y carga diferida que aplicamos en proyectos reales para reducir tiempos de carga.",
-    date: "12 Jun 2026",
-    readTime: "6 min",
-  },
-  {
-    slug: "qa-automatizado-ciclo-desarrollo",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
-    category: "QA & Testing",
-    title: "Por qué integrar QA automatizado desde el primer sprint",
-    excerpt: "La detección temprana de errores reduce costos de forma exponencial. Te contamos cómo estructuramos nuestros ciclos de pruebas.",
-    date: "05 Jun 2026",
-    readTime: "5 min",
-  },
-  {
-    slug: "apis-seguras-integraciones-terceros",
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1200&auto=format&fit=crop",
-    category: "APIs & Integraciones",
-    title: "Buenas prácticas para construir APIs seguras y escalables",
-    excerpt: "Autenticación, rate limiting y versionado: los pilares que no deben faltar al diseñar una arquitectura de API robusta.",
-    date: "28 May 2026",
-    readTime: "7 min",
-  },
-  {
-    slug: "automatizacion-ia-procesos-negocio",
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=1200&auto=format&fit=crop",
-    category: "Automatización & IA",
-    title: "Cómo la automatización con IA está cambiando los flujos de trabajo",
-    excerpt: "Desde chatbots hasta procesamiento inteligente de datos: ejemplos prácticos de automatización que multiplican la eficiencia.",
-    date: "20 May 2026",
-    readTime: "4 min",
-  },
-];
+// ── Tipos que devuelve la API ────────────────────────────────────────────────
 
-const mockPostsEn: BlogPostPreview[] = [
-  {
-    slug: "rendimiento-apps-react-2026",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1200&auto=format&fit=crop",
-    category: "Web Development",
-    title: "5 strategies to improve the performance of your React apps",
-    excerpt: "We break down code-splitting, memoization, and lazy-loading techniques we apply in real projects to cut load times.",
-    date: "Jun 12, 2026",
-    readTime: "6 min",
-  },
-  {
-    slug: "qa-automatizado-ciclo-desarrollo",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
-    category: "QA & Testing",
-    title: "Why integrate automated QA from the very first sprint",
-    excerpt: "Catching bugs early reduces costs exponentially. Here's how we structure our testing cycles.",
-    date: "Jun 05, 2026",
-    readTime: "5 min",
-  },
-  {
-    slug: "apis-seguras-integraciones-terceros",
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1200&auto=format&fit=crop",
-    category: "APIs & Integrations",
-    title: "Best practices for building secure, scalable APIs",
-    excerpt: "Authentication, rate limiting, and versioning: the pillars you can't skip when designing a solid API architecture.",
-    date: "May 28, 2026",
-    readTime: "7 min",
-  },
-  {
-    slug: "automatizacion-ia-procesos-negocio",
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=1200&auto=format&fit=crop",
-    category: "Automation & AI",
-    title: "How AI-driven automation is reshaping business workflows",
-    excerpt: "From chatbots to smart data processing: practical automation examples that multiply efficiency.",
-    date: "May 20, 2026",
-    readTime: "4 min",
-  },
-];
+interface ApiPost {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  image_url: string | null;
+  created_at: string;
+  category_name: string | null;
+  category_slug: string | null;
+}
+
+interface ApiCategory {
+  id: number;
+  slug: string;
+  name: string;
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatDate(dateStr: string, lang: string): string {
+  return new Date(dateStr).toLocaleDateString(
+    lang === "es" ? "es-ES" : "en-US",
+    { day: "2-digit", month: "short", year: "numeric" }
+  );
+}
+
+function apiPostToPreview(post: ApiPost, lang: string): BlogPostPreview {
+  return {
+    slug: post.slug,
+    image: post.image_url ?? "",
+    category: post.category_name ?? (lang === "es" ? "Sin categoría" : "Uncategorized"),
+    title: post.title,
+    excerpt: post.excerpt,
+    date: formatDate(post.created_at, lang),
+  };
+}
+
+// ── Componente principal ─────────────────────────────────────────────────────
 
 export default function Blog() {
   const { lang } = useLanguage();
-  const posts = lang === "es" ? mockPostsEs : mockPostsEn;
+
+  const [posts, setPosts] = useState<ApiPost[]>([]);
+  const [categories, setCategories] = useState<ApiCategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Cargar categorías una sola vez al montar el componente
+  useEffect(() => {
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((data) => setCategories(data.categories ?? []))
+      .catch(() => {}); // las categorías son decorativas — si fallan, no bloquean
+  }, []);
+
+  // Cargar posts cada vez que cambia el filtro de categoría
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+
+    const url = selectedCategory
+      ? `/api/posts?category=${selectedCategory}`
+      : "/api/posts";
+
+    fetch(url)
+      .then((r) => {
+        if (!r.ok) throw new Error("Error al cargar los artículos");
+        return r.json();
+      })
+      .then((data) => setPosts(data.posts ?? []))
+      .catch(() =>
+        setError(
+          lang === "es"
+            ? "No se pudieron cargar los artículos. Inténtalo de nuevo."
+            : "Could not load articles. Please try again."
+        )
+      )
+      .finally(() => setLoading(false));
+  }, [selectedCategory, lang]);
+
+  const previews = posts.map((p) => apiPostToPreview(p, lang));
 
   return (
     <main className="min-h-screen text-foreground font-sans">
       <PageNavbar />
 
       {/* Header / Hero del blog */}
-      <section className="relative pt-40 pb-16 overflow-hidden">
+      <section className="relative pt-40 pb-12 overflow-hidden">
         <div
           className="absolute inset-0 -z-10 opacity-40"
           style={{
@@ -118,9 +120,13 @@ export default function Blog() {
               data-testid="blog-title"
             >
               {lang === "es" ? (
-                <>Ideas y aprendizajes sobre <span className="text-primary">tecnología y calidad</span></>
+                <>Ideas y aprendizajes sobre{" "}
+                  <span className="text-primary">tecnología y calidad</span>
+                </>
               ) : (
-                <>Ideas and insights on <span className="text-primary">technology and quality</span></>
+                <>Ideas and insights on{" "}
+                  <span className="text-primary">technology and quality</span>
+                </>
               )}
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed" data-testid="blog-subtitle">
@@ -132,14 +138,78 @@ export default function Blog() {
         </div>
       </section>
 
+      {/* Filtro por categoría */}
+      {categories.length > 0 && (
+        <section className="container mx-auto px-6 pb-8">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                selectedCategory === null
+                  ? "bg-primary text-white border-primary"
+                  : "border-border text-muted-foreground hover:border-primary/40 hover:text-white"
+              }`}
+            >
+              {lang === "es" ? "Todos" : "All"}
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.slug)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                  selectedCategory === cat.slug
+                    ? "bg-primary text-white border-primary"
+                    : "border-border text-muted-foreground hover:border-primary/40 hover:text-white"
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Grid de artículos */}
       <section className="pb-24 relative z-10">
         <div className="container mx-auto px-6">
-          <div className="grid sm:grid-cols-2 gap-8">
-            {posts.map((post, index) => (
-              <BlogCard key={post.slug} post={post} index={index} />
-            ))}
-          </div>
+
+          {/* Estado: cargando */}
+          {loading && (
+            <div className="flex items-center justify-center py-20 text-muted-foreground">
+              <Loader2 className="w-5 h-5 animate-spin mr-2" />
+              {lang === "es" ? "Cargando artículos..." : "Loading articles..."}
+            </div>
+          )}
+
+          {/* Estado: error */}
+          {!loading && error && (
+            <div className="flex items-center gap-2 text-red-400 bg-red-400/10 border border-red-400/20 rounded-xl px-6 py-4 max-w-lg">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              {error}
+            </div>
+          )}
+
+          {/* Estado: sin posts */}
+          {!loading && !error && previews.length === 0 && (
+            <div className="text-center py-20 text-muted-foreground">
+              <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
+              <p>
+                {lang === "es"
+                  ? "Aún no hay artículos publicados. ¡Vuelve pronto!"
+                  : "No articles published yet. Check back soon!"}
+              </p>
+            </div>
+          )}
+
+          {/* Grid de cards */}
+          {!loading && !error && previews.length > 0 && (
+            <div className="grid sm:grid-cols-2 gap-8">
+              {previews.map((post, index) => (
+                <BlogCard key={post.slug} post={post} index={index} />
+              ))}
+            </div>
+          )}
+
         </div>
       </section>
 
