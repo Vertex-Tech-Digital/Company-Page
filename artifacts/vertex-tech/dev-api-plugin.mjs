@@ -36,9 +36,20 @@ export function devApiPlugin() {
         const file = path.join(root, "api", `${name}.js`);
         if (!fs.existsSync(file)) return next();
 
+        // Query string → req.query (el runtime de Vercel lo hace automáticamente;
+        // aquí lo parseamos manualmente para el dev server).
+        const queryStart = url.indexOf("?");
+        if (queryStart !== -1) {
+          const params = new URLSearchParams(url.slice(queryStart + 1));
+          req.query = Object.fromEntries(params.entries());
+        } else {
+          req.query = {};
+        }
+
         // Body JSON (las funciones esperan req.body ya parseado, estilo Vercel).
+        // Incluye POST, PUT y PATCH — todos pueden llevar body.
         let body = {};
-        if (req.method === "POST" || req.method === "PUT") {
+        if (req.method === "POST" || req.method === "PUT" || req.method === "PATCH") {
           const chunks = [];
           for await (const chunk of req) chunks.push(chunk);
           const raw = Buffer.concat(chunks).toString("utf8");
@@ -51,7 +62,6 @@ export function devApiPlugin() {
 
         // Shim de req/res al estilo de las funciones de Vercel.
         req.body = body;
-        req.query = {};
         res.status = (code) => {
           res.statusCode = code;
           return res;

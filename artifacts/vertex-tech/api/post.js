@@ -1,6 +1,8 @@
 // GET /api/post?slug=mi-articulo
 // Devuelve un post específico por su slug, incluyendo su categoría.
 // No requiere autenticación — es información pública.
+// Solo devuelve el post si status = 'published'; un draft responde 404,
+// igual que si no existiera (evita filtrar cuáles slugs son drafts).
 
 const { Pool } = require("pg");
 
@@ -30,7 +32,7 @@ module.exports = async function handler(req, res) {
          c.slug AS category_slug
        FROM posts p
        LEFT JOIN categories c ON c.id = p.category_id
-       WHERE p.slug = $1
+       WHERE p.slug = $1 AND p.status = 'published'
        LIMIT 1`,
       [slug]
     );
