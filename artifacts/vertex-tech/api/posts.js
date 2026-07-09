@@ -1,8 +1,9 @@
 // GET /api/posts
 // Lista posts públicos (aprobados). Soporta filtro por categoría:
-//   GET /api/posts                     → todos los posts
+//   GET /api/posts                     → todos los posts publicados
 //   GET /api/posts?category=qa-testing → solo los de esa categoría (por slug)
 // No requiere autenticación — es información pública.
+// Solo devuelve posts con status = 'published'; los drafts nunca se exponen aquí.
 
 const { Pool } = require("pg");
 
@@ -33,12 +34,12 @@ module.exports = async function handler(req, res) {
           c.slug AS category_slug
         FROM posts p
         LEFT JOIN categories c ON c.id = p.category_id
-        WHERE c.slug = $1
+        WHERE p.status = 'published' AND c.slug = $1
         ORDER BY p.created_at DESC
       `;
       params = [categorySlug];
     } else {
-      // Todos los posts
+      // Todos los posts publicados
       query = `
         SELECT
           p.id, p.slug, p.title, p.excerpt, p.image_url,
@@ -48,6 +49,7 @@ module.exports = async function handler(req, res) {
           c.slug AS category_slug
         FROM posts p
         LEFT JOIN categories c ON c.id = p.category_id
+        WHERE p.status = 'published'
         ORDER BY p.created_at DESC
       `;
       params = [];
