@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminComments } from "@/components/admin/AdminComments";
 import { AdminBannedWords } from "@/components/admin/AdminBannedWords";
-import { MessageSquare, ShieldAlert, LogOut } from "lucide-react";
+import { AdminPosts } from "@/components/admin/AdminPosts";
+import { MessageSquare, ShieldAlert, LogOut, FileText } from "lucide-react";
 
-type AdminView = "comments" | "banned-words";
+type AdminView = "posts" | "comments" | "banned-words";
 
 export default function Admin() {
   const [token, setToken] = useState<string | null>(null);
-  const [view, setView] = useState<AdminView>("comments");
+  const [view, setView] = useState<AdminView>("posts");
 
   // Al cargar la página, verificar si ya hay un token guardado
   useEffect(() => {
@@ -50,6 +51,17 @@ export default function Admin() {
           {/* Navegación entre secciones */}
           <nav className="flex items-center gap-1">
             <button
+              onClick={() => setView("posts")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                view === "posts"
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:text-white"
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              Posts
+            </button>
+            <button
               onClick={() => setView("comments")}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 view === "comments"
@@ -86,6 +98,7 @@ export default function Admin() {
 
       {/* Contenido */}
       <div className="max-w-4xl mx-auto px-6 py-8">
+        {view === "posts" && <AdminPosts token={token} />}
         {view === "comments" && <AdminComments token={token} />}
         {view === "banned-words" && <AdminBannedWords token={token} />}
       </div>

@@ -4,7 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
-// import Blog from "@/pages/Blog"; // TODO: Reactivar cuando el blog esté listo
+import Blog from "@/pages/Blog";
+import BlogPost from "@/pages/BlogPost";
 import Checkout from "@/pages/Checkout";
 import Admin from "@/pages/Admin";
 import { useEffect } from "react";
@@ -16,8 +17,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo) */}
-      {/* <Route path="/blog" component={Blog} /> */}
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:slug" component={BlogPost} />
       {/* Ruta oculta de pagos: no enlazada en el menú */}
       <Route path="/checkout" component={Checkout} />
       {/* Panel de administración: no enlazado en el menú */}
