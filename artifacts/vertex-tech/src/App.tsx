@@ -8,6 +8,7 @@ import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 import Checkout from "@/pages/Checkout";
 import Admin from "@/pages/Admin";
+import InvoiceForm from "@/pages/admin/InvoiceForm";
 import { useEffect } from "react";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -21,6 +22,9 @@ function Router() {
       <Route path="/blog/:slug" component={BlogPost} />
       {/* Ruta oculta de pagos: no enlazada en el menú */}
       <Route path="/checkout" component={Checkout} />
+      {/* Panel interno de facturación (Entregable A).
+          TODO(AUTH): proteger con el login del Entregable B cuando esté listo. */}
+      <Route path="/admin/facturas" component={InvoiceForm} />
       {/* Panel de administración: no enlazado en el menú */}
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
