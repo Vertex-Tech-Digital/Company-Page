@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vertex-tech",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@workspace/vertex-tech", "dev"],
+      "port": 3000
+    }
+  ]
+}

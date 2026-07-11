@@ -3,9 +3,10 @@ import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminComments } from "@/components/admin/AdminComments";
 import { AdminBannedWords } from "@/components/admin/AdminBannedWords";
 import { AdminPosts } from "@/components/admin/AdminPosts";
-import { MessageSquare, ShieldAlert, LogOut, FileText } from "lucide-react";
+import { AdminInvoices } from "@/components/admin/AdminInvoices";
+import { MessageSquare, ShieldAlert, LogOut, FileText, Receipt } from "lucide-react";
 
-type AdminView = "posts" | "comments" | "banned-words";
+type AdminView = "posts" | "comments" | "banned-words" | "invoices";
 
 export default function Admin() {
   const [token, setToken] = useState<string | null>(null);
@@ -83,6 +84,17 @@ export default function Admin() {
               <ShieldAlert className="w-3.5 h-3.5" />
               Palabras prohibidas
             </button>
+            <button
+              onClick={() => setView("invoices")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                view === "invoices"
+                  ? "bg-primary/15 text-primary"
+                  : "text-muted-foreground hover:text-white"
+              }`}
+            >
+              <Receipt className="w-3.5 h-3.5" />
+              Facturas
+            </button>
           </nav>
 
           {/* Cerrar sesión */}
@@ -101,6 +113,7 @@ export default function Admin() {
         {view === "posts" && <AdminPosts token={token} />}
         {view === "comments" && <AdminComments token={token} />}
         {view === "banned-words" && <AdminBannedWords token={token} />}
+        {view === "invoices" && <AdminInvoices token={token} />}
       </div>
     </main>
   );
