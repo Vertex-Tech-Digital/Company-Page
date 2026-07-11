@@ -4,3 +4,5 @@ export * from "./posts";
 export * from "./comments";
 export * from "./admin-users";
 export * from "./banned-words";
+export * from "./clients";
+export * from "./invoices";
