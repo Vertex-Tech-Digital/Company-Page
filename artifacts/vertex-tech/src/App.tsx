@@ -21,7 +21,8 @@ function Router() {
       <Route path="/blog/:slug" component={BlogPost} />
       {/* Ruta oculta de pagos: no enlazada en el menú */}
       <Route path="/checkout" component={Checkout} />
-      {/* Panel de administración: no enlazado en el menú */}
+      {/* Panel de administración (incluye la pestaña de Facturas, Entregable A).
+          Protegido con el login JWT; no enlazado en el menú. */}
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
