@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/*
+ * Tokens de marca por cliente. Cambia estos valores en site-config.ts (que los
+ * inyecta como variables CSS) o aquí directamente para personalizar la paleta.
+ */
+:root {
+  --brand: #2563eb;
+  --brand-fg: #ffffff;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
