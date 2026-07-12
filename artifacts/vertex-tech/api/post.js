@@ -4,7 +4,7 @@
 // Solo devuelve el post si status = 'published'; un draft responde 404,
 // igual que si no existiera (evita filtrar cuáles slugs son drafts).
 
-const { Pool } = require("pg");
+const { pool } = require("../server/db.js");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "GET") {
@@ -19,8 +19,6 @@ module.exports = async function handler(req, res) {
   if (!slug || typeof slug !== "string") {
     return res.status(400).json({ error: "El parámetro 'slug' es requerido" });
   }
-
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   try {
     const result = await pool.query(
@@ -45,7 +43,5 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("Error al obtener post:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
-  } finally {
-    await pool.end();
   }
 };
