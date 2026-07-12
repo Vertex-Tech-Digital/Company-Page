@@ -13,7 +13,7 @@
 //
 // Requiere: Authorization: Bearer <token>
 
-const { Pool } = require("pg");
+const { pool } = require("../server/db.js");
 const { verifyAuth } = require("./_auth");
 
 // Convierte un título en un slug URL-friendly:
@@ -58,8 +58,6 @@ module.exports = async function handler(req, res) {
   if (!process.env.DATABASE_URL) {
     return res.status(500).json({ error: "Base de datos no configurada" });
   }
-
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   try {
     // ── GET ────────────────────────────────────────────────────────────────
@@ -233,7 +231,5 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("Error en admin-posts:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
-  } finally {
-    await pool.end();
   }
 };

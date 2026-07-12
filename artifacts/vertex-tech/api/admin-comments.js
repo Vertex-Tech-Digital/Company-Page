@@ -6,7 +6,7 @@
 //
 // Requiere: Authorization: Bearer <token>
 
-const { Pool } = require("pg");
+const { pool } = require("../server/db.js");
 const { verifyAuth } = require("./_auth");
 
 module.exports = async function handler(req, res) {
@@ -17,8 +17,6 @@ module.exports = async function handler(req, res) {
   if (!process.env.DATABASE_URL) {
     return res.status(500).json({ error: "Base de datos no configurada" });
   }
-
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   try {
     // ── GET: listar comentarios pendientes ──────────────────────────────────
@@ -70,7 +68,5 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("Error en admin-comments:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
-  } finally {
-    await pool.end();
   }
 };
