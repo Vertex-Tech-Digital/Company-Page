@@ -113,6 +113,15 @@
   --ring: 212 100% 56%;
 }
 
+/* En móvil, el texto gris pequeño (text-muted-foreground) cuesta leerse sobre las
+   partículas del fondo: lo aclaramos para mejorar el contraste. Solo ≤ 640px. */
+@media (max-width: 640px) {
+  :root,
+  .dark {
+    --muted-foreground: 215 18% 74%;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

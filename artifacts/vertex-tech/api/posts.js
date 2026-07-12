@@ -5,7 +5,7 @@
 // No requiere autenticación — es información pública.
 // Solo devuelve posts con status = 'published'; los drafts nunca se exponen aquí.
 
-const { Pool } = require("pg");
+const { pool } = require("../server/db.js");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "GET") {
@@ -16,7 +16,6 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "Base de datos no configurada" });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const categorySlug = req.query?.category ?? null;
 
   try {
@@ -60,7 +59,5 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("Error al obtener posts:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
-  } finally {
-    await pool.end();
   }
 };

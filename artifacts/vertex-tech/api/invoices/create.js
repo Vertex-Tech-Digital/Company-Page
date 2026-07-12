@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const { Pool } = require("pg");
+const { pool } = require("../../server/db.js");
 const { verifyAuth } = require("../_auth");
 const {
   getCompany,
@@ -114,7 +114,6 @@ module.exports = async function handler(req, res) {
   const totals = calculateTotals(items, taxRate);
 
   // ── Persistencia: numeración atómica + upsert cliente + insert factura ──────
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const dbClient = await pool.connect();
   let invoiceNumber;
   try {
@@ -157,7 +156,6 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "No se pudo guardar la factura." });
   } finally {
     dbClient.release();
-    await pool.end();
   }
 
   // ── PDF (regenerable desde los datos) ───────────────────────────────────────

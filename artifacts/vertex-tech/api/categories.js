@@ -2,7 +2,7 @@
 // Devuelve todas las categorías del blog ordenadas por nombre.
 // No requiere autenticación — es información pública.
 
-const { Pool } = require("pg");
+const { pool } = require("../server/db.js");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "GET") {
@@ -13,8 +13,6 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "Base de datos no configurada" });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
   try {
     const result = await pool.query(
       "SELECT id, slug, name FROM categories ORDER BY name ASC"
@@ -23,7 +21,5 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("Error al obtener categorías:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
-  } finally {
-    await pool.end();
   }
 };

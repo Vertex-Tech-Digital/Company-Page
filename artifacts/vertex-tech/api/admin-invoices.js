@@ -4,7 +4,7 @@
 // El PDF no se almacena: se regenera al vuelo desde los datos guardados.
 // Requiere: Authorization: Bearer <token>
 
-const { Pool } = require("pg");
+const { pool } = require("../server/db.js");
 const { verifyAuth } = require("./_auth");
 const { getCompany, renderInvoicePdf, toEsDate } = require("../server/invoice-pdf.js");
 
@@ -29,7 +29,6 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   try {
     const id = queryParam(req, "id");
     const wantPdf = queryParam(req, "pdf");
@@ -75,7 +74,5 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("Error en admin-invoices:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
-  } finally {
-    await pool.end();
   }
 };
