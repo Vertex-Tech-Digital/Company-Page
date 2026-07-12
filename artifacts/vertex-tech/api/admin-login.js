@@ -10,7 +10,7 @@
 // El token debe enviarse en el header Authorization de las rutas protegidas:
 // Authorization: Bearer eyJ...
 
-const { Pool } = require("pg");
+const { pool } = require("../server/db.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -37,8 +37,6 @@ module.exports = async function handler(req, res) {
   if (!password || typeof password !== "string") {
     return res.status(400).json({ error: "Contraseña requerida" });
   }
-
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   try {
     // Buscar el usuario en la base de datos
@@ -71,7 +69,5 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("Error en login:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
-  } finally {
-    await pool.end();
   }
 };
