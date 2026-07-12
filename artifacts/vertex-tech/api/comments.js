@@ -10,7 +10,7 @@
 //   "content": "Gran artículo, muy útil."
 // }
 
-const { Pool } = require("pg");
+const { pool } = require("../server/db.js");
 
 // ─── Validación básica ───────────────────────────────────────────────────────
 
@@ -63,8 +63,6 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "El comentario no puede superar los 2000 caracteres" });
   }
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
   try {
     // Verificar que el post existe
     const postResult = await pool.query(
@@ -106,7 +104,5 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error("Error al guardar comentario:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
-  } finally {
-    await pool.end();
   }
 };
