@@ -18,5 +18,10 @@
     "@rollup/rollup-win32-x64-msvc": "^4.62.0",
     "@tailwindcss/oxide-win32-x64-msvc": "^4.3.1",
     "lightningcss-win32-x64-msvc": "^1.32.0"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "1.0.0-rc.4"
   }
 }
