@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import dns from "dns";
 import { drizzle } from "drizzle-orm/neon-http";
-import { leadsTable } from "../../../lib/db/src/schema/leads";
+import { leadsTable } from "./leads";
 import { analyzeFreeText } from "../src/utils/analyzeFreeText";
 import { problemsData } from "../src/data/problemsData";
 import { generateDiagnosisPDF } from "../src/utils/generateDiagnosisPDF";

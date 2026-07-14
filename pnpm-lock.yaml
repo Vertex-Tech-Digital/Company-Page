@@ -431,6 +431,12 @@ importers:
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
+      dotenv:
+        specifier: ^17.4.2
+        version: 17.4.2
+      drizzle-orm:
+        specifier: 1.0.0-rc.4
+        version: 1.0.0-rc.4(@neondatabase/serverless@1.1.0)(@types/pg@8.20.0)(pg@8.21.0)(zod@3.25.76)
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
