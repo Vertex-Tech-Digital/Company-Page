@@ -1,12 +1,4 @@
-export interface TechProblem {
-  id: number;
-  name: string;
-  keywords: string[];
-  recommendation: string;
-  vertexService: string;
-}
-
-export const problemsData: TechProblem[] = [
+const problemsData = [
   {
     id: 1,
     name: "Tareas manuales repetitivas",
@@ -258,3 +250,5 @@ export const problemsData: TechProblem[] = [
     vertexService: "QA & Testing"
   }
 ];
+
+module.exports = { problemsData };
