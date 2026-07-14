@@ -263,14 +263,18 @@ export default function Diagnostico() {
                       <label className="text-sm font-semibold text-slate-300 mb-2" htmlFor="size">
                         Tamaño de la Empresa:
                       </label>
-                      <input 
-                        className="bg-slate-950/60 border border-slate-800 rounded-lg py-2.5 px-4 text-slate-200 focus:border-blue-500 focus:outline-none transition-colors text-sm"
-                        type="text" 
+                      <select 
+                        className="bg-slate-950/60 border border-slate-800 rounded-lg py-2.5 px-4 text-slate-200 focus:border-blue-500 focus:outline-none transition-colors text-sm cursor-pointer"
                         id="size" 
                         name="size" 
-                        required 
-                        placeholder="Ej: 1-10 empleados" 
-                      />
+                        required
+                        defaultValue="1-9 empleados"
+                      >
+                        <option value="1-9 empleados">1-9 empleados (Microempresa)</option>
+                        <option value="10-49 empleados">10-49 empleados (Pequeña empresa)</option>
+                        <option value="50-249 empleados">50-249 empleados (Mediana empresa)</option>
+                        <option value="250+ empleados">250+ empleados (Gran empresa)</option>
+                      </select>
                     </div>
 
                     <div className="flex flex-col">
