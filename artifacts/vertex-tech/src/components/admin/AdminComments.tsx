@@ -29,7 +29,7 @@ export function AdminComments({ token }: AdminCommentsProps) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin-comments", {
+      const res = await fetch("/api/admin-moderation?resource=comments", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Error al cargar comentarios");
@@ -49,7 +49,7 @@ export function AdminComments({ token }: AdminCommentsProps) {
   async function handleModerate(id: number, status: "approved" | "rejected") {
     setProcessing(id);
     try {
-      const res = await fetch(`/api/admin-comments?id=${id}`, {
+      const res = await fetch(`/api/admin-moderation?resource=comments&id=${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
