@@ -6,6 +6,7 @@ import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
 import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 import { useLanguage } from "@/context/LanguageContext";
+import { RichTextRenderer } from "@/components/blog/RichTextRenderer";
 
 interface FullPost {
   id: number;
@@ -199,23 +200,8 @@ export default function BlogPost() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15 }}
-          className="prose prose-invert prose-lg max-w-none
-            prose-headings:text-white prose-headings:font-bold
-            prose-p:text-muted-foreground prose-p:leading-relaxed
-            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-            prose-strong:text-white
-            prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
-            prose-pre:bg-card prose-pre:border prose-pre:border-border
-            prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground
-            prose-hr:border-border"
         >
-          {/* El contenido se almacena como texto plano con saltos de línea.
-              Cada párrafo separado por línea en blanco se renderiza como <p>.
-              Cuando se integre un editor rich-text (TipTap), este bloque
-              se reemplazará por el renderer correspondiente. */}
-          {post.content.split(/\n\n+/).map((paragraph, i) => (
-            <p key={i}>{paragraph.trim()}</p>
-          ))}
+          <RichTextRenderer content={post.content} />
         </motion.div>
 
       </article>

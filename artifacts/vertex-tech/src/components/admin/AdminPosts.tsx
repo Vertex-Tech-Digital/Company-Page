@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
 // ── Tipos ──────────────────────────────────────────────────────────────────────
 
@@ -42,7 +43,7 @@ interface AdminPostsProps {
 const EMPTY_FORM = {
   title: "",
   excerpt: "",
-  content: "",
+  content: null as object | null,  // TipTap JSON; null = editor vacío
   imageUrl: "",
   categoryId: "",
 };
@@ -78,7 +79,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
   const editingIdRef = useRef<number | null>(null);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
 
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState<typeof EMPTY_FORM>(EMPTY_FORM);
   const [contentLoading, setContentLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -138,7 +139,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
     setForm({
       title: post.title,
       excerpt: post.excerpt,
-      content: "",       // se carga del servidor a continuación
+      content: null,     // se carga del servidor a continuación
       imageUrl: post.image_url ?? "",
       categoryId: post.category_id?.toString() ?? "",
     });
@@ -154,7 +155,15 @@ export function AdminPosts({ token }: AdminPostsProps) {
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
-      setForm((f) => ({ ...f, content: data.post?.content ?? "" }));
+      const raw = data.post?.content ?? "";
+      let parsed: object | null = null;
+      try {
+        const j = JSON.parse(raw);
+        if (j && j.type === "doc") parsed = j;
+      } catch {
+        // texto plano heredado — se deja como null; el editor arrancará vacío
+      }
+      setForm((f) => ({ ...f, content: parsed }));
     } catch {
       // Si el post es draft /api/post devuelve 404 (solo muestra publicados).
       // En ese caso el campo content queda vacío — el admin puede re-introducirlo.
@@ -193,7 +202,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
       setFormError("El resumen (excerpt) es obligatorio");
       return;
     }
-    if (!isEditing && !form.content.trim()) {
+    if (!isEditing && !form.content) {
       setFormError("El contenido es obligatorio para crear un nuevo post");
       return;
     }
@@ -206,7 +215,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
         imageUrl: form.imageUrl.trim() || null,
         categoryId: form.categoryId ? parseInt(form.categoryId) : null,
       };
-      if (form.content.trim()) body.content = form.content.trim();
+      if (form.content) body.content = JSON.stringify(form.content);
 
       let res: Response;
 
@@ -381,25 +390,23 @@ export function AdminPosts({ token }: AdminPostsProps) {
             />
           </div>
 
-          {/* Contenido */}
+          {/* Contenido — editor TipTap */}
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               {isEditing
-                ? "Contenido (dejar vacío para no modificar)"
+                ? "Contenido (dejar vacío para conservar el actual)"
                 : "Contenido *"}
             </label>
             {contentLoading ? (
-              <div className="flex items-center gap-2 py-4 text-muted-foreground text-sm">
+              <div className="flex items-center gap-2 py-6 text-muted-foreground text-sm">
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 Cargando contenido...
               </div>
             ) : (
-              <textarea
+              <RichTextEditor
                 value={form.content}
-                onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-                placeholder="Escribe el contenido del artículo aquí..."
-                rows={14}
-                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors resize-y font-mono leading-relaxed"
+                onChange={(json) => setForm((f) => ({ ...f, content: json }))}
+                disabled={saving}
               />
             )}
           </div>
