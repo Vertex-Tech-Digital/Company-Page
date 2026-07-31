@@ -8,7 +8,17 @@ if (process.env.NODE_ENV !== "production") {
 
 const nodemailer = require("nodemailer");
 const { drizzle } = require("drizzle-orm/neon-http");
-const { pgTable, pgEnum, uuid, timestamp, varchar, integer, text, boolean } = require("drizzle-orm/pg-core");
+const { eq } = require("drizzle-orm");
+const {
+  pgTable,
+  pgEnum,
+  uuid,
+  timestamp,
+  varchar,
+  integer,
+  text,
+  boolean,
+} = require("drizzle-orm/pg-core");
 
 const { analyzeFreeText } = require("../src/utils/analyzeFreeText");
 const { problemsData } = require("../src/data/problemsData");
@@ -28,39 +38,38 @@ const leadStatusEnum = pgEnum("lead_status", [
   "cerrado",
 ]);
 
-const leadsTable = pgTable(
-  "leads",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-    companyName: varchar("company_name", { length: 100 }).notNull(),
-    sector: varchar("sector", { length: 50 }).notNull(),
-    size: varchar("size", { length: 20 }).notNull(),
-    markedProblems: integer("marked_problems").array().notNull(),
-    freeText: text("free_text"),
-    detectedProblems: integer("detected_problems").array().notNull(),
-    email: varchar("email", { length: 255 }).notNull(),
-    phone: varchar("phone", { length: 20 }),
-    contactPreference: contactPreferenceEnum("contact_preference").notNull(),
-    status: leadStatusEnum("status").notNull().default("nuevo"),
-    pdfSent: boolean("pdf_sent").notNull().default(true),
-  }
-);
+const leadsTable = pgTable("leads", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  companyName: varchar("company_name", { length: 100 }).notNull(),
+  sector: varchar("sector", { length: 50 }).notNull(),
+  size: varchar("size", { length: 20 }).notNull(),
+  markedProblems: integer("marked_problems").array().notNull(),
+  freeText: text("free_text"),
+  detectedProblems: integer("detected_problems").array().notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  contactPreference: contactPreferenceEnum("contact_preference").notNull(),
+  status: leadStatusEnum("status").notNull().default("nuevo"),
+  pdfSent: boolean("pdf_sent").notNull().default(false),
+});
 
 let dbInstance = null;
 
 function getDatabaseClient() {
   const connectionString = process.env.DATABASE_URL;
   if (!dbInstance) {
-    if (!connectionString || connectionString === "undefined" || connectionString.trim() === "") {
+    if (
+      !connectionString ||
+      connectionString === "undefined" ||
+      connectionString.trim() === ""
+    ) {
       throw new Error(
-        `La variable de entorno DATABASE_URL no es válida o está vacía: "${connectionString}"`
+        `La variable de entorno DATABASE_URL no es válida o está vacía: "${connectionString}"`,
       );
     }
-    // Al pasar directamente la cadena de conexión como string, drizzle(connectionString)
-    // se encarga de inicializar internamente y de forma correcta el cliente HTTP de Neon.
     dbInstance = drizzle(connectionString);
   }
   return dbInstance;
@@ -75,12 +84,12 @@ function isRateLimited(ip) {
   const now = Date.now();
   const timestamps = rateLimitMap.get(ip) || [];
   const activeTimestamps = timestamps.filter((t) => now - t < HOUR_IN_MS);
-  
+
   if (activeTimestamps.length >= RATE_LIMIT_COUNT) {
     rateLimitMap.set(ip, activeTimestamps);
     return true;
   }
-  
+
   activeTimestamps.push(now);
   rateLimitMap.set(ip, activeTimestamps);
   return false;
@@ -97,9 +106,14 @@ module.exports = async function handler(req, res) {
   }
 
   // 1. Rate Limiting por IP
-  const clientIp = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket?.remoteAddress || "127.0.0.1";
+  const clientIp =
+    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.socket?.remoteAddress ||
+    "127.0.0.1";
   if (isRateLimited(clientIp)) {
-    return res.status(429).json({ error: "Too many requests. Please try again later." });
+    return res
+      .status(429)
+      .json({ error: "Too many requests. Please try again later." });
   }
 
   try {
@@ -116,15 +130,24 @@ module.exports = async function handler(req, res) {
     } = req.body ?? {};
 
     if (
-      !company_name || typeof company_name !== "string" ||
-      !sector || typeof sector !== "string" ||
-      !size || typeof size !== "string" ||
-      !email || typeof email !== "string" || !email.includes("@") ||
-      !Array.isArray(marked_problems) || !marked_problems.every((id) => typeof id === "number") ||
+      !company_name ||
+      typeof company_name !== "string" ||
+      !sector ||
+      typeof sector !== "string" ||
+      !size ||
+      typeof size !== "string" ||
+      !email ||
+      typeof email !== "string" ||
+      !email.includes("@") ||
+      !Array.isArray(marked_problems) ||
+      !marked_problems.every((id) => typeof id === "number") ||
       typeof free_text !== "string" ||
-      !contact_preference || typeof contact_preference !== "string"
+      !contact_preference ||
+      typeof contact_preference !== "string"
     ) {
-      return res.status(400).json({ error: "Datos de entrada inválidos o incompletos." });
+      return res
+        .status(400)
+        .json({ error: "Datos de entrada inválidos o incompletos." });
     }
 
     // Sanitización
@@ -136,13 +159,11 @@ module.exports = async function handler(req, res) {
     const cleanContactPreference = sanitizeString(contact_preference);
     const cleanPhone = phone ? sanitizeString(phone) : "";
 
-    // 3. Procesamiento: determinar problemas detectados automáticamente
+    // 3. Procesamiento
     const detectedProblems = analyzeFreeText(cleanFreeText, marked_problems);
-
-    // A. Obtener cliente de base de datos inicializado perezosamente (vía HTTP)
     const db = getDatabaseClient();
 
-    // B. Persistencia en base de datos con Drizzle (vía HTTP, evitando ECONNRESET)
+    // Insertar inicialmente con pdfSent = false
     const [insertedLead] = await db
       .insert(leadsTable)
       .values({
@@ -156,7 +177,7 @@ module.exports = async function handler(req, res) {
         phone: cleanPhone,
         contactPreference: cleanContactPreference,
         status: "nuevo",
-        pdfSent: true,
+        pdfSent: false,
       })
       .returning();
 
@@ -174,147 +195,198 @@ module.exports = async function handler(req, res) {
       createdAt: insertedLead.createdAt,
     };
 
-    const pdfBuffer = await generateDiagnosisPDF(leadRecordForPdf, problemsData);
+    let pdfBuffer = null;
+    try {
+      pdfBuffer = await generateDiagnosisPDF(leadRecordForPdf, problemsData);
 
-    // D. Configuración de Nodemailer (Opcional para pruebas locales)
+      // Actualizar estado en DB si se generó el PDF exitosamente
+      await db
+        .update(leadsTable)
+        .set({ pdfSent: true })
+        .where(eq(leadsTable.id, insertedLead.id));
+    } catch (pdfErr) {
+      console.error("[Diagnostico PDF Error]:", pdfErr);
+    }
+
+    // D. Configuración y Envío de Correos mediante Nodemailer
     const gmailUser = process.env.GMAIL_USER;
     const gmailPass = process.env.GMAIL_APP_PASSWORD;
-    const companyEmail = process.env.EMAIL_INTERNAL_NOTIFICATION;
+    const companyEmail = process.env.EMAIL_INTERNAL_NOTIFICATION || gmailUser; // Fallback al propio usuario si no existe env
     let emailSent = false;
 
-    if (gmailUser && gmailPass && gmailUser.trim() !== "" && gmailPass.trim() !== "") {
-      let smtpHost = "smtp.gmail.com";
+    if (
+      gmailUser &&
+      gmailPass &&
+      gmailUser.trim() !== "" &&
+      gmailPass.trim() !== ""
+    ) {
+      try {
+        let smtpHost = "smtp.gmail.com";
 
-      // En desarrollo local resolvemos rápido usando DNS públicos para evitar lags locales.
-      if (process.env.NODE_ENV !== "production") {
-        try {
-          const dns = require("dns");
-          const resolvedHost = await new Promise((resolve) => {
-            const resolver = new dns.Resolver();
-            resolver.setServers(["8.8.8.8", "1.1.1.1"]);
-            const timeout = setTimeout(() => resolve("smtp.gmail.com"), 2500);
-            resolver.resolve4("smtp.gmail.com", (err, addresses) => {
-              clearTimeout(timeout);
-              if (err || !addresses || !addresses.length) {
-                resolve("smtp.gmail.com");
-              } else {
-                resolve(addresses[0]);
-              }
+        if (process.env.NODE_ENV !== "production") {
+          try {
+            const dns = require("dns");
+            const resolvedHost = await new Promise((resolve) => {
+              const resolver = new dns.Resolver();
+              resolver.setServers(["8.8.8.8", "1.1.1.1"]);
+              const timeout = setTimeout(() => resolve("smtp.gmail.com"), 2500);
+              resolver.resolve4("smtp.gmail.com", (err, addresses) => {
+                clearTimeout(timeout);
+                if (err || !addresses || !addresses.length) {
+                  resolve("smtp.gmail.com");
+                } else {
+                  resolve(addresses[0]);
+                }
+              });
             });
-          });
-          smtpHost = resolvedHost;
-        } catch (dnsErr) {
-          console.warn("[Diagnostico Local DNS Warning]:", dnsErr.message);
+            smtpHost = resolvedHost;
+          } catch (dnsErr) {
+            console.warn("[Diagnostico Local DNS Warning]:", dnsErr.message);
+          }
         }
+
+        const transporter = nodemailer.createTransport({
+          host: smtpHost,
+          port: 465,
+          secure: true,
+          connectionTimeout: 3000,
+          greetingTimeout: 3000,
+          socketTimeout: 4000,
+          tls: {
+            servername: "smtp.gmail.com",
+          },
+          auth: {
+            user: gmailUser,
+            pass: gmailPass,
+          },
+        });
+
+        const safeCompanyName = cleanCompanyName.replace(/[^a-zA-Z0-9]/g, "_");
+        const pdfFilename = `Diagnostico_Vertex_${safeCompanyName}.pdf`;
+
+        const pdfAttached = Boolean(pdfBuffer);
+        const attachments = pdfAttached
+          ? [
+              {
+                filename: pdfFilename,
+                content: pdfBuffer,
+                contentType: "application/pdf",
+              },
+            ]
+          : [];
+
+        const clientMailHtml = pdfAttached
+          ? `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+              <h2 style="color: #2563eb;">Diagnóstico Tecnológico Completado</h2>
+              <p>Hola,</p>
+              <p>Agradecemos tu interés en optimizar la infraestructura tecnológica de <strong>${cleanCompanyName}</strong>.</p>
+              <p>Hemos adjuntado a este correo tu reporte formal en formato PDF con la hoja de ruta y recomendaciones técnicas diseñadas a medida para tu empresa.</p>
+              <p>Quedamos a tu disposición para cualquier duda o consulta.</p>
+              <br/>
+              <p>Atentamente,</p>
+              <p><strong>El equipo de Vertex Tech Digital</strong></p>
+            </div>
+          `
+          : `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+              <h2 style="color: #2563eb;">Diagnóstico Tecnológico Registrado</h2>
+              <p>Hola,</p>
+              <p>Hemos recibido los datos de diagnóstico tecnológico para <strong>${cleanCompanyName}</strong> correctamente.</p>
+              <p>Un consultor de nuestro equipo evaluará tu solicitud y se pondrá en contacto contigo muy pronto a través del canal seleccionado para detallarte la hoja de ruta.</p>
+              <br/>
+              <p>Atentamente,</p>
+              <p><strong>El equipo de Vertex Tech Digital</strong></p>
+            </div>
+          `;
+
+        const mailPromises = [
+          transporter.sendMail({
+            from: `"Vertex Tech Digital" <${gmailUser}>`,
+            to: cleanEmail,
+            subject:
+              "Tu Reporte de Diagnóstico Tecnológico - Vertex Tech Digital",
+            html: clientMailHtml,
+            attachments,
+          }),
+        ];
+
+        // Solo enviar email administrativo si tenemos un destinatario válido
+        if (companyEmail && companyEmail.trim() !== "") {
+          const markedProblemsNames = marked_problems
+            .map((id) => {
+              const prob = problemsData.find((p) => p.id === id);
+              return prob ? prob.name : `Problema #${id}`;
+            })
+            .join(", ");
+
+          const detectedProblemsNames = detectedProblems
+            .map((id) => {
+              const prob = problemsData.find((p) => p.id === id);
+              return prob ? prob.name : `Problema #${id}`;
+            })
+            .join(", ");
+
+          mailPromises.push(
+            transporter.sendMail({
+              from: `"Vertex Tech Digital Alert" <${gmailUser}>`,
+              to: companyEmail,
+              subject: `[Nuevo Lead] Diagnóstico completado - ${cleanCompanyName}`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; color: #333;">
+                  <h2 style="color: #2563eb;">Alerta: Nuevo Lead de Diagnóstico</h2>
+                  <p>Se ha registrado un diagnóstico automatizado para el siguiente lead:</p>
+                  <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <tr><td style="padding: 6px; font-weight: bold; width: 150px;">UUID Lead:</td><td>${insertedLead.id}</td></tr>
+                    <tr><td style="padding: 6px; font-weight: bold;">Razón Social:</td><td>${cleanCompanyName}</td></tr>
+                    <tr><td style="padding: 6px; font-weight: bold;">Sector:</td><td>${cleanSector}</td></tr>
+                    <tr><td style="padding: 6px; font-weight: bold;">Tamaño:</td><td>${cleanSize}</td></tr>
+                    <tr><td style="padding: 6px; font-weight: bold;">Email:</td><td>${cleanEmail}</td></tr>
+                    <tr><td style="padding: 6px; font-weight: bold;">Teléfono:</td><td>${cleanPhone || "No proporcionado"}</td></tr>
+                    <tr><td style="padding: 6px; font-weight: bold;">Preferencia:</td><td>${cleanContactPreference}</td></tr>
+                    <tr><td style="padding: 6px; font-weight: bold;">Problemas Marcados:</td><td>${markedProblemsNames}</td></tr>
+                    <tr><td style="padding: 6px; font-weight: bold;">Problemas Detectados:</td><td>${detectedProblemsNames || "Ninguno detectado automáticamente"}</td></tr>
+                    <tr><td style="padding: 6px; font-weight: bold;">PDF Generado:</td><td>${pdfAttached ? "Sí" : "Falló (Ver logs)"}</td></tr>
+                  </table>
+                  <p><strong>Mensaje del cliente:</strong></p>
+                  <blockquote style="background: #f3f4f6; padding: 10px; border-left: 4px solid #2563eb;">${cleanFreeText || "Sin comentarios."}</blockquote>
+                </div>
+              `,
+              attachments,
+            }),
+          );
+        }
+
+        await Promise.race([
+          Promise.all(mailPromises),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("SMTP Delivery Timeout")), 5000),
+          ),
+        ]);
+
+        emailSent = true;
+      } catch (emailErr) {
+        console.error("[Diagnostico Email Error]:", emailErr);
       }
-
-      const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: 465,
-        secure: true,
-        connectionTimeout: 4000,
-        greetingTimeout: 3000,
-        socketTimeout: 5000,
-        tls: {
-          servername: "smtp.gmail.com",
-        },
-        auth: {
-          user: gmailUser,
-          pass: gmailPass,
-        },
-      });
-
-      const safeCompanyName = cleanCompanyName.replace(/[^a-zA-Z0-9]/g, "_");
-      const pdfFilename = `Diagnostico_Vertex_${safeCompanyName}.pdf`;
-
-      const clientMail = transporter.sendMail({
-        from: `"Vertex Tech Digital" <${gmailUser}>`,
-        to: cleanEmail,
-        subject: "Tu Reporte de Diagnóstico Tecnológico - Vertex Tech Digital",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-            <h2 style="color: #2563eb;">Diagnóstico Tecnológico Completado</h2>
-            <p>Hola,</p>
-            <p>Agradecemos tu interés en optimizar la infraestructura tecnológica de <strong>${cleanCompanyName}</strong>.</p>
-            <p>Hemos adjuntado a este correo tu reporte formal en formato PDF con la hoja de ruta y recomendaciones técnicas diseñadas a medida para tu empresa.</p>
-            <p>Quedamos a tu disposición para cualquier duda o consulta.</p>
-            <br/>
-            <p>Atentamente,</p>
-            <p><strong>El equipo de Vertex Tech Digital</strong></p>
-          </div>
-        `,
-        attachments: [
-          {
-            filename: pdfFilename,
-            content: pdfBuffer,
-            contentType: "application/pdf",
-          },
-        ],
-      });
-
-      const markedProblemsNames = marked_problems
-        .map((id) => {
-          const prob = problemsData.find((p) => p.id === id);
-          return prob ? prob.name : `Problema #${id}`;
-        })
-        .join(", ");
-
-      const detectedProblemsNames = detectedProblems
-        .map((id) => {
-          const prob = problemsData.find((p) => p.id === id);
-          return prob ? prob.name : `Problema #${id}`;
-        })
-        .join(", ");
-
-      const adminMail = transporter.sendMail({
-        from: `"Vertex Tech Digital Alert" <${gmailUser}>`,
-        to: companyEmail,
-        subject: `[Nuevo Lead] Diagnóstico completado - ${cleanCompanyName}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; padding: 20px; color: #333;">
-            <h2 style="color: #2563eb;">Alerta: Nuevo Lead de Diagnóstico</h2>
-            <p>Se ha registrado un diagnóstico automatizado para el siguiente lead:</p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-              <tr><td style="padding: 6px; font-weight: bold; width: 150px;">UUID Lead:</td><td>${insertedLead.id}</td></tr>
-              <tr><td style="padding: 6px; font-weight: bold;">Razón Social:</td><td>${cleanCompanyName}</td></tr>
-              <tr><td style="padding: 6px; font-weight: bold;">Sector:</td><td>${cleanSector}</td></tr>
-              <tr><td style="padding: 6px; font-weight: bold;">Tamaño:</td><td>${cleanSize}</td></tr>
-              <tr><td style="padding: 6px; font-weight: bold;">Email:</td><td>${cleanEmail}</td></tr>
-              <tr><td style="padding: 6px; font-weight: bold;">Teléfono:</td><td>${cleanPhone || "No proporcionado"}</td></tr>
-              <tr><td style="padding: 6px; font-weight: bold;">Preferencia:</td><td>${cleanContactPreference}</td></tr>
-              <tr><td style="padding: 6px; font-weight: bold;">Problemas Marcados:</td><td>${markedProblemsNames}</td></tr>
-              <tr><td style="padding: 6px; font-weight: bold;">Problemas Detectados:</td><td>${detectedProblemsNames || "Ninguno detectado automáticamente"}</td></tr>
-            </table>
-            <p><strong>Mensaje del cliente:</strong></p>
-            <blockquote style="background: #f3f4f6; padding: 10px; border-left: 4px solid #2563eb;">${cleanFreeText || "Sin comentarios."}</blockquote>
-          </div>
-        `,
-        attachments: [
-          {
-            filename: pdfFilename,
-            content: pdfBuffer,
-            contentType: "application/pdf",
-          },
-        ],
-      });
-
-      await Promise.all([clientMail, adminMail]);
-      emailSent = true;
     } else {
-      console.warn("[Diagnostico API Warning]: GMAIL SMTP credentials are not configured. Skipping email delivery.");
+      console.warn(
+        "[Diagnostico API Warning]: GMAIL SMTP credentials are not configured. Skipping email delivery.",
+      );
     }
 
     return res.status(201).json({
       success: true,
       leadId: insertedLead.id,
-      pdfGenerated: true,
+      pdfGenerated: Boolean(pdfBuffer),
       emailSent: emailSent,
-      message: emailSent 
-        ? "Diagnóstico guardado y correos enviados." 
-        : "Diagnóstico guardado y PDF generado. Envío de correo omitido (sin credenciales SMTP)."
+      message: emailSent
+        ? "Diagnóstico guardado y correos enviados."
+        : "Diagnóstico registrado exitosamente en el sistema.",
     });
   } catch (error) {
     console.error("[Diagnostico API Error]:", error);
-    return res.status(500).json({ error: error.message || "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ error: error.message || "Internal Server Error" });
   }
 };
