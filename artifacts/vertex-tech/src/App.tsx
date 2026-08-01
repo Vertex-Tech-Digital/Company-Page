@@ -8,6 +8,7 @@ import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 import Checkout from "@/pages/Checkout";
 import Admin from "@/pages/Admin";
+import Diagnostico from "@/pages/Diagnostico";
 import { useEffect } from "react";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -24,6 +25,7 @@ function Router() {
       {/* Panel de administración (incluye la pestaña de Facturas, Entregable A).
           Protegido con el login JWT; no enlazado en el menú. */}
       <Route path="/admin" component={Admin} />
+      <Route path="/diagnostico" component={Diagnostico} />
       <Route component={NotFound} />
     </Switch>
   );
