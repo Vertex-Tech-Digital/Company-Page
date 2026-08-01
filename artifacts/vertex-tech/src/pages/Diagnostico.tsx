@@ -38,14 +38,23 @@ const problems = [
   { id: 13, name: "Software de terceros inestable" },
 ];
 
-function SectionTitle({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
+function SectionTitle({
+  icon: Icon,
+  children,
+}: {
+  icon: React.ElementType;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-center gap-3 border-b border-border pb-3 mb-6">
       <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 border border-primary/20">
         <Icon className="w-4 h-4 text-primary" />
       </div>
       <div>
-        <h3 className="text-xl font-bold text-foreground tracking-wide" style={{ fontFamily: "var(--app-font-heading)" }}>
+        <h3
+          className="text-xl font-bold text-foreground tracking-wide"
+          style={{ fontFamily: "var(--app-font-heading)" }}
+        >
           {children}
         </h3>
       </div>
@@ -71,7 +80,10 @@ function FormInput({
 }) {
   return (
     <div className="flex flex-col">
-      <label className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2" htmlFor={id}>
+      <label
+        className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2"
+        htmlFor={id}
+      >
         {Icon && <Icon className="w-3.5 h-3.5 text-primary/70" />}
         {label}
       </label>
@@ -108,7 +120,10 @@ function FormSelect({
 }) {
   return (
     <div className="flex flex-col">
-      <label className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2" htmlFor={id}>
+      <label
+        className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2"
+        htmlFor={id}
+      >
         {Icon && <Icon className="w-3.5 h-3.5 text-primary/70" />}
         {label}
       </label>
@@ -143,7 +158,9 @@ export default function Diagnostico() {
   const [showTextarea, setShowTextarea] = useState(false);
 
   const handleCheckboxChange = () => {
-    const checkboxes = document.querySelectorAll(".problem-cb") as NodeListOf<HTMLInputElement>;
+    const checkboxes = document.querySelectorAll(
+      ".problem-cb",
+    ) as NodeListOf<HTMLInputElement>;
     let count = 0;
     checkboxes.forEach((cb) => {
       if (cb.checked) count++;
@@ -165,7 +182,9 @@ export default function Diagnostico() {
     const formData = new FormData(form);
 
     const markedProblems: number[] = [];
-    const checkboxes = form.querySelectorAll(".problem-cb") as NodeListOf<HTMLInputElement>;
+    const checkboxes = form.querySelectorAll(
+      ".problem-cb",
+    ) as NodeListOf<HTMLInputElement>;
     checkboxes.forEach((cb) => {
       if (cb.checked) {
         markedProblems.push(parseInt(cb.value, 10));
@@ -190,13 +209,29 @@ export default function Diagnostico() {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-      setDebugOutput(JSON.stringify(data, null, 2));
+      // Validar el tipo de contenido antes de intentar llamar a .json()
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        setDebugOutput(JSON.stringify(data, null, 2));
 
-      if (response.ok) {
-        setSuccessData(data);
+        if (response.ok) {
+          setSuccessData(data);
+        } else {
+          setErrorMsg(
+            data.error || "Ocurrió un error al procesar el diagnóstico.",
+          );
+        }
       } else {
-        setErrorMsg(data.error || "Ocurrió un error al procesar el diagnóstico.");
+        // En caso de que el servidor devuelva HTML o texto plano (p. ej., error 500 o timeout de Vercel)
+        const rawText = await response.text();
+        if (import.meta.env.DEV) {
+          console.error("[Diagnostico Non-JSON Response]:", rawText);
+          setDebugOutput(rawText);
+        }
+        setErrorMsg(
+          "El servidor devolvió un error inesperado. Consulta los logs del sistema.",
+        );
       }
     } catch (err: any) {
       setErrorMsg(err.message || "Error de red al conectar con el servidor.");
@@ -232,11 +267,15 @@ export default function Diagnostico() {
                 Análisis Automatizado
               </span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-blue-600 bg-clip-text text-transparent mb-4" style={{ fontFamily: "var(--app-font-heading)" }}>
+            <h1
+              className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-blue-600 bg-clip-text text-transparent mb-4"
+              style={{ fontFamily: "var(--app-font-heading)" }}
+            >
               Diagnóstico Tecnológico
             </h1>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Evalúa la infraestructura digital y procesos de tu empresa de forma automatizada y recibe una hoja de ruta técnica a medida.
+              Evalúa la infraestructura digital y procesos de tu empresa de
+              forma automatizada y recibe una hoja de ruta técnica a medida.
             </p>
           </motion.div>
 
@@ -263,11 +302,15 @@ export default function Diagnostico() {
                       <RefreshCw className="h-10 w-10 text-primary animate-spin" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-foreground tracking-wide" style={{ fontFamily: "var(--app-font-heading)" }}>
+                  <h3
+                    className="text-xl font-semibold text-foreground tracking-wide"
+                    style={{ fontFamily: "var(--app-font-heading)" }}
+                  >
                     Generando tu Diagnóstico...
                   </h3>
                   <p className="text-muted-foreground mt-2 text-center text-sm max-w-sm">
-                    Estamos analizando los síntomas de tu negocio, guardando el lead en base de datos y preparando tu reporte en PDF.
+                    Estamos analizando los síntomas de tu negocio, guardando el
+                    lead en base de datos y preparando tu reporte en PDF.
                   </p>
                   <div className="flex gap-1.5 mt-6">
                     {[0, 1, 2].map((i) => (
@@ -275,7 +318,11 @@ export default function Diagnostico() {
                         key={i}
                         className="w-2 h-2 rounded-full bg-primary"
                         animate={{ opacity: [0.3, 1, 0.3] }}
-                        transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                        transition={{
+                          duration: 1.2,
+                          repeat: Infinity,
+                          delay: i * 0.2,
+                        }}
                       />
                     ))}
                   </div>
@@ -296,8 +343,15 @@ export default function Diagnostico() {
                       <AlertCircle className="h-5 w-5 text-destructive" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-semibold text-destructive" style={{ fontFamily: "var(--app-font-heading)" }}>Error en el proceso</h4>
-                      <p className="text-muted-foreground mt-1 text-sm">{errorMsg}</p>
+                      <h4
+                        className="text-lg font-semibold text-destructive"
+                        style={{ fontFamily: "var(--app-font-heading)" }}
+                      >
+                        Error en el proceso
+                      </h4>
+                      <p className="text-muted-foreground mt-1 text-sm">
+                        {errorMsg}
+                      </p>
                       <button
                         onClick={() => setErrorMsg(null)}
                         className="mt-4 px-4 py-2 bg-destructive/10 text-destructive border border-destructive/20 rounded-lg hover:bg-destructive/20 transition-colors text-xs font-semibold cursor-pointer"
@@ -322,7 +376,12 @@ export default function Diagnostico() {
                     className="flex justify-center mb-6"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 200,
+                      damping: 15,
+                      delay: 0.2,
+                    }}
                   >
                     <div className="relative">
                       <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl" />
@@ -331,18 +390,26 @@ export default function Diagnostico() {
                       </div>
                     </div>
                   </motion.div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 tracking-wide" style={{ fontFamily: "var(--app-font-heading)" }}>
+                  <h2
+                    className="text-2xl md:text-3xl font-bold text-foreground mb-3 tracking-wide"
+                    style={{ fontFamily: "var(--app-font-heading)" }}
+                  >
                     ¡Diagnóstico Completado!
                   </h2>
                   <p className="text-muted-foreground text-sm max-w-lg mx-auto mb-8">
-                    {successData.emailSent
-                      ? "Hemos enviado el reporte de diagnóstico detallado en formato PDF a la dirección de correo electrónico indicada."
-                      : "Hemos registrado tu diagnóstico en el sistema. El correo de confirmación está pendiente de configuración SMTP."}
+                    {successData.emailSent && successData.pdfGenerated
+                      ? "Hemos enviado el reporte de diagnóstico detallado en PDF a tu dirección de correo electrónico."
+                      : successData.emailSent
+                        ? "Hemos registrado tu diagnóstico y te enviamos un correo de confirmación. Tu reporte en PDF se generará en breve."
+                        : "Hemos registrado tu diagnóstico en el sistema. Un consultor se pondrá en contacto contigo muy pronto."}
                   </p>
 
                   {/* Next Steps Card */}
                   <div className="max-w-md mx-auto bg-background/50 border border-border/50 rounded-xl p-6 mb-8 text-left">
-                    <h4 className="text-foreground font-semibold mb-4 flex items-center gap-2 text-sm" style={{ fontFamily: "var(--app-font-heading)" }}>
+                    <h4
+                      className="text-foreground font-semibold mb-4 flex items-center gap-2 text-sm"
+                      style={{ fontFamily: "var(--app-font-heading)" }}
+                    >
                       <ClipboardList className="h-4 w-4 text-primary" />
                       Siguientes Pasos
                     </h4>
@@ -350,7 +417,12 @@ export default function Diagnostico() {
                     {preferenceSelected === "cafe" && (
                       <div className="flex flex-col gap-3">
                         <p className="text-muted-foreground text-xs leading-relaxed">
-                          Has seleccionado <strong className="text-foreground">Café Presencial</strong>. Nos coordinaremos pronto para reunirnos en Canarias para detallar tu hoja de ruta.
+                          Has seleccionado{" "}
+                          <strong className="text-foreground">
+                            Café Presencial
+                          </strong>
+                          . Nos coordinaremos pronto para reunirnos en Canarias
+                          para detallar tu hoja de ruta.
                         </p>
                         <a
                           href="https://wa.me/34600000000?text=Hola!%20Acabo%20de%20hacer%20el%20diagnóstico%20de%20mi%20empresa%20y%20elegí%20la%20opción%20de%20café%20presencial."
@@ -367,7 +439,12 @@ export default function Diagnostico() {
                     {preferenceSelected === "llamada" && (
                       <div className="flex flex-col gap-3">
                         <p className="text-muted-foreground text-xs leading-relaxed">
-                          Has seleccionado <strong className="text-foreground">Llamada telefónica</strong>. Un consultor experto te llamará para comentar la auditoría técnica.
+                          Has seleccionado{" "}
+                          <strong className="text-foreground">
+                            Llamada telefónica
+                          </strong>
+                          . Un consultor experto te llamará para comentar la
+                          auditoría técnica.
                         </p>
                         <a
                           href="tel:+34600000000"
@@ -382,7 +459,11 @@ export default function Diagnostico() {
                     {preferenceSelected === "email" && (
                       <div className="flex flex-col gap-3">
                         <p className="text-muted-foreground text-xs leading-relaxed">
-                          Has seleccionado <strong className="text-foreground">Correo Electrónico</strong>. Te responderemos directamente a tu email.
+                          Has seleccionado{" "}
+                          <strong className="text-foreground">
+                            Correo Electrónico
+                          </strong>
+                          . Te responderemos directamente a tu email.
                         </p>
                         <a
                           href="mailto:vertextechcontact@gmail.com?subject=Diagnóstico Tecnológico Completado"
@@ -456,10 +537,18 @@ export default function Diagnostico() {
                         icon={Users}
                         defaultValue="1-9 empleados"
                       >
-                        <option value="1-9 empleados">1-9 empleados (Microempresa)</option>
-                        <option value="10-49 empleados">10-49 empleados (Pequeña empresa)</option>
-                        <option value="50-249 empleados">50-249 empleados (Mediana empresa)</option>
-                        <option value="250+ empleados">250+ empleados (Gran empresa)</option>
+                        <option value="1-9 empleados">
+                          1-9 empleados (Microempresa)
+                        </option>
+                        <option value="10-49 empleados">
+                          10-49 empleados (Pequeña empresa)
+                        </option>
+                        <option value="50-249 empleados">
+                          50-249 empleados (Mediana empresa)
+                        </option>
+                        <option value="250+ empleados">
+                          250+ empleados (Gran empresa)
+                        </option>
                       </FormSelect>
                       <FormSelect
                         label="Preferencia de Contacto"
@@ -502,7 +591,8 @@ export default function Diagnostico() {
                     </SectionTitle>
 
                     <p className="text-sm md:text-base text-muted-foreground mb-5 leading-relaxed">
-                      Selecciona todos los problemas que reconozcas actualmente en tu infraestructura digital o procesos:
+                      Selecciona todos los problemas que reconozcas actualmente
+                      en tu infraestructura digital o procesos:
                     </p>
 
                     <div className="flex items-center justify-between mb-4">
@@ -574,11 +664,16 @@ export default function Diagnostico() {
                           className="overflow-hidden"
                         >
                           <div className="flex flex-col">
-                            <label className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2" htmlFor="free_text">
+                            <label
+                              className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2"
+                              htmlFor="free_text"
+                            >
                               <FileText className="w-3.5 h-3.5 text-primary/70" />
                               Descripción Libre / Necesidades
                               {markedCount < 3 && (
-                                <span className="text-xs text-destructive font-normal">(requerido)</span>
+                                <span className="text-xs text-destructive font-normal">
+                                  (requerido)
+                                </span>
                               )}
                             </label>
                             <textarea
@@ -631,12 +726,12 @@ export default function Diagnostico() {
               )}
             </AnimatePresence>
 
-            {/* Debug Output */}
-            {debugOutput && !loading && (
+            {/* Debug Output (Solo visible durante desarrollo local) */}
+            {import.meta.env.DEV && debugOutput && !loading && (
               <div className="mt-8 border-t border-border pt-6">
                 <details className="cursor-pointer group">
                   <summary className="text-xs text-muted-foreground hover:text-muted-foreground/80 select-none outline-none">
-                    Ver salida de depuración API (Logs JSON)
+                    Ver salida de depuración API (Solo Dev)
                   </summary>
                   <pre className="mt-4 bg-background/80 p-4 border border-border rounded-lg text-[10px] text-primary/70 overflow-x-auto font-mono max-h-60">
                     {debugOutput}
