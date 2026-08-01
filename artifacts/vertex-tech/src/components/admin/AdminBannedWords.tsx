@@ -31,7 +31,7 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin-banned-words", {
+      const res = await fetch("/api/admin-moderation?resource=words", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
@@ -82,14 +82,14 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
 
     try {
       // 1. Eliminar la palabra original
-      const delRes = await fetch(`/api/admin-banned-words?id=${id}`, {
+      const delRes = await fetch(`/api/admin-moderation?resource=words&id=${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!delRes.ok) throw new Error("No se pudo eliminar la palabra original");
 
       // 2. Insertar la nueva
-      const addRes = await fetch("/api/admin-banned-words", {
+      const addRes = await fetch("/api/admin-moderation?resource=words", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +124,7 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
     setAdding(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin-banned-words", {
+      const res = await fetch("/api/admin-moderation?resource=words", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -152,7 +152,7 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
     setDeletingId(id);
     setError(null);
     try {
-      const res = await fetch(`/api/admin-banned-words?id=${id}`, {
+      const res = await fetch(`/api/admin-moderation?resource=words&id=${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
