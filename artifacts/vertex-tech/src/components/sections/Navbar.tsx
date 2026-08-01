@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link as WouterLink } from "wouter";
+import { Link as WouterLink, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio");
   const { lang, setLang, t } = useLanguage();
+  const [location] = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,6 +41,10 @@ export function Navbar() {
 
   const scrollTo = (href: string) => {
     setMobileMenuOpen(false);
+    if (location !== "/") {
+      window.location.href = "/" + href;
+      return;
+    }
     const el = document.querySelector(href);
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
@@ -75,13 +80,23 @@ export function Navbar() {
               href={link.href}
               onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
               className={`text-sm font-medium transition-colors hover:text-primary ${
-                activeSection === link.id ? "text-primary" : "text-muted-foreground"
+                location === "/" && activeSection === link.id ? "text-primary" : "text-muted-foreground"
               }`}
               data-testid={`nav-link-${link.id}`}
             >
               {t(`nav.${link.id}`)}
             </a>
           ))}
+          
+          <WouterLink
+            href="/diagnostico"
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              location === "/diagnostico" ? "text-primary" : "text-muted-foreground"
+            }`}
+            data-testid="nav-link-diagnostico"
+          >
+            {t("nav.diagnostico")}
+          </WouterLink>
           
           {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
           <WouterLink
@@ -162,12 +177,23 @@ export function Navbar() {
                 href={link.href}
                 onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
                 className={`text-lg font-medium transition-colors ${
-                  activeSection === link.id ? "text-primary" : "text-muted-foreground"
+                  location === "/" && activeSection === link.id ? "text-primary" : "text-muted-foreground"
                 }`}
               >
                 {t(`nav.${link.id}`)}
               </a>
             ))}
+
+            <WouterLink
+              href="/diagnostico"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`text-lg font-medium transition-colors hover:text-primary ${
+                location === "/diagnostico" ? "text-primary" : "text-muted-foreground"
+              }`}
+              data-testid="nav-link-diagnostico-mobile"
+            >
+              {t("nav.diagnostico")}
+            </WouterLink>
             {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
             <WouterLink
               href="/blog"
