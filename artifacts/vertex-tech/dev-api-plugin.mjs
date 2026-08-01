@@ -33,8 +33,17 @@ export function devApiPlugin() {
         if (!url.startsWith("/api/")) return next();
 
         const name = url.split("?")[0].replace(/^\/api\//, "");
-        const file = path.join(root, "api", `${name}.js`);
-        if (!fs.existsSync(file)) return next();
+        let file = path.join(root, "api", `${name}.js`);
+        let isTs = false;
+        if (!fs.existsSync(file)) {
+          const tsFile = path.join(root, "api", `${name}.ts`);
+          if (fs.existsSync(tsFile)) {
+            file = tsFile;
+            isTs = true;
+          } else {
+            return next();
+          }
+        }
 
         // Query string → req.query (el runtime de Vercel lo hace automáticamente;
         // aquí lo parseamos manualmente para el dev server).
@@ -73,9 +82,13 @@ export function devApiPlugin() {
         };
 
         try {
+          if (isTs) {
+            require("tsx/cjs");
+          }
           // Recarga el handler en cada llamada para reflejar cambios sin reiniciar.
           delete require.cache[require.resolve(file)];
-          const handler = require(file);
+          const handlerModule = require(file);
+          const handler = handlerModule.default || handlerModule;
           await handler(req, res);
         } catch (err) {
           console.error(`[dev-api] error en /api/${name}:`, err);

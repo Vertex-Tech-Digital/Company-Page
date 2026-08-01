@@ -24,10 +24,10 @@ import {
 /*  DATOS BANCARIOS OFICIALES (BBVA)                                           */
 /* -------------------------------------------------------------------------- */
 const BANK_DETAILS = {
-  beneficiary: "***REMOVED***",
-  bank: "Banco Bilbao Vizcaya Argentaria, S.A. (BBVA)",
-  iban: "***REMOVED***",
-  bic: "***REMOVED***",
+  beneficiary: import.meta.env.VITE_BANK_BENEFICIARY as string,
+  bank: import.meta.env.VITE_BANK_NAME as string,
+  iban: import.meta.env.VITE_BANK_IBAN as string,
+  bic: import.meta.env.VITE_BANK_BIC as string,
 };
 
 const stripePromise = loadStripe(
