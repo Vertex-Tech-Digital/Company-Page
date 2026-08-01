@@ -23,11 +23,21 @@ import {
 /* -------------------------------------------------------------------------- */
 /*  DATOS BANCARIOS OFICIALES (BBVA)                                           */
 /* -------------------------------------------------------------------------- */
+const getEnvVar = (key: string): string => {
+  const value = import.meta.env[key];
+  if (!value && import.meta.env.DEV) {
+    console.warn(
+      `[Checkout Warning]: La variable de entorno ${key} no está definida.`,
+    );
+  }
+  return typeof value === "string" ? value.trim() : "";
+};
+
 const BANK_DETAILS = {
-  beneficiary: import.meta.env.VITE_BANK_BENEFICIARY as string,
-  bank: import.meta.env.VITE_BANK_NAME as string,
-  iban: import.meta.env.VITE_BANK_IBAN as string,
-  bic: import.meta.env.VITE_BANK_BIC as string,
+  beneficiary: getEnvVar("VITE_BANK_BENEFICIARY"),
+  bank: getEnvVar("VITE_BANK_NAME"),
+  iban: getEnvVar("VITE_BANK_IBAN"),
+  bic: getEnvVar("VITE_BANK_BIC"),
 };
 
 const stripePromise = loadStripe(
@@ -153,7 +163,9 @@ function CardFlow() {
       }
       setClientSecret(data.clientSecret);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo iniciar el pago.");
+      setError(
+        err instanceof Error ? err.message : "No se pudo iniciar el pago.",
+      );
     } finally {
       setIsCreating(false);
     }
@@ -260,7 +272,11 @@ function TransferFlow() {
   }
 
   const rows: { label: string; value: string; key: string }[] = [
-    { label: "Beneficiario", value: BANK_DETAILS.beneficiary, key: "beneficiary" },
+    {
+      label: "Beneficiario",
+      value: BANK_DETAILS.beneficiary,
+      key: "beneficiary",
+    },
     { label: "Banco", value: BANK_DETAILS.bank, key: "bank" },
     { label: "IBAN", value: BANK_DETAILS.iban, key: "iban" },
     { label: "BIC / SWIFT", value: BANK_DETAILS.bic, key: "bic" },
@@ -344,7 +360,11 @@ function TransferFlow() {
 /* -------------------------------------------------------------------------- */
 /*  Selector inicial de método de pago                                        */
 /* -------------------------------------------------------------------------- */
-function MethodSelector({ onSelect }: { onSelect: (m: PaymentMethod) => void }) {
+function MethodSelector({
+  onSelect,
+}: {
+  onSelect: (m: PaymentMethod) => void;
+}) {
   const options: {
     method: PaymentMethod;
     icon: typeof CreditCard;
