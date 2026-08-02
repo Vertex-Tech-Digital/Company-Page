@@ -181,7 +181,7 @@ module.exports = async function handler(req, res) {
       })
       .returning();
 
-    // C. Generación de PDF
+    // C. Generación de PDF (Aislada en try/catch para evitar caídas fatales)
     const leadRecordForPdf = {
       id: insertedLead.id,
       companyName: cleanCompanyName,
