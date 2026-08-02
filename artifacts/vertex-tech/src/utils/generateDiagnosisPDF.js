@@ -5,16 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateDiagnosisPDF = generateDiagnosisPDF;
 const react_1 = __importDefault(require("react"));
-const renderer_1 = require("@react-pdf/renderer");
 // @ts-ignore
 const invoice_pdf_js_1 = require("../../server/invoice-pdf.js");
-// Desactivar globalmente la rotura de palabras con guiones en React PDF
-try {
-    renderer_1.Font.registerHyphenationCallback((word) => [word]);
-}
-catch (e) {
-    // Evita errores de registro duplicado
-}
+// @react-pdf/renderer es ESM puro. Se carga con import() dinámico dentro de la
+// función (mismo patrón que server/invoice-pdf.js): un require() de nivel
+// superior sólo funciona en Node >= 22.12 y en Vercel revienta al cargar el
+// módulo con ERR_REQUIRE_ESM, tumbando la función entera.
+let hyphenationDisabled = false;
 /**
  * Genera el PDF de diagnóstico corporativo adaptando la API de invoice-pdf.js.
  *
@@ -23,6 +20,18 @@ catch (e) {
  * @returns Promesa que resuelve a un Buffer con el PDF generado en memoria.
  */
 async function generateDiagnosisPDF(leadData, fullProblemsList) {
+    const renderer_1 = await import("@react-pdf/renderer");
+    // Desactivar globalmente la rotura de palabras con guiones en React PDF.
+    // El flag evita re-registrar el callback en invocaciones calientes.
+    if (!hyphenationDisabled) {
+        try {
+            renderer_1.Font.registerHyphenationCallback((word) => [word]);
+            hyphenationDisabled = true;
+        }
+        catch (e) {
+            // Evita errores de registro duplicado
+        }
+    }
     const h = react_1.default.createElement;
     const servicePriority = {
         "Automatización": 1,
