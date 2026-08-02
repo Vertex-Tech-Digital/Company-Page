@@ -1,0 +1,11 @@
+# Commits puramente mecanicos (reformateos masivos) que ensucian git blame.
+#
+# Para que git los ignore, cada desarrollador debe ejecutar UNA VEZ:
+#
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# Sin ese comando el archivo no hace nada. GitHub, en cambio, lo detecta
+# y lo aplica automaticamente en su vista de blame.
+
+# style: apply Prettier formatting across the monorepo
+ee9eefeb9d3022bc5288ec01b964b5428f348a92
