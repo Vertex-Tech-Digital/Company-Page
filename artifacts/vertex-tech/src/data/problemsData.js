@@ -13,10 +13,11 @@ const problemsData = [
       "mecanico",
       "mecánico",
       "rutina",
-      "tecleando"
+      "tecleando",
     ],
-    recommendation: "Eliminar el trabajo mecánico del personal. El equipo se centra en atender, no en copiar datos.",
-    vertexService: "Automatización con IA"
+    recommendation:
+      "Eliminar el trabajo mecánico del personal. El equipo se centra en atender, no en copiar datos.",
+    vertexService: "Automatización con IA",
   },
   {
     id: 2,
@@ -33,10 +34,11 @@ const problemsData = [
       "tpv",
       "desconectado",
       "aislado",
-      "integrar"
+      "integrar",
     ],
-    recommendation: "Unificar las herramientas actuales sin sustituirlas. Construir puentes entre sistemas.",
-    vertexService: "Integración de APIs"
+    recommendation:
+      "Unificar las herramientas actuales sin sustituirlas. Construir puentes entre sistemas.",
+    vertexService: "Integración de APIs",
   },
   {
     id: 3,
@@ -53,10 +55,11 @@ const problemsData = [
       "caidas",
       "caídas",
       "servidor",
-      "lento"
+      "lento",
     ],
-    recommendation: "Auditoría de rendimiento y optimización de servidores/bases de datos para soportar picos reales.",
-    vertexService: "QA & Testing"
+    recommendation:
+      "Auditoría de rendimiento y optimización de servidores/bases de datos para soportar picos reales.",
+    vertexService: "QA & Testing",
   },
   {
     id: 4,
@@ -71,10 +74,11 @@ const problemsData = [
       "demora",
       "responder",
       "whatsapp",
-      "espera"
+      "espera",
     ],
-    recommendation: "Asistentes que responden en segundos. El equipo humano interviene solo cuando importa.",
-    vertexService: "Automatización con IA"
+    recommendation:
+      "Asistentes que responden en segundos. El equipo humano interviene solo cuando importa.",
+    vertexService: "Automatización con IA",
   },
   {
     id: 5,
@@ -91,10 +95,11 @@ const problemsData = [
       "facturacion",
       "facturación",
       "iva",
-      "igic"
+      "igic",
     ],
-    recommendation: "Sistemas de facturación propios con IGIC/IVA, cobro automático y conciliación bancaria.",
-    vertexService: "Software a Medida"
+    recommendation:
+      "Sistemas de facturación propios con IGIC/IVA, cobro automático y conciliación bancaria.",
+    vertexService: "Software a Medida",
   },
   {
     id: 6,
@@ -113,10 +118,11 @@ const problemsData = [
       "gráficos",
       "reporte",
       "ventas",
-      "compras"
+      "compras",
     ],
-    recommendation: "Cuadros de mando en tiempo real conectados a TPV, CRM y web. Saber qué se vende y qué se compra al instante.",
-    vertexService: "Software a Medida"
+    recommendation:
+      "Cuadros de mando en tiempo real conectados a TPV, CRM y web. Saber qué se vende y qué se compra al instante.",
+    vertexService: "Software a Medida",
   },
   {
     id: 7,
@@ -132,10 +138,11 @@ const problemsData = [
       "fallo",
       "despiste",
       "mal",
-      "incorrecto"
+      "incorrecto",
     ],
-    recommendation: "Sincronización automática entre sistemas. Se elimina el factor humano del copiado repetitivo.",
-    vertexService: "Automatización"
+    recommendation:
+      "Sincronización automática entre sistemas. Se elimina el factor humano del copiado repetitivo.",
+    vertexService: "Automatización",
   },
   {
     id: 8,
@@ -150,10 +157,11 @@ const problemsData = [
       "heredado",
       "actualizar",
       "antigua",
-      "sistema"
+      "sistema",
     ],
-    recommendation: "Migración controlada a sistemas modernos en la nube, manteniendo la lógica de negocio existente.",
-    vertexService: "Software a Medida"
+    recommendation:
+      "Migración controlada a sistemas modernos en la nube, manteniendo la lógica de negocio existente.",
+    vertexService: "Software a Medida",
   },
   {
     id: 9,
@@ -169,10 +177,11 @@ const problemsData = [
       "efectivo",
       "stripe",
       "redsys",
-      "pagar"
+      "pagar",
     ],
-    recommendation: "Conexión directa con pasarelas de pago (Stripe/Redsys/Bizum). Cada venta se registra automáticamente.",
-    vertexService: "Integración de APIs"
+    recommendation:
+      "Conexión directa con pasarelas de pago (Stripe/Redsys/Bizum). Cada venta se registra automáticamente.",
+    vertexService: "Integración de APIs",
   },
   {
     id: 10,
@@ -188,10 +197,11 @@ const problemsData = [
       "existencias",
       "cuadrar stock",
       "productos",
-      "unidades"
+      "unidades",
     ],
-    recommendation: "Digitalización del almacén. Alertas automáticas de stock mínimo y cuadratura de existencias.",
-    vertexService: "Software a Medida"
+    recommendation:
+      "Digitalización del almacén. Alertas automáticas de stock mínimo y cuadratura de existencias.",
+    vertexService: "Software a Medida",
   },
   {
     id: 11,
@@ -206,10 +216,11 @@ const problemsData = [
       "cuaderno",
       "reservar",
       "citas",
-      "reservas"
+      "reservas",
     ],
-    recommendation: "Motor de reservas propio o integrado. El cliente agenda, el sistema confirma y avisa.",
-    vertexService: "Software a Medida"
+    recommendation:
+      "Motor de reservas propio o integrado. El cliente agenda, el sistema confirma y avisa.",
+    vertexService: "Software a Medida",
   },
   {
     id: 12,
@@ -225,10 +236,11 @@ const problemsData = [
       "proveedor",
       "costes",
       "beneficio",
-      "gasto"
+      "gasto",
     ],
-    recommendation: "ERP ligero a medida. Trazabilidad total desde la compra al proveedor hasta la venta final.",
-    vertexService: "Software a Medida"
+    recommendation:
+      "ERP ligero a medida. Trazabilidad total desde la compra al proveedor hasta la venta final.",
+    vertexService: "Software a Medida",
   },
   {
     id: 13,
@@ -244,11 +256,12 @@ const problemsData = [
       "errores",
       "desarrollador",
       "auditoria",
-      "auditoría"
+      "auditoría",
     ],
-    recommendation: "Revisión técnica completa: seguridad, legalidad (Veri*Factu, RGPD) y mantenimiento.",
-    vertexService: "QA & Testing"
-  }
+    recommendation:
+      "Revisión técnica completa: seguridad, legalidad (Veri*Factu, RGPD) y mantenimiento.",
+    vertexService: "QA & Testing",
+  },
 ];
 
 module.exports = { problemsData };

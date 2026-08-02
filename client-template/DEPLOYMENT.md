@@ -21,7 +21,7 @@ Proceso para poner en producción el sitio de un cliente hecho con este template
 ## 1. Repositorio del cliente
 
 1. Publicar este `client-template` como repo **Template** en la org de GitHub de Vertex
-   (Settings → *Template repository*).
+   (Settings → _Template repository_).
 2. Para cada cliente: **Use this template** → nuevo repo privado `cliente-nombre`.
 3. Personalizar `src/lib/site-config.ts`, `index.html`, `public/favicon.svg` (ver README).
 
@@ -69,7 +69,7 @@ vercel --prod    # deploy a producción
 ## 4. Variables de entorno
 
 - Vercel → **Settings → Environment Variables**. Añadir las que use el proyecto
-  (ver `.env.example`). Marcar como *Sensitive* las secretas.
+  (ver `.env.example`). Marcar como _Sensitive_ las secretas.
 - **Nunca** subir `.env` al repo (ya está en `.gitignore`).
 
 ---
@@ -88,5 +88,5 @@ vercel --prod    # deploy a producción
 
 - **Deploys automáticos:** al conectar el repo, cada push a la rama de producción despliega solo.
 - **Previews:** cada PR genera una URL de preview automática.
-- **Node 22.x:** mantener esa versión en *todos* los proyectos de cliente para evitar el error
+- **Node 22.x:** mantener esa versión en _todos_ los proyectos de cliente para evitar el error
   `Found invalid Node.js Version: "24.x"`.

@@ -77,7 +77,7 @@ module.exports = async function handler(req, res) {
            LEFT JOIN categories c ON c.id = p.category_id
            WHERE p.slug = $1
            LIMIT 1`,
-          [slug]
+          [slug],
         );
         if (result.rows.length === 0) {
           return res.status(404).json({ error: "Post no encontrado" });
@@ -95,7 +95,7 @@ module.exports = async function handler(req, res) {
            c.slug AS category_slug
          FROM posts p
          LEFT JOIN categories c ON c.id = p.category_id
-         ORDER BY p.updated_at DESC`
+         ORDER BY p.updated_at DESC`,
       );
       return res.status(200).json({ posts: result.rows });
     }
@@ -110,7 +110,9 @@ module.exports = async function handler(req, res) {
           .json({ error: "El título debe tener al menos 3 caracteres" });
       }
       if (!excerpt || typeof excerpt !== "string") {
-        return res.status(400).json({ error: "El resumen (excerpt) es requerido" });
+        return res
+          .status(400)
+          .json({ error: "El resumen (excerpt) es requerido" });
       }
       if (!content || typeof content !== "string") {
         return res.status(400).json({ error: "El contenido es requerido" });
@@ -118,9 +120,9 @@ module.exports = async function handler(req, res) {
 
       const baseSlug = slugify(title);
       if (!baseSlug) {
-        return res
-          .status(400)
-          .json({ error: "No se pudo generar un slug válido a partir del título" });
+        return res.status(400).json({
+          error: "No se pudo generar un slug válido a partir del título",
+        });
       }
       const slug = await generateUniqueSlug(pool, baseSlug);
 
@@ -128,7 +130,14 @@ module.exports = async function handler(req, res) {
         `INSERT INTO posts (slug, title, excerpt, content, image_url, category_id, status)
          VALUES ($1, $2, $3, $4, $5, $6, 'draft')
          RETURNING id, slug, title, excerpt, image_url, status, created_at, updated_at`,
-        [slug, title.trim(), excerpt.trim(), content, imageUrl ?? null, categoryId ?? null]
+        [
+          slug,
+          title.trim(),
+          excerpt.trim(),
+          content,
+          imageUrl ?? null,
+          categoryId ?? null,
+        ],
       );
 
       return res.status(201).json({ success: true, post: result.rows[0] });
@@ -141,9 +150,14 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: "ID de post inválido" });
       }
 
-      const { title, excerpt, content, imageUrl, categoryId, status } = req.body ?? {};
+      const { title, excerpt, content, imageUrl, categoryId, status } =
+        req.body ?? {};
 
-      if (status !== undefined && status !== "draft" && status !== "published") {
+      if (
+        status !== undefined &&
+        status !== "draft" &&
+        status !== "published"
+      ) {
         return res
           .status(400)
           .json({ error: "El status debe ser 'draft' o 'published'" });
@@ -188,7 +202,9 @@ module.exports = async function handler(req, res) {
       }
 
       if (fields.length === 0) {
-        return res.status(400).json({ error: "No se enviaron campos para actualizar" });
+        return res
+          .status(400)
+          .json({ error: "No se enviaron campos para actualizar" });
       }
 
       // Siempre actualiza updated_at
@@ -198,7 +214,7 @@ module.exports = async function handler(req, res) {
       const result = await pool.query(
         `UPDATE posts SET ${fields.join(", ")} WHERE id = $${i} RETURNING
            id, slug, title, excerpt, image_url, status, created_at, updated_at`,
-        values
+        values,
       );
 
       if (result.rows.length === 0) {
@@ -217,7 +233,7 @@ module.exports = async function handler(req, res) {
 
       const result = await pool.query(
         "DELETE FROM posts WHERE id = $1 RETURNING id, title",
-        [id]
+        [id],
       );
 
       if (result.rows.length === 0) {

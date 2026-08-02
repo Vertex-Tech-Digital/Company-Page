@@ -49,7 +49,9 @@ function LegalModal({
                 </button>
               </div>
               <div className="p-6">
-                <p className="text-muted-foreground text-sm leading-relaxed">{body}</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  {body}
+                </p>
               </div>
               <div className="px-6 pb-6 flex justify-end">
                 <button
@@ -119,7 +121,8 @@ export function Footer() {
                 className="text-xl font-bold tracking-tight text-white flex items-center gap-2 mb-3"
                 data-testid="footer-logo"
               >
-                Vertex Tech<span className="w-2 h-2 rounded-full bg-primary" />
+                Vertex Tech
+                <span className="w-2 h-2 rounded-full bg-primary" />
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 {t("footer.tagline")}
@@ -146,7 +149,10 @@ export function Footer() {
                 <a
                   key={href}
                   href={href}
-                  onClick={(e) => { e.preventDefault(); scrollTo(href); }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollTo(href);
+                  }}
                   className="cursor-pointer text-sm text-muted-foreground hover:text-white transition-colors"
                 >
                   {label}
