@@ -14,7 +14,9 @@ const ContactSchema = z.object({
 router.post("/contact", async (req, res) => {
   const parsed = ContactSchema.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: "Datos inválidos", details: parsed.error.issues });
+    res
+      .status(400)
+      .json({ error: "Datos inválidos", details: parsed.error.issues });
     return;
   }
 
@@ -54,10 +56,14 @@ router.post("/contact", async (req, res) => {
             <td style="padding: 8px 0; color: #8b949e;">Email</td>
             <td style="padding: 8px 0;"><a href="mailto:${email}" style="color: #3b82f6;">${email}</a></td>
           </tr>
-          ${company ? `<tr>
+          ${
+            company
+              ? `<tr>
             <td style="padding: 8px 0; color: #8b949e;">Empresa</td>
             <td style="padding: 8px 0;">${company}</td>
-          </tr>` : ""}
+          </tr>`
+              : ""
+          }
         </table>
         <hr style="border: none; border-top: 1px solid #21262d; margin: 24px 0;" />
         <h3 style="color: #8b949e; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Mensaje</h3>
@@ -72,7 +78,9 @@ router.post("/contact", async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     req.log.error({ err }, "Failed to send contact email");
-    res.status(500).json({ error: "No se pudo enviar el email. Inténtalo de nuevo." });
+    res
+      .status(500)
+      .json({ error: "No se pudo enviar el email. Inténtalo de nuevo." });
   }
 });
 

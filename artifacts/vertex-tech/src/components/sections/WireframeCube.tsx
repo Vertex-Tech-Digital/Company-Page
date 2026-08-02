@@ -1,35 +1,80 @@
 import { useRef, useEffect } from "react";
 
 const VERTICES: [number, number, number][] = [
-  [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
-  [-1, -1,  1], [1, -1,  1], [1,  1,  1], [-1,  1,  1],
+  [-1, -1, -1],
+  [1, -1, -1],
+  [1, 1, -1],
+  [-1, 1, -1],
+  [-1, -1, 1],
+  [1, -1, 1],
+  [1, 1, 1],
+  [-1, 1, 1],
 ];
 
 const EDGES: [number, number][] = [
-  [0,1],[1,2],[2,3],[3,0],
-  [4,5],[5,6],[6,7],[7,4],
-  [0,4],[1,5],[2,6],[3,7],
+  [0, 1],
+  [1, 2],
+  [2, 3],
+  [3, 0],
+  [4, 5],
+  [5, 6],
+  [6, 7],
+  [7, 4],
+  [0, 4],
+  [1, 5],
+  [2, 6],
+  [3, 7],
 ];
 
 const LABEL_DATA = [
-  { text: "API_SYNC: 2.1ms",   anchor: [1.6, 1.4, 0] as [number,number,number] },
-  { text: "QA_AUDIT: OK",      anchor: [-1.6, 0.4, 1.2] as [number,number,number] },
-  { text: "DEV_DEPLOY: 110s",  anchor: [1.6, -1.0, -1.2] as [number,number,number] },
-  { text: "UPTIME: 99.9%",     anchor: [-1.8, -1.4, 0] as [number,number,number] },
-  { text: "BUILD: PASSED",     anchor: [0, 1.9, 0.4] as [number,number,number] },
+  {
+    text: "API_SYNC: 2.1ms",
+    anchor: [1.6, 1.4, 0] as [number, number, number],
+  },
+  {
+    text: "QA_AUDIT: OK",
+    anchor: [-1.6, 0.4, 1.2] as [number, number, number],
+  },
+  {
+    text: "DEV_DEPLOY: 110s",
+    anchor: [1.6, -1.0, -1.2] as [number, number, number],
+  },
+  {
+    text: "UPTIME: 99.9%",
+    anchor: [-1.8, -1.4, 0] as [number, number, number],
+  },
+  { text: "BUILD: PASSED", anchor: [0, 1.9, 0.4] as [number, number, number] },
 ];
 
-function rotateX(v: [number,number,number], a: number): [number,number,number] {
-  return [v[0], v[1]*Math.cos(a)-v[2]*Math.sin(a), v[1]*Math.sin(a)+v[2]*Math.cos(a)];
+function rotateX(
+  v: [number, number, number],
+  a: number,
+): [number, number, number] {
+  return [
+    v[0],
+    v[1] * Math.cos(a) - v[2] * Math.sin(a),
+    v[1] * Math.sin(a) + v[2] * Math.cos(a),
+  ];
 }
-function rotateY(v: [number,number,number], a: number): [number,number,number] {
-  return [v[0]*Math.cos(a)+v[2]*Math.sin(a), v[1], -v[0]*Math.sin(a)+v[2]*Math.cos(a)];
+function rotateY(
+  v: [number, number, number],
+  a: number,
+): [number, number, number] {
+  return [
+    v[0] * Math.cos(a) + v[2] * Math.sin(a),
+    v[1],
+    -v[0] * Math.sin(a) + v[2] * Math.cos(a),
+  ];
 }
-function project(v: [number,number,number], w: number, h: number): [number,number] {
+function project(
+  v: [number, number, number],
+  w: number,
+  h: number,
+): [number, number] {
   const scale = Math.min(w, h) * 0.22;
   const d = 5;
   const fov = d / (d + v[2]);
-  return [w/2 + v[0]*scale*fov, h/2 - v[1]*scale*fov];
+  return [w / 2 + v[0] * scale * fov, h / 2 - v[1] * scale * fov];
 }
 
 interface ParticleDatum {
@@ -52,8 +97,8 @@ export function WireframeCube() {
         progress: Math.random(),
         speed: 0.004 + Math.random() * 0.004,
         isBlue: Math.random() > 0.45,
-      }))
-    )
+      })),
+    ),
   );
 
   useEffect(() => {
@@ -91,8 +136,10 @@ export function WireframeCube() {
       angleYRef.current += 0.004;
       const ay = angleYRef.current;
 
-      const rotated = VERTICES.map(v => rotateY(rotateX(v, FIXED_TILT_X), ay));
-      const projected = rotated.map(v => project(v, W, H));
+      const rotated = VERTICES.map((v) =>
+        rotateY(rotateX(v, FIXED_TILT_X), ay),
+      );
+      const projected = rotated.map((v) => project(v, W, H));
 
       // Sort edges by avg Z depth (painter's algorithm) for proper overlap
       const sortedEdges = [...EDGES]
@@ -124,10 +171,10 @@ export function WireframeCube() {
         const vA = rotated[edge[0]];
         const vB = rotated[edge[1]];
         const t = p.progress;
-        const v3: [number,number,number] = [
-          vA[0]+(vB[0]-vA[0])*t,
-          vA[1]+(vB[1]-vA[1])*t,
-          vA[2]+(vB[2]-vA[2])*t,
+        const v3: [number, number, number] = [
+          vA[0] + (vB[0] - vA[0]) * t,
+          vA[1] + (vB[1] - vA[1]) * t,
+          vA[2] + (vB[2] - vA[2]) * t,
         ];
         const [px, py] = project(v3, W, H);
 
@@ -137,12 +184,12 @@ export function WireframeCube() {
 
         // glow
         ctx.beginPath();
-        ctx.arc(px, py, 5, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(${color},${(alpha*0.25).toFixed(2)})`;
+        ctx.arc(px, py, 5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color},${(alpha * 0.25).toFixed(2)})`;
         ctx.fill();
         // core
         ctx.beginPath();
-        ctx.arc(px, py, 2.2, 0, Math.PI*2);
+        ctx.arc(px, py, 2.2, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${color},${alpha.toFixed(2)})`;
         ctx.fill();
       }
@@ -171,13 +218,18 @@ export function WireframeCube() {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full h-[460px] mx-auto max-w-[520px]">
+    <div
+      ref={containerRef}
+      className="relative w-full h-[460px] mx-auto max-w-[520px]"
+    >
       <div className="absolute inset-0 bg-primary/8 blur-[90px] rounded-full pointer-events-none" />
       <canvas ref={canvasRef} className="absolute inset-0" />
       {LABEL_DATA.map((label, i) => (
         <div
           key={i}
-          ref={el => { labelRefs.current[i] = el; }}
+          ref={(el) => {
+            labelRefs.current[i] = el;
+          }}
           className="absolute font-mono text-[10px] leading-none text-blue-400 whitespace-nowrap bg-background/90 border border-blue-500/30 px-2 py-1 rounded pointer-events-none"
           style={{ transform: "translate(-50%,-50%)", opacity: 0 }}
         >

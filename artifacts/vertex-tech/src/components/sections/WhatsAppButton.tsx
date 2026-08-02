@@ -6,7 +6,7 @@ export function WhatsAppButton() {
   const { t } = useLanguage();
 
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    t("whatsapp.message")
+    t("whatsapp.message"),
   )}`;
 
   return (

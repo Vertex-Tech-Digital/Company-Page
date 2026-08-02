@@ -33,10 +33,10 @@ const db = drizzle(pool, { schema });
 // ─── 1. Categorías ───────────────────────────────────────────────────────────
 
 const categories = [
-  { slug: "desarrollo-web",   name: "Desarrollo Web" },
-  { slug: "qa-testing",       name: "QA & Testing" },
-  { slug: "apis",             name: "APIs & Integraciones" },
-  { slug: "automatizacion-ia",name: "Automatización & IA" },
+  { slug: "desarrollo-web", name: "Desarrollo Web" },
+  { slug: "qa-testing", name: "QA & Testing" },
+  { slug: "apis", name: "APIs & Integraciones" },
+  { slug: "automatizacion-ia", name: "Automatización & IA" },
 ];
 
 // ─── 2. Palabras prohibidas ───────────────────────────────────────────────────
@@ -45,21 +45,52 @@ const categories = [
 
 const bannedWords = [
   // Insultos generales
-  "idiota", "imbecil", "estupido", "estupida", "imbécil", "estúpido", "estúpida",
-  "maldito", "maldita", "imbeciles",
+  "idiota",
+  "imbecil",
+  "estupido",
+  "estupida",
+  "imbécil",
+  "estúpido",
+  "estúpida",
+  "maldito",
+  "maldita",
+  "imbeciles",
   // Lenguaje ofensivo
-  "puta", "puto", "hijo de puta", "hdp", "coño", "joder", "mierda", "cabrón",
-  "cabron", "pendejo", "pendeja", "gilipollas", "capullo",
+  "puta",
+  "puto",
+  "hijo de puta",
+  "hdp",
+  "coño",
+  "joder",
+  "mierda",
+  "cabrón",
+  "cabron",
+  "pendejo",
+  "pendeja",
+  "gilipollas",
+  "capullo",
   // Racismo / discriminación
-  "negro de mierda", "sudaca", "inmigrante de mierda",
+  "negro de mierda",
+  "sudaca",
+  "inmigrante de mierda",
   // Spam típico
-  "compra ahora", "gana dinero", "trabaja desde casa", "click aqui", "click aquí",
-  "gana dinero facil", "gana dinero fácil", "oferta limitada",
+  "compra ahora",
+  "gana dinero",
+  "trabaja desde casa",
+  "click aqui",
+  "click aquí",
+  "gana dinero facil",
+  "gana dinero fácil",
+  "oferta limitada",
   // Amenazas
-  "te voy a matar", "te voy a encontrar", "voy a hacerte daño",
+  "te voy a matar",
+  "te voy a encontrar",
+  "voy a hacerte daño",
   // Contenido adulto
-  "xxx", "porno", "sexo gratis",
-].map(word => ({ word: word.toLowerCase() }));
+  "xxx",
+  "porno",
+  "sexo gratis",
+].map((word) => ({ word: word.toLowerCase() }));
 
 // ─── 3. Usuario administrador ─────────────────────────────────────────────────
 // La contraseña real la introduce Sandy cuando ejecute el seed.
@@ -113,14 +144,14 @@ async function seed() {
   if (adminPassword === "changeme123") {
     console.log("\n⚠️  AVISO: La contraseña es el placeholder 'changeme123'.");
     console.log("   Para usar una contraseña real, corre:");
-    console.log("   ADMIN_PASSWORD=\"tu_contraseña\" pnpm run seed\n");
+    console.log('   ADMIN_PASSWORD="tu_contraseña" pnpm run seed\n');
   }
 
   console.log("\n✅ Seed completado.");
   await pool.end();
 }
 
-seed().catch(err => {
+seed().catch((err) => {
   console.error("❌ Error en el seed:", err);
   pool.end();
   process.exit(1);

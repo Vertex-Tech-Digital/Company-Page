@@ -16,7 +16,7 @@ function analyzeFreeText(text, markedIds) {
 
   // Filtrar problemas que ya fueron marcados manualmente
   const candidateProblems = problemsData.filter(
-    (problem) => !markedIds.includes(problem.id)
+    (problem) => !markedIds.includes(problem.id),
   );
 
   // Mapear cada problema con su cantidad de palabras clave coincidentes

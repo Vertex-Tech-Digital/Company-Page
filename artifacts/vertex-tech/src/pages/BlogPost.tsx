@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Loader2, AlertCircle, ArrowLeft, Calendar, Tag, Pencil } from "lucide-react";
+import {
+  Loader2,
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  Tag,
+  Pencil,
+} from "lucide-react";
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
 import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
@@ -23,7 +30,7 @@ interface FullPost {
 function formatDate(dateStr: string, lang: string): string {
   return new Date(dateStr).toLocaleDateString(
     lang === "es" ? "es-ES" : "en-US",
-    { day: "2-digit", month: "long", year: "numeric" }
+    { day: "2-digit", month: "long", year: "numeric" },
   );
 }
 
@@ -85,8 +92,12 @@ export default function BlogPost() {
           <AlertCircle className="w-10 h-10 mx-auto mb-4 text-muted-foreground opacity-40" />
           <h1 className="text-2xl font-bold text-white mb-3">
             {isNotFound
-              ? lang === "es" ? "Artículo no encontrado" : "Article not found"
-              : lang === "es" ? "Error al cargar el artículo" : "Error loading article"}
+              ? lang === "es"
+                ? "Artículo no encontrado"
+                : "Article not found"
+              : lang === "es"
+                ? "Error al cargar el artículo"
+                : "Error loading article"}
           </h1>
           <p className="text-muted-foreground mb-8">
             {isNotFound
@@ -116,7 +127,6 @@ export default function BlogPost() {
       <PageNavbar />
 
       <article className="container mx-auto px-6 py-24 max-w-3xl">
-
         {/* Volver al blog */}
         <motion.div
           initial={{ opacity: 0, x: -8 }}
@@ -169,7 +179,11 @@ export default function BlogPost() {
               <button
                 onClick={() => setLocation(`/admin`)}
                 className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors border border-border hover:border-primary/40 rounded-lg px-3 py-1.5"
-                title={lang === "es" ? "Editar este post en el panel admin" : "Edit this post in admin panel"}
+                title={
+                  lang === "es"
+                    ? "Editar este post en el panel admin"
+                    : "Edit this post in admin panel"
+                }
               >
                 <Pencil className="w-3.5 h-3.5" />
                 {lang === "es" ? "Editar" : "Edit"}
@@ -217,7 +231,6 @@ export default function BlogPost() {
             <p key={i}>{paragraph.trim()}</p>
           ))}
         </motion.div>
-
       </article>
 
       <Footer />
