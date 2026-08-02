@@ -1,0 +1,32 @@
+# Normaliza finales de linea en todo el repo.
+#
+# Sin este archivo, Windows (core.autocrlf=true) deja CRLF en disco mientras
+# que Linux/macOS dejan LF. Resultado: PRs con cientos de lineas "modificadas"
+# que en realidad no cambiaron, y Prettier marcando archivos como mal
+# formateados solo por el final de linea.
+#
+# eol=lf fuerza LF tanto en el repositorio como en el working tree de todos
+# los sistemas operativos, que es lo mismo que usa el CI (ubuntu-latest).
+* text=auto eol=lf
+
+# Archivos binarios: nunca tocar.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.webp  binary
+*.avif  binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.mp4   binary
+*.webm  binary
+
+# Scripts de shell: siempre LF, si no fallan al ejecutarse en Linux.
+*.sh text eol=lf
+
+# El lockfile lo genera pnpm; marcarlo evita ruido en las revisiones de PR.
+pnpm-lock.yaml -diff linguist-generated=true
