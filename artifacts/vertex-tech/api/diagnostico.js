@@ -22,7 +22,9 @@ const {
 
 const { analyzeFreeText } = require("../src/utils/analyzeFreeText");
 const { problemsData } = require("../src/data/problemsData");
-const { generateDiagnosisPDF } = require("../src/utils/generateDiagnosisPDF");
+// generateDiagnosisPDF arrastra el stack de @react-pdf/renderer. Se carga de
+// forma perezosa dentro del handler para que un fallo ahí degrade a "correo sin
+// adjunto" en lugar de impedir que el módulo cargue y tumbar todo el endpoint.
 
 // Definición local del esquema para evitar dependencias externas en producción
 const contactPreferenceEnum = pgEnum("contact_preference", [
@@ -197,6 +199,9 @@ module.exports = async function handler(req, res) {
 
     let pdfBuffer = null;
     try {
+      const {
+        generateDiagnosisPDF,
+      } = require("../src/utils/generateDiagnosisPDF");
       pdfBuffer = await generateDiagnosisPDF(leadRecordForPdf, problemsData);
 
       // Actualizar estado en DB si se generó el PDF exitosamente
