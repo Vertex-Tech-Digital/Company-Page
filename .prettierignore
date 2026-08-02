@@ -21,3 +21,8 @@ artifacts/mockup-sandbox/src/.generated
 
 # Assets subidos, no son codigo fuente
 attached_assets
+
+# Plantilla de onboarding con espacios en blanco para rellenar a mano
+# (____________ ). Prettier los escapa y los convierte en algo ilegible:
+#   **Cliente:** ____________  ->  **Cliente:** **\*\*\*\***\_\_\_\_**\*\*\*\***
+client-template/ONBOARDING.md
