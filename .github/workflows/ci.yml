@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   quality:
-    name: Typecheck & Build
+    name: Lint, Typecheck & Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -50,6 +50,22 @@ jobs:
       # interactiva al reconstruir node_modules.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Formato y lint van antes que typecheck y build porque tardan
+      # segundos: si el PR trae un problema de estilo, se sabe enseguida
+      # en vez de esperar el build completo.
+      #
+      # Si este paso falla, se arregla con "pnpm run format".
+      - name: Check formatting
+        run: pnpm run format:check
+
+      # El script "lint" lleva --max-warnings=50, que es el numero exacto
+      # de avisos que existen hoy en el repo. Funciona como trinquete: los
+      # avisos pueden bajar, pero si alguien anade uno nuevo el CI falla.
+      # Al arreglar avisos conviene bajar ese numero en package.json para
+      # que el techo no se quede alto.
+      - name: Lint
+        run: pnpm run lint
 
       - name: Typecheck
         run: pnpm run typecheck
