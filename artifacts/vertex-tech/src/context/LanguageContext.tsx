@@ -15,13 +15,14 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.servicios": "Servicios",
     "nav.proyectos": "Proyectos",
     "nav.metodologia": "Metodología",
-    "nav.diagnostico": "Diagnóstico",
+    "nav.diagnostico": "Diagnóstico Gratis",
     "nav.blog": "Blog",
     "nav.contactar": "Contactar",
     // Hero
     "hero.subheadline": "Consultoría tecnológica y soluciones a medida: automatizamos procesos, integramos sistemas y auditamos tu software para que tu empresa funcione más rápido, con menos errores y a menor coste.",
     "hero.cta.primary": "Solicitar consulta",
     "hero.cta.secondary": "Ver proyectos",
+    "hero.cta.audit": "Solicitar auditoría",
     // Services
     "services.title": "Servicios de Consultoría y Desarrollo Tecnológico",
     "services.0.title": "Aplicaciones Web a Medida y Optimización de Procesos (SaaS)",
@@ -104,13 +105,14 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.servicios": "Services",
     "nav.proyectos": "Projects",
     "nav.metodologia": "Methodology",
-    "nav.diagnostico": "Diagnosis",
+    "nav.diagnostico": "Free Diagnosis",
     "nav.blog": "Blog",
     "nav.contactar": "Contact",
     // Hero
     "hero.subheadline": "Technology consulting and custom solutions: we automate your processes, integrate your systems and audit your software — so your business runs faster, with fewer errors and at lower cost.",
     "hero.cta.primary": "Request a consultation",
     "hero.cta.secondary": "View projects",
+    "hero.cta.audit": "Request audit",
     // Services
     "services.title": "Technology Consulting & Development Services",
     "services.0.title": "Custom Web Applications & Process Optimization (SaaS)",

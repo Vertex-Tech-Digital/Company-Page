@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { Link } from "wouter";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WireframeCube } from "./WireframeCube";
 import { useLanguage } from "@/context/LanguageContext";
@@ -39,24 +41,35 @@ export function Hero() {
             <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed" data-testid="hero-subtitle">
               {t("hero.subheadline")}
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4 sm:gap-6 w-full">
+              <Button 
+                asChild
+                size="lg" 
+                className="w-full sm:w-auto bg-primary text-white hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-6 h-14 cursor-pointer"
+                data-testid="hero-cta-audit"
+              >
+                <Link href="/diagnostico">
+                  {t("hero.cta.audit")}
+                </Link>
+              </Button>
               <Button 
                 onClick={() => scrollTo("#contacto")}
+                variant="outline" 
                 size="lg" 
-                className="bg-primary text-white hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-8 h-14"
+                className="w-full sm:w-auto border-primary/50 text-white hover:bg-primary/10 text-base px-6 h-14 cursor-pointer"
                 data-testid="hero-cta-primary"
               >
                 {t("hero.cta.primary")}
               </Button>
-              <Button 
-                onClick={() => scrollTo("#proyectos")}
-                variant="outline" 
-                size="lg" 
-                className="border-border hover:bg-white/5 text-base px-8 h-14"
+              <a 
+                href="#proyectos"
+                onClick={(e) => { e.preventDefault(); scrollTo("#proyectos"); }}
+                className="inline-flex items-center justify-center sm:justify-start gap-2 text-base font-semibold text-white hover:text-primary transition-colors cursor-pointer group py-3 px-2"
                 data-testid="hero-cta-secondary"
               >
-                {t("hero.cta.secondary")}
-              </Button>
+                <span>{t("hero.cta.secondary")}</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </a>
             </div>
           </motion.div>
 
