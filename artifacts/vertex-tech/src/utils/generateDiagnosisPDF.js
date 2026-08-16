@@ -7,7 +7,6 @@ var __importDefault =
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateDiagnosisPDF = generateDiagnosisPDF;
 const react_1 = __importDefault(require("react"));
-const renderer_1 = require("@react-pdf/renderer");
 // @ts-ignore
 const invoice_pdf_js_1 = require("../../server/invoice-pdf.js");
 // Desactivar globalmente la rotura de palabras con guiones en React PDF
