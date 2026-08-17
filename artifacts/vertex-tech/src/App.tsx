@@ -4,13 +4,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
-import Blog from "@/pages/Blog";
-import BlogPost from "@/pages/BlogPost";
 import { useEffect, Suspense, lazy } from "react";
 import { LanguageProvider } from "@/context/LanguageContext";
 
-// Cargados de forma diferida: Checkout arrastra el SDK de Stripe y no debe
-// entrar en el bundle inicial de la portada.
+// Cargados de forma diferida: cada ruta pasa a su propio chunk para que la
+// portada ("/") no descargue código de páginas que quizás nunca se visiten.
+const Blog = lazy(() => import("@/pages/Blog"));
+const BlogPost = lazy(() => import("@/pages/BlogPost"));
 const Checkout = lazy(() => import("@/pages/Checkout"));
 const Admin = lazy(() => import("@/pages/Admin"));
 const Diagnostico = lazy(() => import("@/pages/Diagnostico"));
