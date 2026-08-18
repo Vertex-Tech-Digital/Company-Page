@@ -15,37 +15,72 @@ export function CodeCard() {
             <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
             <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
           </div>
-          <div className="ml-4 text-xs text-muted-foreground font-mono">api/handler.ts</div>
+          <div className="ml-4 text-xs text-muted-foreground font-mono">
+            api/handler.ts
+          </div>
         </div>
         <div className="p-6 overflow-x-auto text-sm font-mono leading-relaxed">
           <pre>
             <code>
-              <span className="text-blue-400">export const</span> <span className="text-yellow-200">processPayment</span> <span className="text-blue-400">=</span> <span className="text-blue-400">async</span> (
+              <span className="text-blue-400">export const</span>{" "}
+              <span className="text-yellow-200">processPayment</span>{" "}
+              <span className="text-blue-400">=</span>{" "}
+              <span className="text-blue-400">async</span> (
               <br />
-              {"  "}<span className="text-white">req</span>: <span className="text-green-300">NextApiRequest</span>,
+              {"  "}
+              <span className="text-white">req</span>:{" "}
+              <span className="text-green-300">NextApiRequest</span>,
               <br />
-              {"  "}<span className="text-white">res</span>: <span className="text-green-300">NextApiResponse</span>
+              {"  "}
+              <span className="text-white">res</span>:{" "}
+              <span className="text-green-300">NextApiResponse</span>
+              <br />) <span className="text-blue-400">{`=>`}</span> {"{"}
               <br />
-              ) <span className="text-blue-400">{`=>`}</span> {"{"}
+              {"  "}
+              <span className="text-gray-500">
+                // Initialize secure transaction
+              </span>
               <br />
-              {"  "}<span className="text-gray-500">// Initialize secure transaction</span>
+              {"  "}
+              <span className="text-blue-400">const</span>{" "}
+              <span className="text-white">session</span>{" "}
+              <span className="text-blue-400">=</span>{" "}
+              <span className="text-blue-400">await</span>{" "}
+              <span className="text-white">stripe</span>.
+              <span className="text-yellow-200">createSession</span>({"{"}
               <br />
-              {"  "}<span className="text-blue-400">const</span> <span className="text-white">session</span> <span className="text-blue-400">=</span> <span className="text-blue-400">await</span> <span className="text-white">stripe</span>.<span className="text-yellow-200">createSession</span>({"{"}
+              {"    "}
+              <span className="text-white">mode</span>:{" "}
+              <span className="text-green-400">'payment'</span>,
               <br />
-              {"    "}<span className="text-white">mode</span>: <span className="text-green-400">'payment'</span>,
+              {"    "}
+              <span className="text-white">customer</span>:{" "}
+              <span className="text-white">req</span>.
+              <span className="text-white">body</span>.
+              <span className="text-white">customerId</span>,
               <br />
-              {"    "}<span className="text-white">customer</span>: <span className="text-white">req</span>.<span className="text-white">body</span>.<span className="text-white">customerId</span>,
+              {"  "}
+              {"}"});
               <br />
-              {"  "}{"}"});
               <br />
+              {"  "}
+              <span className="text-blue-400">return</span>{" "}
+              <span className="text-white">res</span>.
+              <span className="text-yellow-200">status</span>(
+              <span className="text-purple-400">200</span>).
+              <span className="text-yellow-200">json</span>({"{"}
               <br />
-              {"  "}<span className="text-blue-400">return</span> <span className="text-white">res</span>.<span className="text-yellow-200">status</span>(<span className="text-purple-400">200</span>).<span className="text-yellow-200">json</span>({"{"}
+              {"    "}
+              <span className="text-white">success</span>:{" "}
+              <span className="text-blue-400">true</span>,
               <br />
-              {"    "}<span className="text-white">success</span>: <span className="text-blue-400">true</span>,
+              {"    "}
+              <span className="text-white">sessionId</span>:{" "}
+              <span className="text-white">session</span>.
+              <span className="text-white">id</span>
               <br />
-              {"    "}<span className="text-white">sessionId</span>: <span className="text-white">session</span>.<span className="text-white">id</span>
-              <br />
-              {"  "}{"}"});
+              {"  "}
+              {"}"});
               <br />
               {"}"};
             </code>

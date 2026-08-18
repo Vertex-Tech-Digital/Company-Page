@@ -17,7 +17,7 @@ module.exports = async function handler(req, res) {
       // ── GET: listar todas las palabras ──────────────────────────────────────
       if (req.method === "GET") {
         const result = await pool.query(
-          "SELECT id, word, created_at FROM banned_words ORDER BY word ASC"
+          "SELECT id, word, created_at FROM banned_words ORDER BY word ASC",
         );
         return res.status(200).json({ bannedWords: result.rows });
       }
@@ -39,14 +39,18 @@ module.exports = async function handler(req, res) {
            VALUES ($1)
            ON CONFLICT (word) DO NOTHING
            RETURNING id, word`,
-          [normalized]
+          [normalized],
         );
 
         if (result.rows.length === 0) {
-          return res.status(409).json({ error: "Esa palabra ya existe en la lista" });
+          return res
+            .status(409)
+            .json({ error: "Esa palabra ya existe en la lista" });
         }
 
-        return res.status(201).json({ success: true, bannedWord: result.rows[0] });
+        return res
+          .status(201)
+          .json({ success: true, bannedWord: result.rows[0] });
       }
 
       // ── DELETE: eliminar palabra ────────────────────────────────────────────
@@ -58,7 +62,7 @@ module.exports = async function handler(req, res) {
 
         const result = await pool.query(
           "DELETE FROM banned_words WHERE id = $1 RETURNING id, word",
-          [id]
+          [id],
         );
 
         if (result.rows.length === 0) {
@@ -80,7 +84,7 @@ module.exports = async function handler(req, res) {
            FROM comments c
            JOIN posts p ON p.id = c.post_id
            WHERE c.status = 'pending'
-           ORDER BY c.flagged DESC, c.created_at ASC`
+           ORDER BY c.flagged DESC, c.created_at ASC`,
         );
         return res.status(200).json({ comments: result.rows });
       }
@@ -101,7 +105,7 @@ module.exports = async function handler(req, res) {
 
         const result = await pool.query(
           `UPDATE comments SET status = $1 WHERE id = $2 RETURNING id, status`,
-          [status, id]
+          [status, id],
         );
 
         if (result.rows.length === 0) {

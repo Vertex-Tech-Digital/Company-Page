@@ -41,7 +41,8 @@ export function ParticleNetwork() {
     if (!ctx) return;
 
     let raf: number;
-    let W = 0, H = 0;
+    let W = 0,
+      H = 0;
     let particles: Particle[] = [];
 
     const init = () => {
@@ -73,7 +74,13 @@ export function ParticleNetwork() {
       });
     };
 
-    const drawGlow = (x: number, y: number, r: number, color: string, a: number) => {
+    const drawGlow = (
+      x: number,
+      y: number,
+      r: number,
+      color: string,
+      a: number,
+    ) => {
       const g = ctx.createRadialGradient(x, y, 0, x, y, r);
       g.addColorStop(0, color.replace(")", `,${a})`).replace("rgb", "rgba"));
       g.addColorStop(1, color.replace(")", ",0)").replace("rgb", "rgba"));
@@ -148,7 +155,6 @@ export function ParticleNetwork() {
           ctx.arc(p.x, p.y, r * 2, 0, Math.PI * 2);
           ctx.fillStyle = g1;
           ctx.fill();
-
         } else {
           // regular particle — small bright dot
           ctx.beginPath();
@@ -161,7 +167,9 @@ export function ParticleNetwork() {
       raf = requestAnimationFrame(frame);
     };
 
-    const onResize = () => { init(); };
+    const onResize = () => {
+      init();
+    };
     window.addEventListener("resize", onResize);
     init();
     frame();

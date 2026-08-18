@@ -9,7 +9,10 @@ import { Footer } from "@/components/Footer";
 export function App() {
   // Inyecta el color de marca del cliente como variable CSS global.
   useEffect(() => {
-    document.documentElement.style.setProperty("--brand", siteConfig.brandColor);
+    document.documentElement.style.setProperty(
+      "--brand",
+      siteConfig.brandColor,
+    );
     document.title = `${siteConfig.brandName} — ${siteConfig.tagline}`;
   }, []);
 

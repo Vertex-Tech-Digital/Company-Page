@@ -4,7 +4,13 @@ import { AdminComments } from "@/components/admin/AdminComments";
 import { AdminBannedWords } from "@/components/admin/AdminBannedWords";
 import { AdminPosts } from "@/components/admin/AdminPosts";
 import { AdminInvoices } from "@/components/admin/AdminInvoices";
-import { MessageSquare, ShieldAlert, LogOut, FileText, Receipt } from "lucide-react";
+import {
+  MessageSquare,
+  ShieldAlert,
+  LogOut,
+  FileText,
+  Receipt,
+} from "lucide-react";
 
 type AdminView = "posts" | "comments" | "banned-words" | "invoices";
 

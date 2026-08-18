@@ -6,7 +6,11 @@
 
 const { pool } = require("../server/db.js");
 const { verifyAuth } = require("./_auth");
-const { getCompany, renderInvoicePdf, toEsDate } = require("../server/invoice-pdf.js");
+const {
+  getCompany,
+  renderInvoicePdf,
+  toEsDate,
+} = require("../server/invoice-pdf.js");
 
 // Lee un parámetro de la query. En `pnpm dev` el plugin no rellena req.query,
 // así que lo parseamos de req.url (funciona igual en Vercel).
@@ -35,8 +39,12 @@ module.exports = async function handler(req, res) {
 
     // ── Regenerar el PDF de una factura concreta ──────────────────────────────
     if (id && wantPdf) {
-      const r = await pool.query("SELECT * FROM invoices WHERE id = $1 LIMIT 1", [Number(id)]);
-      if (r.rows.length === 0) return res.status(404).json({ error: "Factura no encontrada" });
+      const r = await pool.query(
+        "SELECT * FROM invoices WHERE id = $1 LIMIT 1",
+        [Number(id)],
+      );
+      if (r.rows.length === 0)
+        return res.status(404).json({ error: "Factura no encontrada" });
       const inv = r.rows[0];
 
       const totals = {
@@ -60,7 +68,10 @@ module.exports = async function handler(req, res) {
         taxRate: Number(inv.tax_rate),
         totals,
       });
-      return res.status(200).json({ invoiceNumber: inv.invoice_number, pdfBase64: pdf.toString("base64") });
+      return res.status(200).json({
+        invoiceNumber: inv.invoice_number,
+        pdfBase64: pdf.toString("base64"),
+      });
     }
 
     // ── Listado de facturas emitidas ──────────────────────────────────────────
