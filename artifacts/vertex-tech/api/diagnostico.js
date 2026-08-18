@@ -91,10 +91,12 @@ if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
   });
 }
 
-async function isRateLimited(ip) {
-  if (!ratelimit) return false; // Fallback si no están configuradas las variables de KV
-  const { success } = await ratelimit.limit(ip);
-  return !success;
+/**
+ * Evalúa el límite de tasa devolviendo el resultado detallado de Upstash.
+ */
+async function checkRateLimit(ip) {
+  if (!ratelimit) return { success: true }; // Fallback si no están configuradas las variables de KV
+  return await ratelimit.limit(ip);
 }
 
 function sanitizeString(str) {
@@ -107,18 +109,29 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // 1. Rate Limiting por IP
-  let clientIp =
-    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
-    req.socket?.remoteAddress ||
-    "127.0.0.1";
+  // 1. Extracción y Saneamiento Seguro de IP
+  const rawIp =
+    req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "127.0.0.1";
+
+  // Si la cabecera es un array o cadena separada por comas, extrae estrictamente la primera IP
+  let clientIp = (Array.isArray(rawIp) ? rawIp[0] : rawIp).split(",")[0].trim();
 
   // Normalizar direcciones IP locales (IPv6 a IPv4)
   if (clientIp === "::1" || clientIp === "::ffff:127.0.0.1") {
     clientIp = "127.0.0.1";
   }
 
-  if (await isRateLimited(clientIp)) {
+  // Verificación de Rate Limit
+  const { success, limit, remaining, reset } = await checkRateLimit(clientIp);
+
+  // Inyección de encabezados HTTP estándar de Rate Limit (si ratelimit está activo)
+  if (limit !== undefined) {
+    res.setHeader("X-RateLimit-Limit", limit);
+    res.setHeader("X-RateLimit-Remaining", remaining);
+    res.setHeader("X-RateLimit-Reset", reset);
+  }
+
+  if (!success) {
     return res
       .status(429)
       .json({ error: "Too many requests. Please try again later." });
