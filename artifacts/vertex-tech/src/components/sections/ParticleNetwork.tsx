@@ -13,9 +13,23 @@ interface Particle {
 }
 
 const BG = "hsl(222, 47%, 7%)";
-const TOTAL = 120;
-const NODE_COUNT = 22;
+const MOBILE_BREAKPOINT = 768;
+const TOTAL_DESKTOP = 120;
+const TOTAL_MOBILE = 36;
+const NODE_COUNT_DESKTOP = 22;
+const NODE_COUNT_MOBILE = 7; // misma proporción nodo/partícula que en desktop
 const CONNECT_DIST = 180;
+
+// El chequeo de distancia entre partículas es O(n²) y cada nodo dibuja 3
+// gradientes radiales, así que en móvil (pantallas <768px) se reduce el
+// total para no saturar la GPU/batería en gama baja.
+function getParticleCounts() {
+  const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+  return {
+    total: isMobile ? TOTAL_MOBILE : TOTAL_DESKTOP,
+    nodeCount: isMobile ? NODE_COUNT_MOBILE : NODE_COUNT_DESKTOP,
+  };
+}
 
 export function ParticleNetwork() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,7 +45,9 @@ export function ParticleNetwork() {
     let particles: Particle[] = [];
 
     const init = () => {
-      const dpr = window.devicePixelRatio || 1;
+      // Capado a 2x: mismo criterio que WireframeCube — el coste de
+      // rasterizar el canvas crece con el cuadrado del DPR.
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = window.innerWidth;
       H = window.innerHeight;
       canvas.width = W * dpr;
@@ -40,8 +56,9 @@ export function ParticleNetwork() {
       canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      particles = Array.from({ length: TOTAL }, (_, i) => {
-        const isNode = i < NODE_COUNT;
+      const { total, nodeCount } = getParticleCounts();
+      particles = Array.from({ length: total }, (_, i) => {
+        const isNode = i < nodeCount;
         return {
           x: Math.random() * W,
           y: Math.random() * H,

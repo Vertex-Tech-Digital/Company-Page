@@ -64,7 +64,10 @@ export function WireframeCube() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
+    // Capado a 2x: en pantallas 3x el coste de rasterizar cada frame crece
+    // con el cuadrado del DPR, sin ganancia visual perceptible en un patrón
+    // de líneas finas.
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     function resize() {
       if (!canvas || !container) return;
@@ -79,6 +82,21 @@ export function WireframeCube() {
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(container);
+
+    // Evita quemar CPU dibujando 60fps mientras el cubo está fuera de
+    // viewport (p. ej. tras hacer scroll más allá del hero).
+    let isVisible = true;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const wasVisible = isVisible;
+        isVisible = entry.isIntersecting;
+        if (isVisible && !wasVisible) {
+          frameRef.current = requestAnimationFrame(draw);
+        }
+      },
+      { threshold: 0 },
+    );
+    io.observe(container);
 
     const FIXED_TILT_X = 0.38;
 
@@ -159,7 +177,9 @@ export function WireframeCube() {
         el.style.opacity = (0.6 + depthFactor * 0.4).toFixed(2);
       });
 
-      frameRef.current = requestAnimationFrame(draw);
+      if (isVisible) {
+        frameRef.current = requestAnimationFrame(draw);
+      }
     }
 
     frameRef.current = requestAnimationFrame(draw);
@@ -167,6 +187,7 @@ export function WireframeCube() {
     return () => {
       cancelAnimationFrame(frameRef.current);
       ro.disconnect();
+      io.disconnect();
     };
   }, []);
 
