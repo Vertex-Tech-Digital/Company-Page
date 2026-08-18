@@ -84,6 +84,7 @@
     "dotenv": "^17.4.2",
     "drizzle-orm": "1.0.0-rc.4",
     "jsonwebtoken": "^9.0.3",
+    "lru-cache": "^11.5.2",
     "pg": "^8.21.0",
     "stripe": "^22.2.3"
   }
