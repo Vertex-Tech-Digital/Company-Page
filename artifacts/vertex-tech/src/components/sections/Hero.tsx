@@ -60,9 +60,7 @@ export function Hero() {
                 className="bg-primary text-white hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-8 h-14"
                 data-testid="hero-cta-primary"
               >
-                <Link href="/diagnostico">
-                  {t("hero.cta.audit")}
-                </Link>
+                <Link href="/diagnostico">{t("hero.cta.audit")}</Link>
               </Button>
               <Button
                 onClick={() => scrollTo("#proyectos")}
@@ -73,9 +71,12 @@ export function Hero() {
               >
                 {t("hero.cta.primary")}
               </Button>
-              <a 
+              <a
                 href="#proyectos"
-                onClick={(e) => { e.preventDefault(); scrollTo("#proyectos"); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo("#proyectos");
+                }}
                 className="inline-flex items-center justify-center sm:justify-start gap-2 text-base font-semibold text-white hover:text-primary transition-colors cursor-pointer group py-3 px-2"
                 data-testid="hero-cta-secondary"
               >
