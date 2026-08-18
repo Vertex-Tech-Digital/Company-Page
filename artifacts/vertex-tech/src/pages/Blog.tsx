@@ -31,7 +31,7 @@ interface ApiCategory {
 function formatDate(dateStr: string, lang: string): string {
   return new Date(dateStr).toLocaleDateString(
     lang === "es" ? "es-ES" : "en-US",
-    { day: "2-digit", month: "short", year: "numeric" }
+    { day: "2-digit", month: "short", year: "numeric" },
   );
 }
 
@@ -39,7 +39,8 @@ function apiPostToPreview(post: ApiPost, lang: string): BlogPostPreview {
   return {
     slug: post.slug,
     image: post.image_url ?? "",
-    category: post.category_name ?? (lang === "es" ? "Sin categoría" : "Uncategorized"),
+    category:
+      post.category_name ?? (lang === "es" ? "Sin categoría" : "Uncategorized"),
     title: post.title,
     excerpt: post.excerpt,
     date: formatDate(post.created_at, lang),
@@ -84,8 +85,8 @@ export default function Blog() {
         setError(
           lang === "es"
             ? "No se pudieron cargar los artículos. Inténtalo de nuevo."
-            : "Could not load articles. Please try again."
-        )
+            : "Could not load articles. Please try again.",
+        ),
       )
       .finally(() => setLoading(false));
   }, [selectedCategory, lang]);
@@ -120,16 +121,21 @@ export default function Blog() {
               data-testid="blog-title"
             >
               {lang === "es" ? (
-                <>Ideas y aprendizajes sobre{" "}
+                <>
+                  Ideas y aprendizajes sobre{" "}
                   <span className="text-primary">tecnología y calidad</span>
                 </>
               ) : (
-                <>Ideas and insights on{" "}
+                <>
+                  Ideas and insights on{" "}
                   <span className="text-primary">technology and quality</span>
                 </>
               )}
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed" data-testid="blog-subtitle">
+            <p
+              className="text-lg text-muted-foreground leading-relaxed"
+              data-testid="blog-subtitle"
+            >
               {lang === "es"
                 ? "Artículos sobre desarrollo, QA, integraciones e inteligencia artificial, escritos por el equipo de Vertex Tech."
                 : "Articles on development, QA, integrations and artificial intelligence, written by the Vertex Tech team."}
@@ -172,7 +178,6 @@ export default function Blog() {
       {/* Grid de artículos */}
       <section className="pb-24 relative z-10">
         <div className="container mx-auto px-6">
-
           {/* Estado: cargando */}
           {loading && (
             <div className="flex items-center justify-center py-20 text-muted-foreground">
@@ -209,7 +214,6 @@ export default function Blog() {
               ))}
             </div>
           )}
-
         </div>
       </section>
 

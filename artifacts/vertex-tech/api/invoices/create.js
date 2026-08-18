@@ -20,7 +20,14 @@ const {
  */
 
 /* ── Email con adjunto + BCC ─────────────────────────────────────────────────── */
-async function sendInvoiceEmail({ to, bcc, invoiceNumber, language, companyName, pdf }) {
+async function sendInvoiceEmail({
+  to,
+  bcc,
+  invoiceNumber,
+  language,
+  companyName,
+  pdf,
+}) {
   const gmailUser = process.env.GMAIL_USER;
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
   if (!gmailUser || !gmailPass) throw new Error("Email service not configured");
@@ -35,8 +42,16 @@ async function sendInvoiceEmail({ to, bcc, invoiceNumber, language, companyName,
   });
   const copy =
     language === "en"
-      ? { subject: `Invoice ${invoiceNumber}`, body: `Hello,\n\nPlease find attached invoice ${invoiceNumber} issued by ${companyName}.\n\nThank you for your business.\n\n— ${companyName}`, filename: "Invoice" }
-      : { subject: `Factura ${invoiceNumber}`, body: `Hola,\n\nAdjuntamos la factura ${invoiceNumber} emitida por ${companyName}.\n\nGracias por confiar en nosotros.\n\n— ${companyName}`, filename: "Factura" };
+      ? {
+          subject: `Invoice ${invoiceNumber}`,
+          body: `Hello,\n\nPlease find attached invoice ${invoiceNumber} issued by ${companyName}.\n\nThank you for your business.\n\n— ${companyName}`,
+          filename: "Invoice",
+        }
+      : {
+          subject: `Factura ${invoiceNumber}`,
+          body: `Hola,\n\nAdjuntamos la factura ${invoiceNumber} emitida por ${companyName}.\n\nGracias por confiar en nosotros.\n\n— ${companyName}`,
+          filename: "Factura",
+        };
 
   await transporter.sendMail({
     from: `"${companyName}" <${gmailUser}>`,
@@ -44,23 +59,38 @@ async function sendInvoiceEmail({ to, bcc, invoiceNumber, language, companyName,
     bcc,
     subject: copy.subject,
     text: copy.body,
-    attachments: [{ filename: `${copy.filename}-${invoiceNumber}.pdf`, content: pdf, contentType: "application/pdf" }],
+    attachments: [
+      {
+        filename: `${copy.filename}-${invoiceNumber}.pdf`,
+        content: pdf,
+        contentType: "application/pdf",
+      },
+    ],
   });
 }
 
 /* ── Validación ──────────────────────────────────────────────────────────────── */
 function validate(body) {
   const client = body && body.client;
-  if (!client || typeof client !== "object") return "Faltan los datos del cliente.";
-  if (!client.legalName || String(client.legalName).trim().length < 2) return "Razón social inválida.";
-  if (!client.nif || String(client.nif).trim().length < 1) return "NIF/CIF inválido.";
-  if (!client.email || !String(client.email).includes("@")) return "Email de facturación inválido.";
-  if (!client.address || String(client.address).trim().length < 1) return "Dirección inválida.";
-  if (!Array.isArray(body.items) || body.items.length < 1) return "La factura necesita al menos una línea.";
+  if (!client || typeof client !== "object")
+    return "Faltan los datos del cliente.";
+  if (!client.legalName || String(client.legalName).trim().length < 2)
+    return "Razón social inválida.";
+  if (!client.nif || String(client.nif).trim().length < 1)
+    return "NIF/CIF inválido.";
+  if (!client.email || !String(client.email).includes("@"))
+    return "Email de facturación inválido.";
+  if (!client.address || String(client.address).trim().length < 1)
+    return "Dirección inválida.";
+  if (!Array.isArray(body.items) || body.items.length < 1)
+    return "La factura necesita al menos una línea.";
   for (const it of body.items) {
-    if (!it || String(it.description || "").trim().length < 1) return "Cada línea necesita descripción.";
-    if (!Number.isFinite(Number(it.quantity)) || Number(it.quantity) <= 0) return "Las cantidades deben ser mayores que 0.";
-    if (!Number.isFinite(Number(it.unitPrice)) || Number(it.unitPrice) < 0) return "Precios unitarios inválidos.";
+    if (!it || String(it.description || "").trim().length < 1)
+      return "Cada línea necesita descripción.";
+    if (!Number.isFinite(Number(it.quantity)) || Number(it.quantity) <= 0)
+      return "Las cantidades deben ser mayores que 0.";
+    if (!Number.isFinite(Number(it.unitPrice)) || Number(it.unitPrice) < 0)
+      return "Precios unitarios inválidos.";
   }
   return null;
 }
@@ -74,14 +104,18 @@ async function nextInvoiceNumber(dbClient, year) {
   );
   let seq = 1;
   if (r.rows.length) {
-    const n = parseInt(String(r.rows[0].invoice_number).slice(prefix.length), 10);
+    const n = parseInt(
+      String(r.rows[0].invoice_number).slice(prefix.length),
+      10,
+    );
     if (Number.isFinite(n)) seq = n + 1;
   }
   return `${prefix}${String(seq).padStart(3, "0")}`;
 }
 
 module.exports = async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST")
+    return res.status(405).json({ error: "Method not allowed" });
 
   const auth = verifyAuth(req, res);
   if (!auth) return; // verifyAuth ya respondió 401
@@ -96,7 +130,9 @@ module.exports = async function handler(req, res) {
 
   const company = getCompany();
   const language = body.language === "en" ? "en" : "es";
-  const taxRate = Number.isFinite(Number(body.taxRate)) ? Number(body.taxRate) : 7;
+  const taxRate = Number.isFinite(Number(body.taxRate))
+    ? Number(body.taxRate)
+    : 7;
   const client = {
     legalName: String(body.client.legalName).trim(),
     nif: String(body.client.nif).trim(),
@@ -120,7 +156,9 @@ module.exports = async function handler(req, res) {
     await dbClient.query("BEGIN");
     const year = new Date().getFullYear();
     // Serializa la numeración por año: garantiza correlativos sin huecos ni duplicados.
-    await dbClient.query("SELECT pg_advisory_xact_lock(hashtext($1))", [`invoices_${year}`]);
+    await dbClient.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
+      `invoices_${year}`,
+    ]);
 
     invoiceNumber = await nextInvoiceNumber(dbClient, year);
 
@@ -143,9 +181,20 @@ module.exports = async function handler(req, res) {
           subtotal, tax_amount, total, status)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'sent')`,
       [
-        invoiceNumber, clientId, client.legalName, client.nif, client.email,
-        client.address, language, issueDate, dueDate, JSON.stringify(items),
-        taxRate, totals.subtotal, totals.taxAmount, totals.total,
+        invoiceNumber,
+        clientId,
+        client.legalName,
+        client.nif,
+        client.email,
+        client.address,
+        language,
+        issueDate,
+        dueDate,
+        JSON.stringify(items),
+        taxRate,
+        totals.subtotal,
+        totals.taxAmount,
+        totals.total,
       ],
     );
 
@@ -177,9 +226,14 @@ module.exports = async function handler(req, res) {
     console.error("Invoice PDF error:", err);
     // La factura ya está guardada; se puede descargar/reenviar desde el listado.
     return res.status(200).json({
-      invoiceNumber, status: "sent", issueDate,
-      subtotal: totals.subtotal, taxAmount: totals.taxAmount, total: totals.total,
-      emailSent: false, pdfError: true,
+      invoiceNumber,
+      status: "sent",
+      issueDate,
+      subtotal: totals.subtotal,
+      taxAmount: totals.taxAmount,
+      total: totals.total,
+      emailSent: false,
+      pdfError: true,
     });
   }
 
@@ -187,8 +241,12 @@ module.exports = async function handler(req, res) {
   let emailSent = true;
   try {
     await sendInvoiceEmail({
-      to: client.email, bcc: company.bcc, invoiceNumber, language,
-      companyName: company.companyName, pdf,
+      to: client.email,
+      bcc: company.bcc,
+      invoiceNumber,
+      language,
+      companyName: company.companyName,
+      pdf,
     });
   } catch (err) {
     console.error("Invoice email error:", err);

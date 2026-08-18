@@ -15,8 +15,14 @@ export function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
-      
-      const sections = ["inicio", "servicios", "proyectos", "metodologia", "contacto"];
+
+      const sections = [
+        "inicio",
+        "servicios",
+        "proyectos",
+        "metodologia",
+        "contacto",
+      ];
       const current = sections.find((section) => {
         const el = document.getElementById(section);
         if (el) {
@@ -54,21 +60,37 @@ export function Navbar() {
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/80 backdrop-blur-md border-b border-border/50" : "bg-transparent"
+        isScrolled
+          ? "bg-background/80 backdrop-blur-md border-b border-border/50"
+          : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-        <a href="#inicio" onClick={(e) => { e.preventDefault(); scrollTo("#inicio"); }} className="flex items-center gap-3 group" data-testid="nav-logo">
+        <a
+          href="#inicio"
+          onClick={(e) => {
+            e.preventDefault();
+            scrollTo("#inicio");
+          }}
+          className="flex items-center gap-3 group"
+          data-testid="nav-logo"
+        >
           <img
             src="/logo.jpg"
             alt="Vertex Tech"
             className="h-11 w-11 rounded-xl object-cover transition-transform group-hover:scale-105 drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]"
           />
           <div className="flex flex-col leading-none">
-            <span className="text-lg font-bold tracking-widest uppercase text-white" style={{ fontFamily: "var(--app-font-heading)" }}>
-              Vertex Tech<span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.9)] ml-1 mb-0.5 align-middle"></span>
+            <span
+              className="text-lg font-bold tracking-widest uppercase text-white"
+              style={{ fontFamily: "var(--app-font-heading)" }}
+            >
+              Vertex Tech
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.9)] ml-1 mb-0.5 align-middle"></span>
             </span>
-            <span className="text-[10px] tracking-[0.2em] uppercase text-primary/70 font-medium">Consultora Tecnológica</span>
+            <span className="text-[10px] tracking-[0.2em] uppercase text-primary/70 font-medium">
+              Consultora Tecnológica
+            </span>
           </div>
         </a>
 
@@ -78,26 +100,33 @@ export function Navbar() {
             <a
               key={link.id}
               href={link.href}
-              onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
+              onClick={(e) => {
+                e.preventDefault();
+                scrollTo(link.href);
+              }}
               className={`text-sm font-medium transition-colors hover:text-primary ${
-                location === "/" && activeSection === link.id ? "text-primary" : "text-muted-foreground"
+                location === "/" && activeSection === link.id
+                  ? "text-primary"
+                  : "text-muted-foreground"
               }`}
               data-testid={`nav-link-${link.id}`}
             >
               {t(`nav.${link.id}`)}
             </a>
           ))}
-          
+
           <WouterLink
             href="/diagnostico"
             className={`text-sm font-medium transition-colors hover:text-primary ${
-              location === "/diagnostico" ? "text-primary" : "text-muted-foreground"
+              location === "/diagnostico"
+                ? "text-primary"
+                : "text-muted-foreground"
             }`}
             data-testid="nav-link-diagnostico"
           >
             {t("nav.diagnostico")}
           </WouterLink>
-          
+
           {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
           <WouterLink
             href="/blog"
@@ -109,16 +138,16 @@ export function Navbar() {
           */}
 
           <div className="flex items-center gap-1 text-xs tracking-widest uppercase">
-            <button 
-              onClick={() => setLang("es")} 
+            <button
+              onClick={() => setLang("es")}
               className={`${lang === "es" ? "text-white font-semibold" : "text-muted-foreground hover:text-white"}`}
               data-testid="lang-toggle-es"
             >
               ES
             </button>
             <span className="text-muted-foreground/50">|</span>
-            <button 
-              onClick={() => setLang("en")} 
+            <button
+              onClick={() => setLang("en")}
               className={`${lang === "en" ? "text-white font-semibold" : "text-muted-foreground hover:text-white"}`}
               data-testid="lang-toggle-en"
             >
@@ -126,8 +155,8 @@ export function Navbar() {
             </button>
           </div>
 
-          <Button 
-            onClick={() => scrollTo("#contacto")} 
+          <Button
+            onClick={() => scrollTo("#contacto")}
             className="bg-primary text-white hover:bg-primary/90 shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
             data-testid="nav-cta"
           >
@@ -136,8 +165,8 @@ export function Navbar() {
         </div>
 
         {/* Mobile Nav Toggle */}
-        <button 
-          className="md:hidden text-white" 
+        <button
+          className="md:hidden text-white"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           data-testid="nav-mobile-toggle"
         >
@@ -156,28 +185,33 @@ export function Navbar() {
             data-testid="nav-mobile-menu"
           >
             <div className="flex justify-end gap-2 text-sm tracking-widest uppercase mb-2">
-              <button 
-                onClick={() => setLang("es")} 
+              <button
+                onClick={() => setLang("es")}
                 className={`${lang === "es" ? "text-white font-semibold" : "text-muted-foreground"}`}
               >
                 ES
               </button>
               <span className="text-muted-foreground/50">|</span>
-              <button 
-                onClick={() => setLang("en")} 
+              <button
+                onClick={() => setLang("en")}
                 className={`${lang === "en" ? "text-white font-semibold" : "text-muted-foreground"}`}
               >
                 EN
               </button>
             </div>
-            
+
             {navLinks.map((link) => (
               <a
                 key={link.id}
                 href={link.href}
-                onClick={(e) => { e.preventDefault(); scrollTo(link.href); }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo(link.href);
+                }}
                 className={`text-lg font-medium transition-colors ${
-                  location === "/" && activeSection === link.id ? "text-primary" : "text-muted-foreground"
+                  location === "/" && activeSection === link.id
+                    ? "text-primary"
+                    : "text-muted-foreground"
                 }`}
               >
                 {t(`nav.${link.id}`)}
@@ -188,7 +222,9 @@ export function Navbar() {
               href="/diagnostico"
               onClick={() => setMobileMenuOpen(false)}
               className={`text-lg font-medium transition-colors hover:text-primary ${
-                location === "/diagnostico" ? "text-primary" : "text-muted-foreground"
+                location === "/diagnostico"
+                  ? "text-primary"
+                  : "text-muted-foreground"
               }`}
               data-testid="nav-link-diagnostico-mobile"
             >
@@ -204,7 +240,10 @@ export function Navbar() {
               {t("nav.blog")}
             </WouterLink>
             */}
-            <Button onClick={() => scrollTo("#contacto")} className="bg-primary w-full text-white">
+            <Button
+              onClick={() => scrollTo("#contacto")}
+              className="bg-primary w-full text-white"
+            >
               {t("nav.contactar")}
             </Button>
           </motion.div>

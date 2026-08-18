@@ -50,8 +50,12 @@ export function Methodology() {
                 </span>
                 <div className="absolute inset-0 bg-primary/20 blur-xl rounded-2xl -z-10" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-              <p className="text-sm text-muted-foreground">{step.description}</p>
+              <h3 className="text-lg font-bold text-white mb-2">
+                {step.title}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {step.description}
+              </p>
             </motion.div>
           ))}
         </div>

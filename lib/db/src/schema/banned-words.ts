@@ -16,10 +16,12 @@ export const bannedWordsTable = pgTable("banned_words", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const insertBannedWordSchema = createInsertSchema(bannedWordsTable).omit({
-  id: true,
-  createdAt: true,
-});
+export const insertBannedWordSchema = createInsertSchema(bannedWordsTable).omit(
+  {
+    id: true,
+    createdAt: true,
+  },
+);
 
 export type InsertBannedWord = z.infer<typeof insertBannedWordSchema>;
 export type BannedWord = typeof bannedWordsTable.$inferSelect;

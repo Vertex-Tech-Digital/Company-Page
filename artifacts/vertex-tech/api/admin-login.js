@@ -42,7 +42,7 @@ module.exports = async function handler(req, res) {
     // Buscar el usuario en la base de datos
     const result = await pool.query(
       "SELECT id, username, password_hash FROM admin_users WHERE username = $1 LIMIT 1",
-      [username.toLowerCase().trim()]
+      [username.toLowerCase().trim()],
     );
 
     // Respuesta genérica tanto si el usuario no existe como si la
@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
     const token = jwt.sign(
       { userId: user.id, username: user.username },
       getJwtSecret(),
-      { expiresIn: "8h" }
+      { expiresIn: "8h" },
     );
 
     return res.status(200).json({ token });

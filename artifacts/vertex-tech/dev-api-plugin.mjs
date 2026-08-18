@@ -58,7 +58,11 @@ export function devApiPlugin() {
         // Body JSON (las funciones esperan req.body ya parseado, estilo Vercel).
         // Incluye POST, PUT y PATCH — todos pueden llevar body.
         let body = {};
-        if (req.method === "POST" || req.method === "PUT" || req.method === "PATCH") {
+        if (
+          req.method === "POST" ||
+          req.method === "PUT" ||
+          req.method === "PATCH"
+        ) {
           const chunks = [];
           for await (const chunk of req) chunks.push(chunk);
           const raw = Buffer.concat(chunks).toString("utf8");

@@ -45,5 +45,5 @@ export const leadsTable = pgTable(
   (table) => [
     index("leads_email_idx").on(table.email),
     index("leads_created_at_idx").on(table.createdAt),
-  ]
+  ],
 );

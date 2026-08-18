@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldAlert, Plus, Trash2, RefreshCw, Pencil, Check, X } from "lucide-react";
+import {
+  ShieldAlert,
+  Plus,
+  Trash2,
+  RefreshCw,
+  Pencil,
+  Check,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface BannedWord {
@@ -82,11 +90,15 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
 
     try {
       // 1. Eliminar la palabra original
-      const delRes = await fetch(`/api/admin-moderation?resource=words&id=${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!delRes.ok) throw new Error("No se pudo eliminar la palabra original");
+      const delRes = await fetch(
+        `/api/admin-moderation?resource=words&id=${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (!delRes.ok)
+        throw new Error("No se pudo eliminar la palabra original");
 
       // 2. Insertar la nueva
       const addRes = await fetch("/api/admin-moderation?resource=words", {
@@ -109,11 +121,13 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
       setWords((prev) =>
         prev
           .map((w) => (w.id === id ? addData.bannedWord : w))
-          .sort((a, b) => a.word.localeCompare(b.word))
+          .sort((a, b) => a.word.localeCompare(b.word)),
       );
       cancelEditing();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error al editar la palabra");
+      setError(
+        err instanceof Error ? err.message : "Error al editar la palabra",
+      );
     } finally {
       setSavingEdit(false);
     }
@@ -138,7 +152,7 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
         return;
       }
       setWords((prev) =>
-        [...prev, data.bannedWord].sort((a, b) => a.word.localeCompare(b.word))
+        [...prev, data.bannedWord].sort((a, b) => a.word.localeCompare(b.word)),
       );
       setNewWord("");
     } catch {

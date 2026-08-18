@@ -16,15 +16,14 @@ export default defineConfig(async () => {
   const plugins: any[] = [react(), tailwindcss(), devApiPlugin()];
 
   if (isReplit && !isVercel) {
-    const { default: runtimeErrorOverlay } = await import(
-      "@replit/vite-plugin-runtime-error-modal"
-    );
+    const { default: runtimeErrorOverlay } =
+      await import("@replit/vite-plugin-runtime-error-modal");
     plugins.push(runtimeErrorOverlay());
 
     if (process.env.NODE_ENV !== "production") {
       const { cartographer } = await import("@replit/vite-plugin-cartographer");
       plugins.push(
-        cartographer({ root: path.resolve(import.meta.dirname, "..") })
+        cartographer({ root: path.resolve(import.meta.dirname, "..") }),
       );
       const { devBanner } = await import("@replit/vite-plugin-dev-banner");
       plugins.push(devBanner());
@@ -37,9 +36,20 @@ export default defineConfig(async () => {
     resolve: {
       alias: {
         "@": path.resolve(import.meta.dirname, "src"),
-        "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
+        "@assets": path.resolve(
+          import.meta.dirname,
+          "..",
+          "..",
+          "attached_assets",
+        ),
       },
-      dedupe: ["react", "react-dom", "three", "@react-three/fiber", "@react-three/drei"],
+      dedupe: [
+        "react",
+        "react-dom",
+        "three",
+        "@react-three/fiber",
+        "@react-three/drei",
+      ],
     },
     root: path.resolve(import.meta.dirname),
     build: {
