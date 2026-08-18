@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 const path = require("path");
+const { LRUCache } = require("lru-cache");
 
 // Cargar y forzar la sobreescritura de variables de entorno (override: true) sólo en desarrollo local
 if (process.env.NODE_ENV !== "production") {
@@ -77,23 +78,32 @@ function getDatabaseClient() {
   return dbInstance;
 }
 
-// Control de tasa (Rate Limiting) en memoria
-const rateLimitMap = new Map();
+// Control de tasa (Rate Limiting) en memoria mediante LRUCache
+const globalForRateLimit = global;
+
+if (!globalForRateLimit.rateLimitCache) {
+  globalForRateLimit.rateLimitCache = new LRUCache({
+    max: 5000,
+    ttl: 60 * 60 * 1000, // 1 hora
+  });
+}
+
+const rateLimitCache = globalForRateLimit.rateLimitCache;
+
 const RATE_LIMIT_COUNT = 3;
-const HOUR_IN_MS = 60 * 60 * 1000;
 
 function isRateLimited(ip) {
   const now = Date.now();
-  const timestamps = rateLimitMap.get(ip) || [];
-  const activeTimestamps = timestamps.filter((t) => now - t < HOUR_IN_MS);
+  const timestamps = rateLimitCache.get(ip) || [];
+  const activeTimestamps = timestamps.filter((t) => now - t < 60 * 60 * 1000);
 
   if (activeTimestamps.length >= RATE_LIMIT_COUNT) {
-    rateLimitMap.set(ip, activeTimestamps);
+    rateLimitCache.set(ip, activeTimestamps);
     return true;
   }
 
   activeTimestamps.push(now);
-  rateLimitMap.set(ip, activeTimestamps);
+  rateLimitCache.set(ip, activeTimestamps);
   return false;
 }
 
@@ -108,10 +118,16 @@ module.exports = async function handler(req, res) {
   }
 
   // 1. Rate Limiting por IP
-  const clientIp =
-    req.headers["x-forwarded-for"]?.split(",")[0] ||
+  let clientIp =
+    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
     req.socket?.remoteAddress ||
     "127.0.0.1";
+
+  // Normalizar direcciones IP locales (IPv6 a IPv4) para asegurar inconsistencias en entorno de desarrollo local
+  if (clientIp === "::1" || clientIp === "::ffff:127.0.0.1") {
+    clientIp = "127.0.0.1";
+  }
+
   if (isRateLimited(clientIp)) {
     return res
       .status(429)
