@@ -19,6 +19,8 @@ expertMode = true
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
 
+# GMAIL_USER y demás credenciales viven en Replit Secrets / .env, no acá.
+
 [[ports]]
 localPort = 8080
 externalPort = 8080
@@ -38,8 +40,3 @@ externalPort = 3002
 [[ports]]
 localPort = 25371
 externalPort = 80
-
-[userenv]
-
-[userenv.shared]
-GMAIL_USER = "robealain97@gmail.com"
