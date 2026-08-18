@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 const path = require("path");
-const { LRUCache } = require("lru-cache");
+const { kv } = require("@vercel/kv");
+const { Ratelimit } = require("@upstash/ratelimit");
 
 // Cargar y forzar la sobreescritura de variables de entorno (override: true) sólo en desarrollo local
 if (process.env.NODE_ENV !== "production") {
@@ -78,33 +79,22 @@ function getDatabaseClient() {
   return dbInstance;
 }
 
-// Control de tasa (Rate Limiting) en memoria mediante LRUCache
-const globalForRateLimit = global;
+// Control de tasa (Rate Limiting) con Vercel KV / Upstash (3 peticiones por 1 hora)
+let ratelimit = null;
 
-if (!globalForRateLimit.rateLimitCache) {
-  globalForRateLimit.rateLimitCache = new LRUCache({
-    max: 5000,
-    ttl: 60 * 60 * 1000, // 1 hora
+if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  ratelimit = new Ratelimit({
+    redis: kv,
+    limiter: Ratelimit.slidingWindow(3, "1 h"),
+    analytics: true,
+    prefix: "ratelimit:diagnostico",
   });
 }
 
-const rateLimitCache = globalForRateLimit.rateLimitCache;
-
-const RATE_LIMIT_COUNT = 3;
-
-function isRateLimited(ip) {
-  const now = Date.now();
-  const timestamps = rateLimitCache.get(ip) || [];
-  const activeTimestamps = timestamps.filter((t) => now - t < 60 * 60 * 1000);
-
-  if (activeTimestamps.length >= RATE_LIMIT_COUNT) {
-    rateLimitCache.set(ip, activeTimestamps);
-    return true;
-  }
-
-  activeTimestamps.push(now);
-  rateLimitCache.set(ip, activeTimestamps);
-  return false;
+async function isRateLimited(ip) {
+  if (!ratelimit) return false; // Fallback si no están configuradas las variables de KV
+  const { success } = await ratelimit.limit(ip);
+  return !success;
 }
 
 function sanitizeString(str) {
@@ -123,12 +113,12 @@ module.exports = async function handler(req, res) {
     req.socket?.remoteAddress ||
     "127.0.0.1";
 
-  // Normalizar direcciones IP locales (IPv6 a IPv4) para asegurar inconsistencias en entorno de desarrollo local
+  // Normalizar direcciones IP locales (IPv6 a IPv4)
   if (clientIp === "::1" || clientIp === "::ffff:127.0.0.1") {
     clientIp = "127.0.0.1";
   }
 
-  if (isRateLimited(clientIp)) {
+  if (await isRateLimited(clientIp)) {
     return res
       .status(429)
       .json({ error: "Too many requests. Please try again later." });
