@@ -45,7 +45,9 @@ export function ParticleNetwork() {
     let particles: Particle[] = [];
 
     const init = () => {
-      const dpr = window.devicePixelRatio || 1;
+      // Capado a 2x: mismo criterio que WireframeCube — el coste de
+      // rasterizar el canvas crece con el cuadrado del DPR.
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = window.innerWidth;
       H = window.innerHeight;
       canvas.width = W * dpr;

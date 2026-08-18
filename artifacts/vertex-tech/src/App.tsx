@@ -5,7 +5,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import { useEffect, Suspense, lazy } from "react";
+import { Loader2 } from "lucide-react";
 import { LanguageProvider } from "@/context/LanguageContext";
+
+function RouteFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <Loader2 className="w-8 h-8 text-primary animate-spin" />
+    </div>
+  );
+}
 
 // Cargados de forma diferida: cada ruta pasa a su propio chunk para que la
 // portada ("/") no descargue código de páginas que quizás nunca se visiten.
@@ -19,7 +28,7 @@ const queryClient = new QueryClient();
 
 function Router() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<RouteFallback />}>
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/blog" component={Blog} />
