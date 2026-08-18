@@ -22,9 +22,10 @@ router.post("/contact", async (req, res) => {
 
   const gmailUser = process.env["GMAIL_USER"];
   const gmailPass = process.env["GMAIL_APP_PASSWORD"];
+  const notificationEmail = process.env["EMAIL_INTERNAL_NOTIFICATION"];
 
-  if (!gmailUser || !gmailPass) {
-    req.log.error("Gmail credentials not configured");
+  if (!gmailUser || !gmailPass || !notificationEmail) {
+    req.log.error("Email service not configured");
     res.status(500).json({ error: "Email service not configured" });
     return;
   }
@@ -39,7 +40,7 @@ router.post("/contact", async (req, res) => {
 
   const mailOptions = {
     from: `"Vertex Tech Contact" <${gmailUser}>`,
-    to: "***REMOVED***",
+    to: notificationEmail,
     replyTo: email,
     subject: `Nueva consulta de ${name}${company ? ` (${company})` : ""}`,
     html: `

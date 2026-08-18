@@ -47,6 +47,9 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+# Scratch generado por el Agente de Replit (pastes, capturas de pantalla) —
+# no son assets de la app; pueden contener datos personales pegados en el chat.
+/attached_assets/
 
 # Environment variables
 .env
