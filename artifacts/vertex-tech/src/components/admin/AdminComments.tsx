@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle, XCircle, AlertTriangle, RefreshCw, MessageSquare } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  RefreshCw,
+  MessageSquare,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Comment {
@@ -49,14 +55,17 @@ export function AdminComments({ token }: AdminCommentsProps) {
   async function handleModerate(id: number, status: "approved" | "rejected") {
     setProcessing(id);
     try {
-      const res = await fetch(`/api/admin-moderation?resource=comments&id=${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        `/api/admin-moderation?resource=comments&id=${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status }),
         },
-        body: JSON.stringify({ status }),
-      });
+      );
       if (!res.ok) throw new Error();
       // Quitar el comentario de la lista al moderarlo
       setComments((prev) => prev.filter((c) => c.id !== id));
@@ -149,14 +158,14 @@ export function AdminComments({ token }: AdminCommentsProps) {
 
             {/* Metadata */}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-              <span className="font-medium text-white">{comment.author_name}</span>
+              <span className="font-medium text-white">
+                {comment.author_name}
+              </span>
               <span>{comment.author_email}</span>
               <span>·</span>
               <span>{formatDate(comment.created_at)}</span>
               <span>·</span>
-              <span className="text-primary">
-                En: {comment.post_title}
-              </span>
+              <span className="text-primary">En: {comment.post_title}</span>
             </div>
 
             {/* Contenido */}

@@ -1,0 +1,86 @@
+name: CI
+
+# Control de calidad automatizado.
+# Se ejecuta en cada Pull Request hacia main y en cada push a main
+# (para que main quede siempre verificado despues del merge).
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Si se empujan varios commits seguidos a un PR, cancela los runs viejos
+# y deja solo el ultimo. En main NO se cancela: cada commit de main
+# se verifica completo.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Minimo privilegio: el workflow solo necesita leer el codigo.
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, Typecheck & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # pnpm/action-setup DEBE ir antes de setup-node para que el cache
+      # de pnpm funcione. Ademas, el script "preinstall" del package.json
+      # raiz rechaza npm/yarn: este repo solo instala con pnpm.
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # --frozen-lockfile falla si pnpm-lock.yaml no coincide con los
+      # package.json. Evita que un PR se mergee con el lockfile desactualizado.
+      # GitHub Actions ya define CI=true, asi que pnpm no pide confirmacion
+      # interactiva al reconstruir node_modules.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Formato y lint van antes que typecheck y build porque tardan
+      # segundos: si el PR trae un problema de estilo, se sabe enseguida
+      # en vez de esperar el build completo.
+      #
+      # Si este paso falla, se arregla con "pnpm run format".
+      - name: Check formatting
+        run: pnpm run format:check
+
+      # El script "lint" lleva --max-warnings=50, que es el numero exacto
+      # de avisos que existen hoy en el repo. Funciona como trinquete: los
+      # avisos pueden bajar, pero si alguien anade uno nuevo el CI falla.
+      # Al arreglar avisos conviene bajar ese numero en package.json para
+      # que el techo no se quede alto.
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      # Equivale a la segunda mitad del script "build" del package.json raiz.
+      # Se llama directo porque "pnpm run build" volveria a correr el
+      # typecheck que ya paso en el paso anterior.
+      #
+      # PORT y BASE_PATH son valores dummy que solo existen para este paso:
+      # artifacts/mockup-sandbox/vite.config.ts lanza un throw si faltan,
+      # incluso en "vite build" (las necesita Replit en runtime). Sin ellas
+      # el build recursivo falla y nunca llega a compilar vertex-tech.
+      # No afectan a vertex-tech ni a api-server.
+      - name: Build
+        env:
+          PORT: "3000"
+          BASE_PATH: "/"
+        run: pnpm -r --if-present run build

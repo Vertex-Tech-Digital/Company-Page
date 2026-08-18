@@ -16,7 +16,9 @@ export function Features() {
                 style={{ backgroundColor: "var(--brand)", opacity: 0.15 }}
               />
               <h3 className="text-lg font-semibold">{feature.title}</h3>
-              <p className="mt-2 text-sm text-slate-600">{feature.description}</p>
+              <p className="mt-2 text-sm text-slate-600">
+                {feature.description}
+              </p>
             </div>
           ))}
         </div>

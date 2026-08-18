@@ -67,7 +67,6 @@ export function Projects() {
                 />
               </div>
               <div className="p-6">
-                
                 <h3 className="text-xl font-bold text-white mb-3">
                   {project.title}
                 </h3>

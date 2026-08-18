@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const result = await pool.query(
-      "SELECT id, slug, name FROM categories ORDER BY name ASC"
+      "SELECT id, slug, name FROM categories ORDER BY name ASC",
     );
     return res.status(200).json({ categories: result.rows });
   } catch (err) {

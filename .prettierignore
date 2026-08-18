@@ -1,0 +1,28 @@
+# Dependencias y salidas de build
+node_modules
+dist
+build
+out-tsc
+.vercel
+.cache
+*.tsbuildinfo
+
+# Lockfiles
+pnpm-lock.yaml
+package-lock.json
+
+# Codigo generado automaticamente.
+# Formatearlo no sirve de nada: se sobreescribe en la siguiente
+# regeneracion (orval via "pnpm --filter @workspace/api-spec codegen",
+# y el mockupPreviewPlugin de mockup-sandbox).
+lib/api-client-react/src/generated
+lib/api-zod/src/generated
+artifacts/mockup-sandbox/src/.generated
+
+# Assets subidos, no son codigo fuente
+attached_assets
+
+# Plantilla de onboarding con espacios en blanco para rellenar a mano
+# (____________ ). Prettier los escapa y los convierte en algo ilegible:
+#   **Cliente:** ____________  ->  **Cliente:** **\*\*\*\***\_\_\_\_**\*\*\*\***
+client-template/ONBOARDING.md

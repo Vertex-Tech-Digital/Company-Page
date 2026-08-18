@@ -15,7 +15,9 @@ const { pool } = require("../server/db.js");
 // ─── Validación básica ───────────────────────────────────────────────────────
 
 function isValidEmail(email) {
-  return typeof email === "string" && email.includes("@") && email.includes(".");
+  return (
+    typeof email === "string" && email.includes("@") && email.includes(".")
+  );
 }
 
 // ─── Filtro de palabras prohibidas ──────────────────────────────────────────
@@ -50,24 +52,34 @@ module.exports = async function handler(req, res) {
   if (!postId || typeof postId !== "number") {
     return res.status(400).json({ error: "postId inválido" });
   }
-  if (!authorName || typeof authorName !== "string" || authorName.trim().length < 2) {
-    return res.status(400).json({ error: "El nombre es requerido (mínimo 2 caracteres)" });
+  if (
+    !authorName ||
+    typeof authorName !== "string" ||
+    authorName.trim().length < 2
+  ) {
+    return res
+      .status(400)
+      .json({ error: "El nombre es requerido (mínimo 2 caracteres)" });
   }
   if (!isValidEmail(authorEmail)) {
     return res.status(400).json({ error: "El email no es válido" });
   }
   if (!content || typeof content !== "string" || content.trim().length < 5) {
-    return res.status(400).json({ error: "El comentario es requerido (mínimo 5 caracteres)" });
+    return res
+      .status(400)
+      .json({ error: "El comentario es requerido (mínimo 5 caracteres)" });
   }
   if (content.trim().length > 2000) {
-    return res.status(400).json({ error: "El comentario no puede superar los 2000 caracteres" });
+    return res
+      .status(400)
+      .json({ error: "El comentario no puede superar los 2000 caracteres" });
   }
 
   try {
     // Verificar que el post existe
     const postResult = await pool.query(
       "SELECT id FROM posts WHERE id = $1 LIMIT 1",
-      [postId]
+      [postId],
     );
     if (postResult.rows.length === 0) {
       return res.status(404).json({ error: "El post no existe" });
@@ -88,7 +100,7 @@ module.exports = async function handler(req, res) {
         authorEmail.trim().toLowerCase(),
         content.trim(),
         flagged,
-      ]
+      ],
     );
 
     const commentId = insertResult.rows[0].id;

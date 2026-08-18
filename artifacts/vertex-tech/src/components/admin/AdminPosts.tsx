@@ -138,7 +138,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
     setForm({
       title: post.title,
       excerpt: post.excerpt,
-      content: "",       // se carga del servidor a continuación
+      content: "", // se carga del servidor a continuación
       imageUrl: post.image_url ?? "",
       categoryId: post.category_id?.toString() ?? "",
     });
@@ -149,9 +149,12 @@ export function AdminPosts({ token }: AdminPostsProps) {
     // (el GET /admin-posts solo devuelve metadatos, no el content completo)
     setContentLoading(true);
     try {
-      const res = await fetch(`/api/admin-posts?slug=${encodeURIComponent(post.slug)}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `/api/admin-posts?slug=${encodeURIComponent(post.slug)}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (!res.ok) throw new Error();
       const data = await res.json();
       setForm((f) => ({ ...f, content: data.post?.content ?? "" }));
@@ -161,7 +164,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
       // Se muestra un aviso informativo pero no se bloquea el formulario.
       setFormError(
         "No se pudo cargar el contenido del artículo (puede ser un borrador no publicado). " +
-        "Puedes escribirlo de nuevo aquí — los demás campos ya están cargados."
+          "Puedes escribirlo de nuevo aquí — los demás campos ya están cargados.",
       );
     } finally {
       setContentLoading(false);
@@ -237,7 +240,11 @@ export function AdminPosts({ token }: AdminPostsProps) {
       }
 
       await fetchPosts();
-      setSuccessMsg(isEditing ? "Post actualizado correctamente" : "Post creado como borrador");
+      setSuccessMsg(
+        isEditing
+          ? "Post actualizado correctamente"
+          : "Post creado como borrador",
+      );
       setTimeout(() => setSuccessMsg(null), 3000);
       backToList();
     } catch {
@@ -262,7 +269,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
       });
       if (!res.ok) throw new Error();
       setPosts((prev) =>
-        prev.map((p) => (p.id === post.id ? { ...p, status: newStatus } : p))
+        prev.map((p) => (p.id === post.id ? { ...p, status: newStatus } : p)),
       );
     } catch {
       setError("Error al cambiar el estado del post");
@@ -274,7 +281,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
   async function handleDelete(post: Post) {
     if (
       !window.confirm(
-        `¿Eliminar el post "${post.title}"? Esta acción no se puede deshacer.`
+        `¿Eliminar el post "${post.title}"? Esta acción no se puede deshacer.`,
       )
     )
       return;
@@ -336,7 +343,9 @@ export function AdminPosts({ token }: AdminPostsProps) {
           <div className="flex items-center gap-2">
             <FileEdit className="w-5 h-5 text-primary" />
             <h2 className="text-lg font-semibold text-white">
-              {isEditing ? `Editando: ${editingPost?.title ?? ""}` : "Nuevo post"}
+              {isEditing
+                ? `Editando: ${editingPost?.title ?? ""}`
+                : "Nuevo post"}
             </h2>
           </div>
         </div>
@@ -357,7 +366,9 @@ export function AdminPosts({ token }: AdminPostsProps) {
             <input
               type="text"
               value={form.title}
-              onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, title: e.target.value }))
+              }
               placeholder="Título del artículo"
               className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
             />
@@ -374,7 +385,9 @@ export function AdminPosts({ token }: AdminPostsProps) {
             </label>
             <textarea
               value={form.excerpt}
-              onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, excerpt: e.target.value }))
+              }
               placeholder="Breve descripción del artículo para la tarjeta del blog"
               rows={2}
               className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors resize-none"
@@ -396,7 +409,9 @@ export function AdminPosts({ token }: AdminPostsProps) {
             ) : (
               <textarea
                 value={form.content}
-                onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, content: e.target.value }))
+                }
                 placeholder="Escribe el contenido del artículo aquí..."
                 rows={14}
                 className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors resize-y font-mono leading-relaxed"
@@ -413,7 +428,9 @@ export function AdminPosts({ token }: AdminPostsProps) {
               <input
                 type="url"
                 value={form.imageUrl}
-                onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, imageUrl: e.target.value }))
+                }
                 placeholder="https://..."
                 className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
               />
@@ -425,7 +442,9 @@ export function AdminPosts({ token }: AdminPostsProps) {
               </label>
               <select
                 value={form.categoryId}
-                onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, categoryId: e.target.value }))
+                }
                 className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary/50 transition-colors"
               >
                 <option value="">Sin categoría</option>
@@ -449,8 +468,8 @@ export function AdminPosts({ token }: AdminPostsProps) {
             {saving
               ? "Guardando..."
               : isEditing
-              ? "Guardar cambios"
-              : "Crear borrador"}
+                ? "Guardar cambios"
+                : "Crear borrador"}
           </Button>
           <Button
             onClick={backToList}
@@ -522,7 +541,9 @@ export function AdminPosts({ token }: AdminPostsProps) {
         <div className="text-center py-16 text-muted-foreground">
           <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p>No hay posts todavía</p>
-          <p className="text-xs mt-1">Crea el primero con el botón "Nuevo post"</p>
+          <p className="text-xs mt-1">
+            Crea el primero con el botón "Nuevo post"
+          </p>
         </div>
       )}
 
@@ -582,7 +603,11 @@ export function AdminPosts({ token }: AdminPostsProps) {
                 {/* Publicar / despublicar */}
                 <button
                   onClick={() => handleToggleStatus(post)}
-                  title={post.status === "published" ? "Volver a borrador" : "Publicar"}
+                  title={
+                    post.status === "published"
+                      ? "Volver a borrador"
+                      : "Publicar"
+                  }
                   className={`p-1.5 rounded-lg transition-colors ${
                     post.status === "published"
                       ? "text-green-400 hover:bg-green-400/10"
