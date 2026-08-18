@@ -30,7 +30,10 @@ export function BlogCard({ post, index }: BlogCardProps) {
       >
         <div className="aspect-video relative overflow-hidden bg-background">
           <img
-            src={post.image || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1200&auto=format&fit=crop"}
+            src={
+              post.image ||
+              "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1200&auto=format&fit=crop"
+            }
             alt={post.title}
             loading="lazy"
             className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"

@@ -50,7 +50,9 @@ export function Contact() {
       }
       setIsSuccess(true);
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : t("contact.error.server"));
+      setServerError(
+        err instanceof Error ? err.message : t("contact.error.server"),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -72,7 +74,9 @@ export function Contact() {
               data-testid="contact-title"
             >
               {t("contact.title")}{" "}
-              <span className="text-primary">{t("contact.titleHighlight")}</span>
+              <span className="text-primary">
+                {t("contact.titleHighlight")}
+              </span>
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
               {t("contact.subtitle")}
@@ -96,11 +100,16 @@ export function Contact() {
                 <h3 className="text-2xl font-bold text-white mb-2">
                   {t("contact.success.title")}
                 </h3>
-                <p className="text-muted-foreground">{t("contact.success.desc")}</p>
+                <p className="text-muted-foreground">
+                  {t("contact.success.desc")}
+                </p>
                 <Button
                   variant="outline"
                   className="mt-8 border-border"
-                  onClick={() => { setIsSuccess(false); form.reset(); }}
+                  onClick={() => {
+                    setIsSuccess(false);
+                    form.reset();
+                  }}
                 >
                   {t("contact.success.another")}
                 </Button>

@@ -40,8 +40,17 @@ export const siteConfig: SiteConfig = {
     { label: "Contacto", href: "#contacto" },
   ],
   features: [
-    { title: "Servicio 1", description: "Describe aquí el primer servicio del cliente." },
-    { title: "Servicio 2", description: "Describe aquí el segundo servicio del cliente." },
-    { title: "Servicio 3", description: "Describe aquí el tercer servicio del cliente." },
+    {
+      title: "Servicio 1",
+      description: "Describe aquí el primer servicio del cliente.",
+    },
+    {
+      title: "Servicio 2",
+      description: "Describe aquí el segundo servicio del cliente.",
+    },
+    {
+      title: "Servicio 3",
+      description: "Describe aquí el tercer servicio del cliente.",
+    },
   ],
 };

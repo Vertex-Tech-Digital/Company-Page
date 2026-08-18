@@ -32,7 +32,7 @@ module.exports = async function handler(req, res) {
        LEFT JOIN categories c ON c.id = p.category_id
        WHERE p.slug = $1 AND p.status = 'published'
        LIMIT 1`,
-      [slug]
+      [slug],
     );
 
     if (result.rows.length === 0) {

@@ -11,7 +11,6 @@ import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 import { useEffect } from "react";
 
 export default function Home() {
- 
   useEffect(() => {
     const id = window.location.hash.replace("#", "");
     if (!id) return;
@@ -34,14 +33,14 @@ export default function Home() {
     <main className="min-h-screen text-foreground font-sans">
       <ParticleNetwork />
       <div className="relative" style={{ zIndex: 1 }}>
-      <Navbar />
-      <Hero />
-      <Services />
-      <Projects />
-      <Methodology />
-      <WhyUs />
-      <Contact />
-      <Footer />
+        <Navbar />
+        <Hero />
+        <Services />
+        <Projects />
+        <Methodology />
+        <WhyUs />
+        <Contact />
+        <Footer />
       </div>
       <WhatsAppButton />
     </main>
