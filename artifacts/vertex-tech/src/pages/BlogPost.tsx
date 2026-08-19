@@ -14,6 +14,9 @@ interface FullPost {
   title: string;
   excerpt: string;
   content: string;
+  title_en: string | null;
+  excerpt_en: string | null;
+  content_en: string | null;
   image_url: string | null;
   created_at: string;
   updated_at: string;
@@ -111,6 +114,12 @@ export default function BlogPost() {
     );
   }
 
+  // Si el post no tiene traducción al inglés, se muestra el contenido en
+  // español como respaldo en vez de dejar el artículo vacío.
+  const displayTitle = lang === "en" && post.title_en ? post.title_en : post.title;
+  const displayExcerpt = lang === "en" && post.excerpt_en ? post.excerpt_en : post.excerpt;
+  const displayContent = lang === "en" && post.content_en ? post.content_en : post.content;
+
   // ── Vista del artículo ───────────────────────────────────────────────────────
   return (
     <main className="min-h-screen text-foreground font-sans">
@@ -151,12 +160,12 @@ export default function BlogPost() {
 
           {/* Título */}
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
-            {post.title}
+            {displayTitle}
           </h1>
 
           {/* Excerpt */}
           <p className="text-lg text-muted-foreground leading-relaxed">
-            {post.excerpt}
+            {displayExcerpt}
           </p>
 
           {/* Meta: fecha + botón editar (solo si hay token admin) */}
@@ -189,7 +198,7 @@ export default function BlogPost() {
           >
             <img
               src={post.image_url}
-              alt={post.title}
+              alt={displayTitle}
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -201,7 +210,7 @@ export default function BlogPost() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15 }}
         >
-          <RichTextRenderer content={post.content} />
+          <RichTextRenderer content={displayContent} />
         </motion.div>
 
       </article>

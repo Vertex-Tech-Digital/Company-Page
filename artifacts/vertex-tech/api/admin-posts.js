@@ -69,6 +69,7 @@ module.exports = async function handler(req, res) {
         const result = await pool.query(
           `SELECT
              p.id, p.slug, p.title, p.excerpt, p.content, p.image_url, p.status,
+             p.title_en, p.excerpt_en, p.content_en,
              p.created_at, p.updated_at,
              c.id   AS category_id,
              c.name AS category_name,
@@ -102,7 +103,8 @@ module.exports = async function handler(req, res) {
 
     // ── POST: crear un post nuevo ────────────────────────────────────────────
     if (req.method === "POST") {
-      const { title, excerpt, content, imageUrl, categoryId } = req.body ?? {};
+      const { title, excerpt, content, imageUrl, categoryId, titleEn, excerptEn, contentEn } =
+        req.body ?? {};
 
       if (!title || typeof title !== "string" || title.trim().length < 3) {
         return res
@@ -125,10 +127,22 @@ module.exports = async function handler(req, res) {
       const slug = await generateUniqueSlug(pool, baseSlug);
 
       const result = await pool.query(
-        `INSERT INTO posts (slug, title, excerpt, content, image_url, category_id, status)
-         VALUES ($1, $2, $3, $4, $5, $6, 'draft')
+        `INSERT INTO posts
+           (slug, title, excerpt, content, image_url, category_id, status,
+            title_en, excerpt_en, content_en)
+         VALUES ($1, $2, $3, $4, $5, $6, 'draft', $7, $8, $9)
          RETURNING id, slug, title, excerpt, image_url, status, created_at, updated_at`,
-        [slug, title.trim(), excerpt.trim(), content, imageUrl ?? null, categoryId ?? null]
+        [
+          slug,
+          title.trim(),
+          excerpt.trim(),
+          content,
+          imageUrl ?? null,
+          categoryId ?? null,
+          titleEn?.trim() || null,
+          excerptEn?.trim() || null,
+          contentEn ?? null,
+        ]
       );
 
       return res.status(201).json({ success: true, post: result.rows[0] });
@@ -141,7 +155,8 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: "ID de post inválido" });
       }
 
-      const { title, excerpt, content, imageUrl, categoryId, status } = req.body ?? {};
+      const { title, excerpt, content, imageUrl, categoryId, status, titleEn, excerptEn, contentEn } =
+        req.body ?? {};
 
       if (status !== undefined && status !== "draft" && status !== "published") {
         return res
@@ -185,6 +200,18 @@ module.exports = async function handler(req, res) {
         // Postgres requiere un cast explícito al asignar un enum vía parámetro
         fields.push(`status = $${i++}::post_status`);
         values.push(status);
+      }
+      if (titleEn !== undefined) {
+        fields.push(`title_en = $${i++}`);
+        values.push(titleEn?.trim() || null);
+      }
+      if (excerptEn !== undefined) {
+        fields.push(`excerpt_en = $${i++}`);
+        values.push(excerptEn?.trim() || null);
+      }
+      if (contentEn !== undefined) {
+        fields.push(`content_en = $${i++}`);
+        values.push(contentEn || null);
       }
 
       if (fields.length === 0) {

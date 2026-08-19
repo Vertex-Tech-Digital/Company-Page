@@ -24,6 +24,7 @@ module.exports = async function handler(req, res) {
     const result = await pool.query(
       `SELECT
          p.id, p.slug, p.title, p.excerpt, p.content, p.image_url,
+         p.title_en, p.excerpt_en, p.content_en,
          p.created_at, p.updated_at,
          c.id   AS category_id,
          c.name AS category_name,

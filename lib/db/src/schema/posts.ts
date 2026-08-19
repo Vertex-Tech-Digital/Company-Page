@@ -20,6 +20,12 @@ export const postsTable = pgTable("posts", {
   content: text("content").notNull(), // contenido completo del artículo
   imageUrl: text("image_url"),
 
+  // Traducción al inglés (opcional). Si el admin no la carga, el sitio
+  // muestra el contenido en español como fallback cuando lang="en".
+  titleEn: text("title_en"),
+  excerptEn: text("excerpt_en"),
+  contentEn: text("content_en"),
+
   status: postStatusEnum("status").notNull().default("draft"),
 
   // Relación con categories: cada post pertenece a una sola categoría.

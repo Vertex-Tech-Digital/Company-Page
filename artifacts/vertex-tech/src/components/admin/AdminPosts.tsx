@@ -14,6 +14,7 @@ import {
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { parseTiptapContent } from "@/lib/tiptap-content";
 
 // ── Tipos ──────────────────────────────────────────────────────────────────────
 
@@ -46,6 +47,11 @@ const EMPTY_FORM = {
   content: null as object | null,  // TipTap JSON; null = editor vacío
   imageUrl: "",
   categoryId: "",
+  // Traducción al inglés (opcional) — si se deja vacía, el sitio muestra
+  // el contenido en español como fallback cuando el visitante elige "en".
+  titleEn: "",
+  excerptEn: "",
+  contentEn: null as object | null,
 };
 
 // ── Slug preview en tiempo real ────────────────────────────────────────────────
@@ -142,6 +148,9 @@ export function AdminPosts({ token }: AdminPostsProps) {
       content: null,     // se carga del servidor a continuación
       imageUrl: post.image_url ?? "",
       categoryId: post.category_id?.toString() ?? "",
+      titleEn: "",
+      excerptEn: "",
+      contentEn: null,   // se carga del servidor a continuación
     });
     setFormError(null);
     setView("form");
@@ -156,14 +165,19 @@ export function AdminPosts({ token }: AdminPostsProps) {
       if (!res.ok) throw new Error();
       const data = await res.json();
       const raw = data.post?.content ?? "";
-      let parsed: object | null = null;
-      try {
-        const j = JSON.parse(raw);
-        if (j && j.type === "doc") parsed = j;
-      } catch {
-        // texto plano heredado — se deja como null; el editor arrancará vacío
-      }
-      setForm((f) => ({ ...f, content: parsed }));
+      // Convierte tanto JSON de TipTap como texto plano heredado a un
+      // documento TipTap válido (misma lógica que RichTextRenderer, para
+      // que lo que se ve en /blog sea lo mismo que se carga en el editor).
+      const parsed = parseTiptapContent(raw);
+      const rawEn = data.post?.content_en ?? "";
+      const parsedEn = rawEn ? parseTiptapContent(rawEn) : null;
+      setForm((f) => ({
+        ...f,
+        content: parsed,
+        titleEn: data.post?.title_en ?? "",
+        excerptEn: data.post?.excerpt_en ?? "",
+        contentEn: parsedEn,
+      }));
     } catch {
       // Si el post es draft /api/post devuelve 404 (solo muestra publicados).
       // En ese caso el campo content queda vacío — el admin puede re-introducirlo.
@@ -214,6 +228,10 @@ export function AdminPosts({ token }: AdminPostsProps) {
         excerpt: form.excerpt.trim(),
         imageUrl: form.imageUrl.trim() || null,
         categoryId: form.categoryId ? parseInt(form.categoryId) : null,
+        // Traducción al inglés — opcional, se puede dejar vacía o borrarse.
+        titleEn: form.titleEn.trim() || null,
+        excerptEn: form.excerptEn.trim() || null,
+        contentEn: form.contentEn ? JSON.stringify(form.contentEn) : null,
       };
       if (form.content) body.content = JSON.stringify(form.content);
 
@@ -442,6 +460,65 @@ export function AdminPosts({ token }: AdminPostsProps) {
                   </option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          {/* ── Traducción al inglés (opcional) ──────────────────────────── */}
+          <div className="space-y-4 pt-4 border-t border-border/50">
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-semibold text-white">
+                Traducción al inglés (opcional)
+              </h3>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Si se deja vacío, los visitantes que elijan inglés verán el
+              contenido en español como respaldo.
+            </p>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Título (EN)
+              </label>
+              <input
+                type="text"
+                value={form.titleEn}
+                onChange={(e) => setForm((f) => ({ ...f, titleEn: e.target.value }))}
+                placeholder="Article title"
+                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Resumen (EN)
+              </label>
+              <textarea
+                value={form.excerptEn}
+                onChange={(e) => setForm((f) => ({ ...f, excerptEn: e.target.value }))}
+                placeholder="Short description for the blog card"
+                rows={2}
+                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors resize-none"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Contenido (EN)
+              </label>
+              {contentLoading ? (
+                <div className="flex items-center gap-2 py-6 text-muted-foreground text-sm">
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  Cargando contenido...
+                </div>
+              ) : (
+                <RichTextEditor
+                  value={form.contentEn}
+                  onChange={(json) => setForm((f) => ({ ...f, contentEn: json }))}
+                  placeholder="Write the article content in English here..."
+                  disabled={saving}
+                />
+              )}
             </div>
           </div>
         </div>

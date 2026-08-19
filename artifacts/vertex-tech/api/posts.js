@@ -27,6 +27,7 @@ module.exports = async function handler(req, res) {
       query = `
         SELECT
           p.id, p.slug, p.title, p.excerpt, p.image_url,
+          p.title_en, p.excerpt_en,
           p.created_at,
           c.id   AS category_id,
           c.name AS category_name,
@@ -42,6 +43,7 @@ module.exports = async function handler(req, res) {
       query = `
         SELECT
           p.id, p.slug, p.title, p.excerpt, p.image_url,
+          p.title_en, p.excerpt_en,
           p.created_at,
           c.id   AS category_id,
           c.name AS category_name,
