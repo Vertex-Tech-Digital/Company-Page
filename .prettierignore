@@ -1,0 +1,17 @@
+node_modules
+dist
+build
+out-tsc
+tmp
+coverage
+*.tsbuildinfo
+.vercel
+.cache
+.local
+.expo
+.expo-shared
+
+# Snapshots/journal generados por drizzle-kit — no son código a mano
+lib/db/drizzle/meta
+
+pnpm-lock.yaml
