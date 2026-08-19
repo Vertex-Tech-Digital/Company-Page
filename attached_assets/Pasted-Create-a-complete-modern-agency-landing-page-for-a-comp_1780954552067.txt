@@ -1,0 +1,127 @@
+Create a complete modern agency landing page for a company called **Vertex Tech**.
+
+The website is a premium corporate tech landing page for a Fullstack development agency selling services in Europe. The company specializes in React, Next.js, Node.js, APIs, integrations, and scalable system architecture.
+
+Use this stack:
+
+* Next.js
+* TypeScript
+* Tailwind CSS
+* Responsive design
+* Clean component structure
+* Modern animations with CSS or Framer Motion if available
+
+Visual style:
+
+* Tech Premium
+* Dark mode by default
+* Minimalist and modern European corporate aesthetic
+* Background: very dark navy/black, not pure black
+* Text: white, light gray, muted gray
+* Accent color: electric blue
+* Use subtle gradients, glassmorphism cards, soft borders, and elegant hover effects
+* Add subtle animated elements like glowing gradients, floating code blocks, smooth section reveals, and button hover transitions
+* Avoid childish or generic SaaS design. It must feel professional, high-end, and trustworthy.
+
+Page sections:
+
+1. Header / Navigation
+
+* Logo text: Vertex Tech
+* Navigation links: Inicio, Servicios, Proyectos, Metodología, Contacto
+* CTA button: Contactar
+* Sticky or fixed header with subtle blur background
+* Mobile responsive menu
+
+2. Hero Section
+   Create a powerful first impression.
+   Headline in Spanish:
+   “Transformamos ideas en aplicaciones web de alto rendimiento”
+   Subheadline:
+   “Desarrollo Fullstack, APIs e integración de sistemas con React, Next.js y Node.js para empresas que buscan velocidad, escalabilidad y calidad técnica.”
+   Primary CTA: “Solicitar consulta”
+   Secondary CTA: “Ver proyectos”
+   Add a modern visual element on the right side: a premium code preview card, architecture diagram, or dashboard-style mockup showing code/API/system blocks.
+
+3. Services Section
+   Create three clean premium cards:
+
+* Desarrollo Web Fullstack
+  Description: “Aplicaciones modernas, rápidas y escalables con React, Next.js y arquitecturas frontend de alto rendimiento.”
+* APIs e Integraciones
+  Description: “Diseño e implementación de APIs robustas, integraciones con servicios externos, automatizaciones y conexión entre sistemas.”
+* Arquitectura Node.js
+  Description: “Backends sólidos, seguros y preparados para crecer usando Node.js, bases de datos modernas y buenas prácticas de arquitectura.”
+
+Each card should include an icon, title, description, and subtle hover animation.
+
+4. Portfolio / Projects Section
+   Create 3 fictional but realistic portfolio cards based on prior fullstack experience:
+
+* Plataforma SaaS para Gestión Empresarial
+  Technologies: React, Node.js, PostgreSQL, Stripe
+  Description: “Sistema multiusuario con autenticación, pagos, panel administrativo y módulos de gestión interna.”
+* Dashboard de Analítica en Tiempo Real
+  Technologies: Next.js, APIs, WebSockets, Charts
+  Description: “Panel corporativo para visualizar métricas, eventos y datos operativos en tiempo real.”
+* Integración de Sistemas y Automatización
+  Technologies: Node.js, REST APIs, Cloud, Cron Jobs
+  Description: “Automatización de flujos empresariales conectando CRM, pagos, notificaciones y servicios externos.”
+
+Make this section visually attractive with cards, tags, and hover states.
+
+5. About / Methodology Section
+   Corporate Spanish copy:
+   “En Vertex Tech trabajamos con una metodología ágil orientada a resultados. Dividimos cada proyecto en etapas claras, priorizamos comunicación constante, control de calidad riguroso y entregas puntuales. Nuestro objetivo no es solo construir software, sino crear soluciones estables, mantenibles y preparadas para escalar.”
+
+Include 4 methodology points:
+
+* Análisis técnico inicial
+* Desarrollo ágil por iteraciones
+* Control de calidad y testing
+* Entrega, documentación y soporte
+
+6. Why Choose Us Section
+   Add a section explaining benefits:
+
+* Código limpio y mantenible
+* Comunicación clara
+* Experiencia Fullstack real
+* Enfoque en rendimiento y escalabilidad
+* Diseño moderno y profesional
+
+7. Contact Section
+   Create a strong final CTA:
+   “¿Listo para construir tu próxima plataforma?”
+   Text:
+   “Cuéntanos qué necesitas y te ayudamos a convertirlo en una solución web sólida, moderna y escalable.”
+   Add a simple contact form with:
+
+* Nombre
+* Email
+* Empresa
+* Mensaje
+* Button: “Enviar solicitud”
+  The form can be frontend-only for now, but structure the code so it can later connect to an API.
+
+8. Footer
+   Include:
+
+* Vertex Tech
+* “Desarrollo Fullstack para empresas modernas.”
+* Links: Servicios, Proyectos, Contacto
+* Copyright current year
+
+Technical requirements:
+
+* Make the page fully responsive for desktop, tablet, and mobile.
+* Use semantic HTML.
+* Optimize for SEO with title, meta description, and good heading hierarchy.
+* Use reusable components where appropriate.
+* Keep the code clean and easy to maintain.
+* Do not use placeholder lorem ipsum.
+* All content must be in Spanish.
+* The final result should look like a premium agency website ready to present to a client.
+* Add smooth scrolling behavior.
+* Add subtle animations, but keep performance high.
+* Make sure there are no TypeScript or build errors.
