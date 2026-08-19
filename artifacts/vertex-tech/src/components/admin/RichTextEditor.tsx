@@ -134,14 +134,15 @@ export function RichTextEditor({
     },
   });
 
-  // Sincronizar contenido externo (cuando se carga un post para editar)
+  // Sincronizar contenido externo (cuando se carga un post para editar,
+  // o cuando value pasa a null y el editor debe limpiarse)
   useEffect(() => {
     if (!editor) return;
     // Solo actualizar si el contenido difiere del actual para evitar bucles
     const current = JSON.stringify(editor.getJSON());
     const incoming = JSON.stringify(value ?? "");
-    if (current !== incoming && value) {
-      editor.commands.setContent(value);
+    if (current !== incoming) {
+      editor.commands.setContent(value ?? "");
     }
   }, [editor, value]);
 
@@ -154,6 +155,15 @@ export function RichTextEditor({
   if (!editor) return null;
 
   // Gestión de links
+
+  // Si la URL no trae protocolo, el navegador la trata como ruta relativa
+  // interna (ej. "www.ejemplo.com" -> "/www.ejemplo.com", un 404). Anteponemos
+  // https:// salvo que ya sea http(s):// o un enlace mailto:.
+  function normalizeUrl(url: string): string {
+    if (/^(https?:\/\/|mailto:)/i.test(url)) return url;
+    return `https://${url}`;
+  }
+
   function handleSetLink() {
     const previousUrl = editor.getAttributes("link").href ?? "";
     const url = window.prompt("URL del enlace:", previousUrl);
@@ -161,7 +171,7 @@ export function RichTextEditor({
     if (url === "") {
       editor.chain().focus().unsetLink().run();
     } else {
-      editor.chain().focus().setLink({ href: url }).run();
+      editor.chain().focus().setLink({ href: normalizeUrl(url) }).run();
     }
   }
 

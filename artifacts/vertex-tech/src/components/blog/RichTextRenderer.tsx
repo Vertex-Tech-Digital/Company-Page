@@ -12,47 +12,14 @@ import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
+import { parseTiptapContent } from "@/lib/tiptap-content";
 
 interface RichTextRendererProps {
   content: string; // String JSON de TipTap, o texto plano (posts heredados)
 }
 
-// Intenta parsear el content como JSON de TipTap.
-// Si falla (texto plano), convierte los párrafos en un documento TipTap válido.
-function parseContent(raw: string): object {
-  if (!raw || raw.trim() === "") {
-    return { type: "doc", content: [] };
-  }
-
-  // Intentar parsear como JSON de TipTap
-  try {
-    const parsed = JSON.parse(raw);
-    // Verificar que tiene la estructura mínima de un documento TipTap
-    if (parsed && parsed.type === "doc" && Array.isArray(parsed.content)) {
-      return parsed;
-    }
-  } catch {
-    // No es JSON — es texto plano (post heredado)
-  }
-
-  // Convertir texto plano: cada bloque separado por línea en blanco = párrafo
-  const paragraphs = raw
-    .split(/\n\n+/)
-    .map((p) => p.trim())
-    .filter(Boolean)
-    .map((text) => ({
-      type: "paragraph",
-      content: [{ type: "text", text }],
-    }));
-
-  return {
-    type: "doc",
-    content: paragraphs.length > 0 ? paragraphs : [],
-  };
-}
-
 export function RichTextRenderer({ content }: RichTextRendererProps) {
-  const parsedContent = parseContent(content);
+  const parsedContent = parseTiptapContent(content);
 
   const editor = useEditor({
     extensions: [
