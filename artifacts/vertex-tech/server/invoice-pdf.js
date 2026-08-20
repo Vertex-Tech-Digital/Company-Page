@@ -12,14 +12,16 @@ function getCompany() {
     companyName:
       env.INVOICE_COMPANY_NAME || "Vertex Tech Digital — en constitución",
     nif: env.INVOICE_NIF || "[NIF pendiente de alta]",
-    address: env.INVOICE_ADDRESS || "El Fraile, Arona, Santa Cruz de Tenerife",
+    address: env.INVOICE_ADDRESS || "[Domicilio fiscal pendiente]",
     iae: env.INVOICE_IAE || "[IAE pendiente de alta]",
     email:
       env.INVOICE_EMAIL ||
       env.EMAIL_INTERNAL_NOTIFICATION ||
       "[Correo de Contacto]",
     bcc:
-      env.INVOICE_BCC || env.EMAIL_INTERNAL_NOTIFICATION || "[Correo de Contacto]",
+      env.INVOICE_BCC ||
+      env.EMAIL_INTERNAL_NOTIFICATION ||
+      "[Correo de Contacto]",
   };
 }
 
