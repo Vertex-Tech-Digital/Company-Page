@@ -805,7 +805,10 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       issueDate: formattedDate,
       company: {
         companyName: "Vertex Tech Digital",
-        nif: "***REMOVED***",
+         nif:
+           process.env.VITE_COMPANY_TAX_ID ||
+           process.env.COMPANY_TAX_ID ||
+           "[Tax ID]",
         address: "",
         email: "vertextechdigital.com/diagnostico",
         iae: "",

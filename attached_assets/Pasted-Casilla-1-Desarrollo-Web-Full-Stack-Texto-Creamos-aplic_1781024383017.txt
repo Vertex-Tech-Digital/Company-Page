@@ -6,7 +6,7 @@ Texto: "Conectamos tus sistemas con cualquier servicio de terceros de forma segu
 
 Casilla 3: Ingeniería de Calidad (QA & Testing)
 Texto: "Protegemos la estabilidad de tu software. Implementamos ciclos rigurosos de control de calidad, pruebas automatizadas y auditorías de código antes del despliegue para asegurar que tu plataforma funcione sin errores desde el primer día."
-[6/9, 9:13 AM] ***REMOVED***: ECCIÓN: Proyectos Destacados (Los 3 casos de estudio anónimos)
+[NOTA_INTERNA]: ECCIÓN: Proyectos Destacados (Los 3 casos de estudio anónimos)
 esto para mantener la privacidad de tu trabajo:
 
 Proyecto 1: "Plataformas de Gestión Empresarial y RRHH (SaaS)" -> Desarrollo de ecosistemas internos en la nube para la administración masiva de activos y personal con arquitectura reactiva.
@@ -14,7 +14,7 @@ Proyecto 1: "Plataformas de Gestión Empresarial y RRHH (SaaS)" -> Desarrollo de
 Proyecto 2: "Dashboards y Analítica en Tiempo Real" -> Paneles de control optimizados para el procesamiento de datos a gran escala y visualización de métricas críticas de negocio.
 
 Proyecto 3: "Automatización e Integración de Sistemas" -> Migración de software heredado a infraestructuras API modernas y adaptadas para entornos móviles.
-[6/9, 9:14 AM] ***REMOVED***: ECCIÓN: Nuestra Metodología (Las 4 etapas)
+[NOTA_INTERNA]: ECCIÓN: Nuestra Metodología (Las 4 etapas)
 Las cuatro etapas:
 
 Análisis y Estrategia: Definición de requisitos y diseño de la arquitectura técnica.

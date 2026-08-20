@@ -41,7 +41,7 @@ router.post("/contact", async (req, res) => {
 
   const mailOptions = {
     from: `"Vertex Tech Contact" <${gmailUser}>`,
-    to: "***REMOVED***",
+    to: process.env.EMAIL_INTERNAL_NOTIFICATION || process.env.GMAIL_USER,
     replyTo: email,
     subject: `Nueva consulta de ${name}${company ? ` (${company})` : ""}`,
     html: `

@@ -447,7 +447,7 @@ export default function Diagnostico() {
                           auditoría técnica.
                         </p>
                         <a
-                          href="tel:***REMOVED***"
+                          href={`tel:${import.meta.env.VITE_CONTACT_PHONE || ""}`}
                           className="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary/90 transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                         >
                           <Phone className="h-4 w-4" />
@@ -466,7 +466,7 @@ export default function Diagnostico() {
                           . Te responderemos directamente a tu email.
                         </p>
                         <a
-                          href="mailto:***REMOVED***?subject=Diagnóstico Tecnológico Completado"
+                           href={`mailto:${import.meta.env.VITE_CONTACT_EMAIL || ""}?subject=Diagnóstico Tecnológico Completado`}
                           className="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary/90 transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                         >
                           <Mail className="h-4 w-4" />

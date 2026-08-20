@@ -32,7 +32,7 @@ module.exports = async function handler(req, res) {
   try {
     await transporter.sendMail({
       from: `"Vertex Tech Contact" <${gmailUser}>`,
-      to: "***REMOVED***",
+      to: process.env.EMAIL_INTERNAL_NOTIFICATION || process.env.GMAIL_USER,
       replyTo: email,
       subject: `Nueva consulta de ${name.trim()}${company ? ` (${company})` : ""}`,
       html: `
