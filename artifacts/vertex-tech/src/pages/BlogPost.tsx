@@ -13,6 +13,8 @@ import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
 import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 import { useLanguage } from "@/context/LanguageContext";
+import { RichTextRenderer } from "@/components/blog/RichTextRenderer";
+import { hasRichTextContent } from "@/lib/tiptap-content";
 
 interface FullPost {
   id: number;
@@ -20,6 +22,9 @@ interface FullPost {
   title: string;
   excerpt: string;
   content: string;
+  title_en: string | null;
+  excerpt_en: string | null;
+  content_en: string | null;
   image_url: string | null;
   created_at: string;
   updated_at: string;
@@ -121,6 +126,19 @@ export default function BlogPost() {
     );
   }
 
+  // Si el post no tiene traducción al inglés, se muestra el contenido en
+  // español como respaldo en vez de dejar el artículo vacío. hasRichTextContent
+  // evita tratar un documento TipTap "vacío por dentro" (ej. tras borrar todo
+  // el texto en el editor) como si fuera una traducción real.
+  const displayTitle =
+    lang === "en" && post.title_en ? post.title_en : post.title;
+  const displayExcerpt =
+    lang === "en" && post.excerpt_en ? post.excerpt_en : post.excerpt;
+  const displayContent =
+    lang === "en" && hasRichTextContent(post.content_en)
+      ? post.content_en!
+      : post.content;
+
   // ── Vista del artículo ───────────────────────────────────────────────────────
   return (
     <main className="min-h-screen text-foreground font-sans">
@@ -160,12 +178,12 @@ export default function BlogPost() {
 
           {/* Título */}
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
-            {post.title}
+            {displayTitle}
           </h1>
 
           {/* Excerpt */}
           <p className="text-lg text-muted-foreground leading-relaxed">
-            {post.excerpt}
+            {displayExcerpt}
           </p>
 
           {/* Meta: fecha + botón editar (solo si hay token admin) */}
@@ -202,7 +220,7 @@ export default function BlogPost() {
           >
             <img
               src={post.image_url}
-              alt={post.title}
+              alt={displayTitle}
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -213,23 +231,8 @@ export default function BlogPost() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15 }}
-          className="prose prose-invert prose-lg max-w-none
-            prose-headings:text-white prose-headings:font-bold
-            prose-p:text-muted-foreground prose-p:leading-relaxed
-            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-            prose-strong:text-white
-            prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
-            prose-pre:bg-card prose-pre:border prose-pre:border-border
-            prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground
-            prose-hr:border-border"
         >
-          {/* El contenido se almacena como texto plano con saltos de línea.
-              Cada párrafo separado por línea en blanco se renderiza como <p>.
-              Cuando se integre un editor rich-text (TipTap), este bloque
-              se reemplazará por el renderer correspondiente. */}
-          {post.content.split(/\n\n+/).map((paragraph, i) => (
-            <p key={i}>{paragraph.trim()}</p>
-          ))}
+          <RichTextRenderer content={displayContent} />
         </motion.div>
       </article>
 

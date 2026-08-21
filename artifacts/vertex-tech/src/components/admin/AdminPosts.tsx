@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { parseTiptapContent, hasRichTextContent } from "@/lib/tiptap-content";
 
 // ── Tipos ──────────────────────────────────────────────────────────────────────
 
@@ -42,9 +44,14 @@ interface AdminPostsProps {
 const EMPTY_FORM = {
   title: "",
   excerpt: "",
-  content: "",
+  content: null as object | null, // TipTap JSON; null = editor vacío
   imageUrl: "",
   categoryId: "",
+  // Traducción al inglés (opcional) — si se deja vacía, el sitio muestra
+  // el contenido en español como fallback cuando el visitante elige "en".
+  titleEn: "",
+  excerptEn: "",
+  contentEn: null as object | null,
 };
 
 // ── Slug preview en tiempo real ────────────────────────────────────────────────
@@ -78,7 +85,19 @@ export function AdminPosts({ token }: AdminPostsProps) {
   const editingIdRef = useRef<number | null>(null);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
 
-  const [form, setForm] = useState(EMPTY_FORM);
+  // Se incrementa cada vez que se abre un formulario (crear, editar u otro
+  // post). La respuesta async de openEditForm solo se aplica si sigue siendo
+  // la petición vigente — evita que la respuesta de un post abandonado
+  // sobreescriba el formulario de otro post abierto mientras tanto.
+  const loadRequestIdRef = useRef(0);
+
+  // true si la carga del contenido del post en edición falló — en ese caso
+  // handleSave no debe mandar los campos de traducción (title_en/excerpt_en/
+  // content_en), porque nunca se hidrataron con el valor real y mandarían
+  // null, borrando una traducción ya guardada.
+  const contentLoadFailedRef = useRef(false);
+
+  const [form, setForm] = useState<typeof EMPTY_FORM>(EMPTY_FORM);
   const [contentLoading, setContentLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -123,6 +142,8 @@ export function AdminPosts({ token }: AdminPostsProps) {
   // ── Navegación entre vistas ────────────────────────────────────────────────
 
   function openCreateForm() {
+    loadRequestIdRef.current++; // invalida cualquier carga anterior en curso
+    contentLoadFailedRef.current = false;
     editingIdRef.current = null;
     setEditingPost(null);
     setForm(EMPTY_FORM);
@@ -134,19 +155,27 @@ export function AdminPosts({ token }: AdminPostsProps) {
     // Guardamos el ID en el ref ANTES de cambiar de vista —
     // así handleSave siempre lo puede leer aunque el estado tarde en actualizarse.
     editingIdRef.current = post.id;
+    // Cada llamada obtiene su propio número de petición. Si el usuario abre
+    // otro post (u otro "crear"/"volver") antes de que esta respuesta llegue,
+    // loadRequestIdRef ya habrá avanzado y esta respuesta se descarta.
+    const requestId = ++loadRequestIdRef.current;
+    contentLoadFailedRef.current = false;
     setEditingPost(post);
     setForm({
       title: post.title,
       excerpt: post.excerpt,
-      content: "", // se carga del servidor a continuación
+      content: null, // se carga del servidor a continuación
       imageUrl: post.image_url ?? "",
       categoryId: post.category_id?.toString() ?? "",
+      titleEn: "",
+      excerptEn: "",
+      contentEn: null, // se carga del servidor a continuación
     });
     setFormError(null);
     setView("form");
 
-    // Cargar el contenido completo del post vía /api/post?slug=
-    // (el GET /admin-posts solo devuelve metadatos, no el content completo)
+    // Cargar el contenido completo del post vía /api/admin-posts?slug=
+    // (el GET /admin-posts sin slug solo devuelve metadatos, no el content completo)
     setContentLoading(true);
     try {
       const res = await fetch(
@@ -157,21 +186,42 @@ export function AdminPosts({ token }: AdminPostsProps) {
       );
       if (!res.ok) throw new Error();
       const data = await res.json();
-      setForm((f) => ({ ...f, content: data.post?.content ?? "" }));
+      if (loadRequestIdRef.current !== requestId) return; // respuesta obsoleta
+      const raw = data.post?.content ?? "";
+      // Convierte tanto JSON de TipTap como texto plano heredado a un
+      // documento TipTap válido (misma lógica que RichTextRenderer, para
+      // que lo que se ve en /blog sea lo mismo que se carga en el editor).
+      const parsed = parseTiptapContent(raw);
+      const rawEn = data.post?.content_en ?? "";
+      const parsedEn = rawEn ? parseTiptapContent(rawEn) : null;
+      setForm((f) => ({
+        ...f,
+        content: parsed,
+        titleEn: data.post?.title_en ?? "",
+        excerptEn: data.post?.excerpt_en ?? "",
+        contentEn: parsedEn,
+      }));
     } catch {
+      if (loadRequestIdRef.current !== requestId) return; // respuesta obsoleta
       // Si el post es draft /api/post devuelve 404 (solo muestra publicados).
       // En ese caso el campo content queda vacío — el admin puede re-introducirlo.
       // Se muestra un aviso informativo pero no se bloquea el formulario.
+      // contentLoadFailedRef evita que handleSave mande title_en/excerpt_en/
+      // content_en vacíos y borre una traducción que sí existía en el servidor.
+      contentLoadFailedRef.current = true;
       setFormError(
         "No se pudo cargar el contenido del artículo (puede ser un borrador no publicado). " +
-          "Puedes escribirlo de nuevo aquí — los demás campos ya están cargados.",
+          "Puedes escribirlo de nuevo aquí — los demás campos ya están cargados. " +
+          "La traducción al inglés no se modificará al guardar.",
       );
     } finally {
-      setContentLoading(false);
+      if (loadRequestIdRef.current === requestId) setContentLoading(false);
     }
   }
 
   function backToList() {
+    loadRequestIdRef.current++; // invalida cualquier carga anterior en curso
+    contentLoadFailedRef.current = false;
     editingIdRef.current = null;
     setView("list");
     setEditingPost(null);
@@ -196,7 +246,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
       setFormError("El resumen (excerpt) es obligatorio");
       return;
     }
-    if (!isEditing && !form.content.trim()) {
+    if (!isEditing && !form.content) {
       setFormError("El contenido es obligatorio para crear un nuevo post");
       return;
     }
@@ -209,7 +259,25 @@ export function AdminPosts({ token }: AdminPostsProps) {
         imageUrl: form.imageUrl.trim() || null,
         categoryId: form.categoryId ? parseInt(form.categoryId) : null,
       };
-      if (form.content.trim()) body.content = form.content.trim();
+      if (form.content) body.content = JSON.stringify(form.content);
+
+      // Traducción al inglés — opcional, se puede dejar vacía o borrarse.
+      // Si la carga del contenido falló (contentLoadFailedRef), estos campos
+      // nunca se hidrataron con el valor real del servidor: mandarlos ahora
+      // enviaría null y borraría una traducción ya guardada. Se omiten del
+      // body por completo — el PATCH solo actualiza lo que se envía.
+      if (!isEditing || !contentLoadFailedRef.current) {
+        body.titleEn = form.titleEn.trim() || null;
+        body.excerptEn = form.excerptEn.trim() || null;
+        // hasRichTextContent evita guardar un documento TipTap "vacío por
+        // dentro" (ej. '{"type":"doc","content":[]}') como si fuera una
+        // traducción real — eso haría que el sitio público lo tratara como
+        // "hay traducción" y mostrara el artículo en blanco.
+        body.contentEn =
+          form.contentEn && hasRichTextContent(form.contentEn)
+            ? JSON.stringify(form.contentEn)
+            : null;
+      }
 
       let res: Response;
 
@@ -394,27 +462,23 @@ export function AdminPosts({ token }: AdminPostsProps) {
             />
           </div>
 
-          {/* Contenido */}
+          {/* Contenido — editor TipTap */}
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               {isEditing
-                ? "Contenido (dejar vacío para no modificar)"
+                ? "Contenido (dejar vacío para conservar el actual)"
                 : "Contenido *"}
             </label>
             {contentLoading ? (
-              <div className="flex items-center gap-2 py-4 text-muted-foreground text-sm">
+              <div className="flex items-center gap-2 py-6 text-muted-foreground text-sm">
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 Cargando contenido...
               </div>
             ) : (
-              <textarea
+              <RichTextEditor
                 value={form.content}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, content: e.target.value }))
-                }
-                placeholder="Escribe el contenido del artículo aquí..."
-                rows={14}
-                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors resize-y font-mono leading-relaxed"
+                onChange={(json) => setForm((f) => ({ ...f, content: json }))}
+                disabled={saving}
               />
             )}
           </div>
@@ -454,6 +518,71 @@ export function AdminPosts({ token }: AdminPostsProps) {
                   </option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          {/* ── Traducción al inglés (opcional) ──────────────────────────── */}
+          <div className="space-y-4 pt-4 border-t border-border/50">
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-semibold text-white">
+                Traducción al inglés (opcional)
+              </h3>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Si se deja vacío, los visitantes que elijan inglés verán el
+              contenido en español como respaldo.
+            </p>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Título (EN)
+              </label>
+              <input
+                type="text"
+                value={form.titleEn}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, titleEn: e.target.value }))
+                }
+                placeholder="Article title"
+                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Resumen (EN)
+              </label>
+              <textarea
+                value={form.excerptEn}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, excerptEn: e.target.value }))
+                }
+                placeholder="Short description for the blog card"
+                rows={2}
+                className="w-full bg-background border border-border rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors resize-none"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Contenido (EN)
+              </label>
+              {contentLoading ? (
+                <div className="flex items-center gap-2 py-6 text-muted-foreground text-sm">
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  Cargando contenido...
+                </div>
+              ) : (
+                <RichTextEditor
+                  value={form.contentEn}
+                  onChange={(json) =>
+                    setForm((f) => ({ ...f, contentEn: json }))
+                  }
+                  placeholder="Write the article content in English here..."
+                  disabled={saving}
+                />
+              )}
             </div>
           </div>
         </div>
