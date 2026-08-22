@@ -1,0 +1,55 @@
+export const meta = {
+  title:
+    "La ilusión de lo «aceptable»: el coste de la maquetación cosmética sin arquitectura técnica",
+  excerpt:
+    "Contrató lo que parecía un servicio digital integral. Recibió una fachada bonita sin ingeniería detrás: correo que perdía mensajes, dominios redundantes y una plataforma imposible de ampliar.",
+  pseudonym: "Emprendimiento",
+  tags: ["Tecnología", "Servicios", "Emprendimiento"],
+  date: "2026-08-22",
+  cover: "/images/casos/caso-conceptual-no1/portada.png",
+};
+
+## Prólogo: la trampa del «todo en uno» y la ilusión del emprendedor
+
+Todo proyecto empresarial nace con una dosis inmensa de ilusión. Cuando una persona cercana a nuestro entorno decidió dar el salto y abrir las puertas de su propio negocio —una cuidada tienda enfocada en la botánica y la decoración natural—, sabía que la presencia digital no era un lujo, sino una necesidad imperiosa.
+
+Sin experiencia previa en el sector tecnológico y empujada por la urgencia de arrancar, cometió un error sumamente común en el tejido emprendedor: buscar en internet y dejarse llevar por reclamos publicitarios atractivos. Encontró a un proveedor que prometía un servicio integral: diseño de marca, desarrollo de página web «profesional», posicionamiento SEO y configuración de sistemas. A ojos de alguien ajeno a la industria, la propuesta parecía perfecta y la tarifa, aunque considerable, se justificaba por la promesa de entregar un sistema completo listo para facturar.
+
+Lo que ella no sabía —y lo que la publicidad no aclaraba— era que al otro lado no había un equipo de ingeniería ni de desarrollo de software, sino un diseñador gráfico que, al amparo de la facilidad que ofrecen los maquetadores modernos, asumió un rol técnico para el que no estaba cualificado. El resultado fue una bonita fachada sobre unos cimientos de barro que, al poco tiempo de echar a andar, comenzaron a agrietarse.
+
+> **Nota de transparencia:** contamos con la autorización explícita de la protagonista de esta historia para compartir y analizar su caso de forma completamente anonimizada. Este ejercicio no busca señalar ni responsabilizar en el plano personal, sino servir de reflexión, guía y lección de aprendizaje para que ella misma y otros emprendedores aprendan a identificar a los profesionales adecuados según las necesidades reales de su negocio.
+
+## Contexto del proyecto y promesa comercial
+
+La emprendedora contrató lo que creía que sería la infraestructura digital de su empresa. Tras el pago de una factura inicial y el compromiso de cuotas recurrentes, el encargo quedó estructurado de la siguiente manera:
+
+- **Diseño de identidad visual: 380 €** (creación de logotipo, paleta cromática y manual de aplicación gráfica).
+- **«Desarrollo» y maquetación web: 350 €** (creación de una web basada en maquetadores visuales y plantillas).
+- **Mantenimiento, dominio y alojamiento: 145 €/año** (suscripción recurrente a servidores de correo, hosting y gestión de dominios).
+
+A primera vista, la web entregada «funcionaba»: se veía bonita en un navegador, los colores combinaban con la tienda física y el logotipo lucía profesional. Sin embargo, la brecha entre el aspecto visual y la ingeniería subyacente pronto empezó a generar serios problemas operativos.
+
+## Análisis técnico: la invasión de roles y la deuda técnica
+
+Este caso ilustra a la perfección el fenómeno de la **invasión cruzada de roles**: cuando especialistas en comunicación visual asumen la arquitectura de sistemas y servidores sin aplicar protocolos ni estándares de ingeniería de software.
+
+| Dimensión técnica | Solución entregada (proveedor no técnico) | Riesgo estructural e impacto de ingeniería |
+| --- | --- | --- |
+| Infraestructura de correo | Asignación exclusiva del protocolo POP3 (restringiendo IMAP) y envío de credenciales en texto plano por correo. | Imposibilidad de sincronizar la bandeja de entrada entre el móvil y el ordenador de la tienda. Al descargar los correos en un dispositivo, desaparecían de los demás, con un alto riesgo de pérdida definitiva de datos de clientes y presupuestos. |
+| Estrategia de dominios y SEO | Recomendación de comprar múltiples dominios secundarios para crear «mini-webs» paralelas y redirecciones manuales. | Generación de costes fijos innecesarios y recurrentes. En lugar de mejorar el SEO, esta práctica penaliza el posicionamiento por contenido duplicado y falta de URLs canónicas adecuadas. |
+| Arquitectura web | Despliegue montado sobre subcarpetas de prueba provisionales (`/wordpress24/`) apoyado masivamente en plugins visuales de terceros. | Ausencia total de código nativo optimizado. La web era extremadamente pesada, lenta en dispositivos móviles y dependiente de actualizaciones de plugins que podían romper el sitio en cualquier momento. |
+| Seguridad y mantenimiento | Inexistencia de políticas de seguridad Zero Trust, sin certificados correctamente aislados ni entornos de pruebas (staging). | Vulnerabilidad ante inyecciones de código y colapso del sitio ante cualquier pico de tráfico o actualización automática del servidor. |
+
+## Impacto comercial y moraleja financiera
+
+Lo que comenzó como una solución «rápida y asequible» se transformó en un lastre diario para la tienda:
+
+1. **Frustración operativa:** gestionar los pedidos de los clientes era un caos debido a la pérdida de correos provocada por la configuración POP3.
+2. **Gasto recurrente ineficiente:** la cliente quedó atada a facturas anuales por dominios redundantes que no aportaban valor ni tráfico real a la web.
+3. **Pérdida total de la inversión:** cuando la tienda necesitó evolucionar para añadir una pasarela de pago y un catálogo interactivo con control de inventario, fue imposible ampliar la web existente. Hubo que desechar el trabajo por completo y rehacer la plataforma desde cero bajo principios de ingeniería real.
+
+## Conclusión y vinculación con la industria
+
+Este caso real respalda las conclusiones planteadas en el artículo del blog «La paradoja de la IA y el intrusismo digital»: el trabajo cosmético no sustituye a la ingeniería.
+
+Confiar la arquitectura tecnológica de una empresa a perfiles no cualificados —por muy atractivos que sean sus anuncios— suele terminar en una trampa de deuda técnica y costes duplicados. Esperamos que esta experiencia sirva de lección a futuros emprendedores: cuando se trata de construir la infraestructura sobre la que operará tu negocio, investigar, verificar perfiles y contratar a verdaderos profesionales de la ingeniería de software no es un gasto, sino el único blindaje real para tu inversión.
