@@ -131,6 +131,18 @@ export function Navbar() {
             {t("nav.diagnostico")}
           </WouterLink>
 
+          <WouterLink
+            href="/casos-conceptuales"
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              location.startsWith("/casos-conceptuales")
+                ? "text-primary"
+                : "text-muted-foreground"
+            }`}
+            data-testid="nav-link-casos"
+          >
+            {t("nav.casos")}
+          </WouterLink>
+
           {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
           <WouterLink
             href="/blog"
@@ -233,6 +245,18 @@ export function Navbar() {
               data-testid="nav-link-diagnostico-mobile"
             >
               {t("nav.diagnostico")}
+            </WouterLink>
+            <WouterLink
+              href="/casos-conceptuales"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`text-lg font-medium transition-colors hover:text-primary ${
+                location.startsWith("/casos-conceptuales")
+                  ? "text-primary"
+                  : "text-muted-foreground"
+              }`}
+              data-testid="nav-link-casos-mobile"
+            >
+              {t("nav.casos")}
             </WouterLink>
             {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
             <WouterLink

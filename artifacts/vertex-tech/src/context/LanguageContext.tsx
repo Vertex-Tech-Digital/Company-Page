@@ -30,6 +30,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.metodologia": "Metodología",
     "nav.diagnostico": "Diagnóstico Gratis",
     "nav.blog": "Blog",
+    "nav.casos": "Casos Conceptuales",
     "nav.contactar": "Contactar",
     // Hero
     "hero.subheadline":
@@ -141,6 +142,7 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.metodologia": "Methodology",
     "nav.diagnostico": "Free Diagnosis",
     "nav.blog": "Blog",
+    "nav.casos": "Conceptual Cases",
     "nav.contactar": "Contact",
     // Hero
     "hero.subheadline":
