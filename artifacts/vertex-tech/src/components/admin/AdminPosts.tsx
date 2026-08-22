@@ -35,10 +35,6 @@ interface Category {
   name: string;
 }
 
-interface AdminPostsProps {
-  token: string;
-}
-
 const EMPTY_FORM = {
   title: "",
   excerpt: "",
@@ -63,7 +59,7 @@ function slugify(text: string): string {
 
 // ── Componente principal ───────────────────────────────────────────────────────
 
-export function AdminPosts({ token }: AdminPostsProps) {
+export function AdminPosts() {
   const [, setLocation] = useLocation();
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -92,7 +88,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
     setError(null);
     try {
       const res = await fetch("/api/admin-posts", {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -102,7 +98,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -151,9 +147,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
     try {
       const res = await fetch(
         `/api/admin-posts?slug=${encodeURIComponent(post.slug)}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { credentials: "include" },
       );
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -216,19 +210,15 @@ export function AdminPosts({ token }: AdminPostsProps) {
       if (isEditing) {
         res = await fetch(`/api/admin-posts?id=${currentEditingId}`, {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(body),
         });
       } else {
         res = await fetch("/api/admin-posts", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify(body),
         });
       }
@@ -261,10 +251,8 @@ export function AdminPosts({ token }: AdminPostsProps) {
     try {
       const res = await fetch(`/api/admin-posts?id=${post.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ status: newStatus }),
       });
       if (!res.ok) throw new Error();
@@ -291,7 +279,7 @@ export function AdminPosts({ token }: AdminPostsProps) {
     try {
       const res = await fetch(`/api/admin-posts?id=${post.id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       if (!res.ok) throw new Error();
       setPosts((prev) => prev.filter((p) => p.id !== post.id));

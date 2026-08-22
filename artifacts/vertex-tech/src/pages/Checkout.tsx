@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -130,6 +130,33 @@ function CardFlow() {
 
   const amountNum = Number(amount);
 
+  // Una idempotency key estable por intento de pago: si el usuario reintenta
+  // (doble click, fallo de red) con los MISMOS datos, el servidor reconoce
+  // que es el mismo intento y no crea un customer/factura duplicados en
+  // Stripe. Si cambia nombre/email/importe, es un intento distinto de
+  // verdad — se genera una key nueva.
+  const idempotencyRef = useRef<{
+    key: string;
+    name: string;
+    email: string;
+    amount: number;
+  } | null>(null);
+
+  function getIdempotencyKey(): string {
+    const prev = idempotencyRef.current;
+    if (
+      prev &&
+      prev.name === name &&
+      prev.email === email &&
+      prev.amount === amountNum
+    ) {
+      return prev.key;
+    }
+    const key = crypto.randomUUID();
+    idempotencyRef.current = { key, name, email, amount: amountNum };
+    return key;
+  }
+
   async function startPayment(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -154,7 +181,12 @@ function CardFlow() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, amount: amountNum }),
+          body: JSON.stringify({
+            name,
+            email,
+            amount: amountNum,
+            idempotencyKey: getIdempotencyKey(),
+          }),
         },
       );
       const data = await res.json().catch(() => ({}));

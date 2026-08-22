@@ -2,7 +2,7 @@
 // GET /api/admin-invoices?id=5&pdf=1 -> regenera y devuelve el PDF (base64) de esa factura
 //
 // El PDF no se almacena: se regenera al vuelo desde los datos guardados.
-// Requiere: Authorization: Bearer <token>
+// Requiere sesión activa (cookie httpOnly admin_token, ver _auth.js)
 
 const { pool } = require("../server/db.js");
 const { verifyAuth } = require("./_auth");
@@ -23,7 +23,7 @@ function queryParam(req, name) {
 }
 
 module.exports = async function handler(req, res) {
-  const payload = verifyAuth(req, res);
+  const payload = await verifyAuth(req, res);
   if (!payload) return;
 
   if (!process.env.DATABASE_URL) {

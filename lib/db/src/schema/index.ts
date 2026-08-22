@@ -7,3 +7,4 @@ export * from "./banned-words";
 export * from "./clients";
 export * from "./invoices";
 export * from "./leads";
+export * from "./payment-orders";

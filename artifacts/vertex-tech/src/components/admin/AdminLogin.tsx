@@ -4,7 +4,7 @@ import { Lock, User, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminLoginProps {
-  onLoginSuccess: (token: string) => void;
+  onLoginSuccess: () => void;
 }
 
 export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
@@ -27,6 +27,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       const res = await fetch("/api/admin-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ username: username.trim(), password }),
       });
 
@@ -37,9 +38,9 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
         return;
       }
 
-      // Guardar el token y notificar al padre
-      localStorage.setItem("admin_token", data.token);
-      onLoginSuccess(data.token);
+      // La sesión ya quedó en una cookie httpOnly (Set-Cookie de la
+      // respuesta) — no hay token que guardar del lado del cliente.
+      onLoginSuccess();
     } catch {
       setError("No se pudo conectar con el servidor");
     } finally {

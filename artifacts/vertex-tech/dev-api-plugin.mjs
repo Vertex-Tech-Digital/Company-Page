@@ -55,26 +55,7 @@ export function devApiPlugin() {
           req.query = {};
         }
 
-        // Body JSON (las funciones esperan req.body ya parseado, estilo Vercel).
-        // Incluye POST, PUT y PATCH — todos pueden llevar body.
-        let body = {};
-        if (
-          req.method === "POST" ||
-          req.method === "PUT" ||
-          req.method === "PATCH"
-        ) {
-          const chunks = [];
-          for await (const chunk of req) chunks.push(chunk);
-          const raw = Buffer.concat(chunks).toString("utf8");
-          try {
-            body = raw ? JSON.parse(raw) : {};
-          } catch {
-            body = {};
-          }
-        }
-
         // Shim de req/res al estilo de las funciones de Vercel.
-        req.body = body;
         res.status = (code) => {
           res.statusCode = code;
           return res;
@@ -93,6 +74,32 @@ export function devApiPlugin() {
           delete require.cache[require.resolve(file)];
           const handlerModule = require(file);
           const handler = handlerModule.default || handlerModule;
+
+          // Réplica del convenio de Vercel: un handler puede exportar
+          // `config.api.bodyParser = false` para leer el body crudo él
+          // mismo (necesario para verificar firmas, ej. stripe-webhook.js).
+          // Si no, parseamos JSON como siempre.
+          const bodyParserDisabled =
+            handlerModule.config?.api?.bodyParser === false;
+
+          if (
+            !bodyParserDisabled &&
+            (req.method === "POST" ||
+              req.method === "PUT" ||
+              req.method === "PATCH")
+          ) {
+            const chunks = [];
+            for await (const chunk of req) chunks.push(chunk);
+            const raw = Buffer.concat(chunks).toString("utf8");
+            try {
+              req.body = raw ? JSON.parse(raw) : {};
+            } catch {
+              req.body = {};
+            }
+          } else if (!bodyParserDisabled) {
+            req.body = {};
+          }
+
           await handler(req, res);
         } catch (err) {
           console.error(`[dev-api] error en /api/${name}:`, err);

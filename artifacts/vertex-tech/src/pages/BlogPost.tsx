@@ -46,8 +46,15 @@ export default function BlogPost() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Token admin en localStorage — si existe, mostramos el botón de editar
-  const adminToken = localStorage.getItem("admin_token");
+  // La sesión admin vive en una cookie httpOnly, invisible a JS — le
+  // preguntamos al servidor si hay una activa para decidir si mostrar el
+  // botón de editar (puramente cosmético: /admin igual vuelve a validar).
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    fetch("/api/admin-me", { credentials: "include" })
+      .then((r) => setIsAdmin(r.ok))
+      .catch(() => setIsAdmin(false));
+  }, []);
 
   useEffect(() => {
     if (!slug) return;
@@ -175,7 +182,7 @@ export default function BlogPost() {
               {formatDate(post.created_at, lang)}
             </span>
 
-            {adminToken && (
+            {isAdmin && (
               <button
                 onClick={() => setLocation(`/admin`)}
                 className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors border border-border hover:border-primary/40 rounded-lg px-3 py-1.5"
