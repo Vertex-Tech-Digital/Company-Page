@@ -40,7 +40,7 @@ jobs:
 
       # TODO (CTO): agregar aquí un paso de backup/snapshot antes de migrar.
 
-        # MIGRACIONES DESACTIVADAS (decisión CTO 22/08/2026)
+      # MIGRACIONES DESACTIVADAS (decisión CTO 22/08/2026)
   # Las migraciones se ejecutan manualmente post-merge:
   #   1. pnpm db:generate  → genera archivo .sql
   #   2. Revisar .sql (desarrollador + Carlos)
