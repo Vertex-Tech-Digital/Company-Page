@@ -40,7 +40,10 @@ jobs:
 
       # TODO (CTO): agregar aquí un paso de backup/snapshot antes de migrar.
 
-      - name: Aplicar migraciones
-        run: pnpm --filter db migrate
-        env:
-          DATABASE_URL: ${{ secrets.MIGRATIONS_DATABASE_URL }}
+        # MIGRACIONES DESACTIVADAS (decisión CTO 22/08/2026)
+  # Las migraciones se ejecutan manualmente post-merge:
+  #   1. pnpm db:generate  → genera archivo .sql
+  #   2. Revisar .sql (desarrollador + Carlos)
+  #   3. Commit + PR con el .sql
+  #   4. Merge a main
+  #   5. pnpm db:migrate   → aplica en producción (manual)
