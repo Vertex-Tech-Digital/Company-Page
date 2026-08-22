@@ -4,16 +4,30 @@ import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 import { devApiPlugin } from "./dev-api-plugin.mjs";
 
-const isReplit = process.env.REPL_ID !== undefined;
-const isVercel = process.env.VERCEL === "1";
-
-const rawPort = process.env.PORT;
-const port = rawPort ? Number(rawPort) : 3000;
-
-const basePath = process.env.BASE_PATH ?? "/";
-
 export default defineConfig(async () => {
-  const plugins: any[] = [react(), tailwindcss(), devApiPlugin()];
+  const isReplit = process.env.REPL_ID !== undefined;
+  const isVercel = process.env.VERCEL === "1";
+
+  const rawPort = process.env.PORT;
+  const port = rawPort ? Number(rawPort) : 3000;
+
+  const basePath = process.env.BASE_PATH ?? "/";
+
+  // Plugin MDX para los casos conceptuales estáticos (src/content/casos/*.mdx).
+  // Se activa solo si @mdx-js/rollup está instalado; si falta, el resto de la
+  // app sigue funcionando. Para activarlo:
+  //   pnpm --filter @workspace/vertex-tech add -D @mdx-js/rollup
+  const plugins: any[] = [];
+  try {
+    const { default: mdx } = await import("@mdx-js/rollup");
+    const { default: remarkGfm } = await import("remark-gfm");
+    plugins.push({ enforce: "pre", ...mdx({ remarkPlugins: [remarkGfm] }) });
+  } catch {
+    console.warn(
+      "[vite] @mdx-js/rollup no está instalado — los .mdx de casos conceptuales no compilarán.",
+    );
+  }
+  plugins.push(react(), tailwindcss(), devApiPlugin());
 
   if (isReplit && !isVercel) {
     const { default: runtimeErrorOverlay } =
