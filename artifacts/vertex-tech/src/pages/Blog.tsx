@@ -14,6 +14,8 @@ interface ApiPost {
   slug: string;
   title: string;
   excerpt: string;
+  title_en: string | null;
+  excerpt_en: string | null;
   image_url: string | null;
   created_at: string;
   category_name: string | null;
@@ -36,13 +38,18 @@ function formatDate(dateStr: string, lang: string): string {
 }
 
 function apiPostToPreview(post: ApiPost, lang: string): BlogPostPreview {
+  // Si el post no tiene traducción al inglés, se muestra el contenido en
+  // español como respaldo en vez de dejar la tarjeta vacía.
+  const title = lang === "en" && post.title_en ? post.title_en : post.title;
+  const excerpt =
+    lang === "en" && post.excerpt_en ? post.excerpt_en : post.excerpt;
   return {
     slug: post.slug,
     image: post.image_url ?? "",
     category:
       post.category_name ?? (lang === "es" ? "Sin categoría" : "Uncategorized"),
-    title: post.title,
-    excerpt: post.excerpt,
+    title,
+    excerpt,
     date: formatDate(post.created_at, lang),
   };
 }

@@ -8,6 +8,13 @@ import {
 
 type Language = "es" | "en";
 
+const companyTaxId =
+  import.meta.env.VITE_COMPANY_TAX_ID || "[Identificación Fiscal / Tax ID]";
+const companyHolder =
+  import.meta.env.VITE_COMPANY_HOLDER || "[Titular Legal / Legal Holder]";
+const contactEmail =
+  import.meta.env.VITE_CONTACT_EMAIL || "[Correo de Contacto / Contact Email]";
+
 interface LanguageContextType {
   lang: Language;
   setLang: (lang: Language) => void;
@@ -113,11 +120,9 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies": "Cookies",
     "footer.github": "GitHub",
     "footer.legal.title": "Aviso Legal",
-    "footer.legal.body":
-      "En cumplimiento del artículo 10 de la Ley 34/2002 (LSSI-CE), se informa que este sitio web es una plataforma de presentación comercial operada provisionalmente por su fundador, ***REMOVED***, con identificación fiscal ***REMOVED*** y residencia en ***REMOVED***, Canarias, España. Para cualquier consulta o comunicación, puede dirigirse al correo electrónico oficial de contacto: ***REMOVED***.",
+    "footer.legal.body": `En cumplimiento del artículo 10 de la Ley 34/2002 (LSSI-CE), se informa que este sitio web es una plataforma de presentación comercial operada por ${companyHolder}, con identificación fiscal ${companyTaxId} y domicilio legal configurado. Para cualquier consulta o comunicación, puede dirigirse al correo electrónico oficial de contacto: ${contactEmail}.`,
     "footer.privacy.title": "Política de Privacidad",
-    "footer.privacy.body":
-      "De conformidad con el Reglamento General de Protección de Datos (RGPD), le informamos que los datos personales facilitados a través de nuestro formulario de contacto serán tratados con la única finalidad de responder a sus solicitudes de información o presupuesto de servicios tecnológicos y QA. Sus datos no serán cedidos a terceros bajo ningún concepto. Puede ejercer sus derechos de acceso, rectificación o eliminación escribiendo a: ***REMOVED***.",
+    "footer.privacy.body": `De conformidad con el Reglamento General de Protección de Datos (RGPD), le informamos que los datos personales facilitados a través de nuestro formulario de contacto serán tratados con la única finalidad de responder a sus solicitudes de información o presupuesto de servicios tecnológicos y QA. Sus datos no serán cedidos a terceros bajo ningún concepto. Puede ejercer sus derechos de acceso, rectificación o eliminación escribiendo a: ${contactEmail}.`,
     "footer.cookies.title": "Política de Cookies",
     "footer.cookies.body":
       "Esta web ha sido diseñada bajo principios de privacidad y rendimiento técnico. No utilizamos cookies de rastreo, analítica o marketing. Únicamente se emplean cookies técnicas esenciales para garantizar una navegación fluida y segura por el sitio.",
@@ -222,11 +227,9 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies": "Cookies",
     "footer.github": "GitHub",
     "footer.legal.title": "Legal Notice",
-    "footer.legal.body":
-      "In compliance with Article 10 of Law 34/2002 (LSSI-CE), please be advised that this website is a commercial presentation platform provisionally operated by its founder, ***REMOVED***, with tax identification number ***REMOVED***, residing in ***REMOVED***, Canary Islands, Spain. For any inquiries, please reach out to our official contact email: ***REMOVED***.",
+    "footer.legal.body": `In compliance with Article 10 of Law 34/2002 (LSSI-CE), please be advised that this website is a commercial presentation platform operated by ${companyHolder}, with tax identification number ${companyTaxId} and a configured legal address. For any inquiries, please reach out to our official contact email: ${contactEmail}.`,
     "footer.privacy.title": "Privacy Policy",
-    "footer.privacy.body":
-      "In accordance with the General Data Protection Regulation (GDPR), we inform you that any personal data provided through our contact form will be processed solely to respond to your requests for information or service quotes. Your data will never be shared with third parties. You may exercise your rights to access, rectify, or delete your data by contacting us at: ***REMOVED***.",
+    "footer.privacy.body": `In accordance with the General Data Protection Regulation (GDPR), we inform you that any personal data provided through our contact form will be processed solely to respond to your requests for information or service quotes. Your data will never be shared with third parties. You may exercise your rights to access, rectify, or delete your data by contacting us at: ${contactEmail}.`,
     "footer.cookies.title": "Cookie Policy",
     "footer.cookies.body":
       "This website has been designed under principles of privacy and technical performance. We do not use tracking, analytics, or marketing cookies. Only essential technical cookies are used to ensure smooth and secure navigation throughout the site.",

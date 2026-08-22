@@ -11,7 +11,11 @@ const UUID_RE =
 
 // 5 intentos cada 10 min por IP: deja margen para que un pago legítimo con
 // algún reintento de red pase sin problema, pero frena scripting/abuso.
-const isRateLimited = createRateLimiter({ count: 5, windowMs: 10 * 60 * 1000 });
+const isRateLimited = createRateLimiter({
+  prefix: "create-payment-intent",
+  count: 5,
+  window: "10 m",
+});
 
 /**
  * Recupera el client_secret asociado a una factura ya finalizada.
@@ -63,7 +67,7 @@ module.exports = async function handler(req, res) {
   }
 
   const clientIp = getClientIp(req);
-  if (isRateLimited(clientIp)) {
+  if (await isRateLimited(clientIp)) {
     return res
       .status(429)
       .json({ error: "Demasiados intentos. Inténtalo de nuevo más tarde." });

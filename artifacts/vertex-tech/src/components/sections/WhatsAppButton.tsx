@@ -1,6 +1,6 @@
 import { useLanguage } from "@/context/LanguageContext";
 
-const WHATSAPP_NUMBER = "***REMOVED***";
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || "";
 
 export function WhatsAppButton() {
   const { t } = useLanguage();

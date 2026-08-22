@@ -45,6 +45,7 @@ Thumbs.db
 .github/instructions/nx.instructions.md
 
 # Replit
+.replit
 .cache/
 .local/
 # Scratch generado por el Agente de Replit (pastes, capturas de pantalla) —

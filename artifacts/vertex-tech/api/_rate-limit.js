@@ -1,38 +1,46 @@
-// _rate-limit.js — control de tasa en memoria, por IP.
+// _rate-limit.js — control de tasa compartido, por IP.
 // El prefijo _ hace que Vercel NO lo exponga como ruta pública.
 //
-// Igual que el rate limiter de diagnostico.js: en memoria del proceso, así
-// que se resetea en cada cold start y no comparte estado entre instancias.
-// Suficiente para frenar abuso obvio en un endpoint de bajo tráfico; no es
-// un límite distribuido.
+// Mismo enfoque que diagnostico.js: Upstash + Vercel KV (distribuido — a
+// diferencia de un Map en memoria, el límite se respeta entre todas las
+// instancias serverless, no solo dentro de una). Si KV_REST_API_URL/
+// KV_REST_API_TOKEN no están configuradas, se degrada a "sin límite" en vez
+// de bloquear el endpoint entero por una pieza de infraestructura opcional
+// — mismo criterio que ya usa diagnostico.js.
 
-function createRateLimiter({ count, windowMs }) {
-  const hits = new Map();
+const { kv } = require("@vercel/kv");
+const { Ratelimit } = require("@upstash/ratelimit");
 
-  return function isRateLimited(key) {
-    const now = Date.now();
-    const timestamps = (hits.get(key) || []).filter((t) => now - t < windowMs);
+function createRateLimiter({ prefix, count, window }) {
+  let ratelimit = null;
+  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    ratelimit = new Ratelimit({
+      redis: kv,
+      limiter: Ratelimit.slidingWindow(count, window),
+      analytics: true,
+      prefix: `ratelimit:${prefix}`,
+    });
+  }
 
-    if (timestamps.length >= count) {
-      hits.set(key, timestamps);
-      return true;
-    }
-
-    timestamps.push(now);
-    hits.set(key, timestamps);
-    return false;
+  // Devuelve true si la key está limitada (que es lo que espera el
+  // call site: `if (await isRateLimited(clientIp)) return 429`).
+  return async function isRateLimited(key) {
+    if (!ratelimit) return false;
+    const { success } = await ratelimit.limit(key);
+    return !success;
   };
 }
 
-// Vercel antepone la IP real del cliente a x-forwarded-for; el resto de la
-// lista (si la hay) son proxies intermedios, así que solo confiamos en el
-// primer valor.
+// Misma extracción/normalización que diagnostico.js, para que el mismo
+// visitante cuente igual en ambos endpoints.
 function getClientIp(req) {
-  return (
-    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
-    req.socket?.remoteAddress ||
-    "127.0.0.1"
-  );
+  const rawIp =
+    req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "127.0.0.1";
+  let clientIp = (Array.isArray(rawIp) ? rawIp[0] : rawIp).split(",")[0].trim();
+  if (clientIp === "::1" || clientIp === "::ffff:127.0.0.1") {
+    clientIp = "127.0.0.1";
+  }
+  return clientIp;
 }
 
 module.exports = { createRateLimiter, getClientIp };
