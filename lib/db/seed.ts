@@ -4,18 +4,24 @@
  * Inserta:
  *   1. Las 4 categorías del blog
  *   2. Lista inicial de palabras prohibidas (30 palabras)
- *   3. Usuario administrador (Anier) con contraseña hasheada
+ *   3. Usuario administrador, con contraseña hasheada
  *
  * Cómo correrlo:
  *   cd lib/db
- *   pnpm run seed
+ *   ADMIN_USERNAME="usuario" ADMIN_PASSWORD="contraseña_real_y_larga" pnpm run seed
  *
- * Es seguro correrlo más de una vez: usa INSERT ... ON CONFLICT DO NOTHING
- * para no duplicar datos si ya existen.
+ * Categorías y palabras prohibidas: seguro correrlo más de una vez, usan
+ * INSERT ... ON CONFLICT DO NOTHING (no duplican si ya existen).
+ *
+ * Usuario administrador: ADMIN_USERNAME y ADMIN_PASSWORD son obligatorias
+ * (el seed falla si faltan — nada de defaults adivinables). Si el usuario ya
+ * existe, re-correr el seed ROTA su contraseña (ON CONFLICT DO UPDATE) e
+ * invalida sus sesiones activas — no es un no-op.
  */
 
 import pg from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
+import { sql } from "drizzle-orm";
 import { hash } from "bcryptjs";
 import * as schema from "./src/schema/index.js";
 
@@ -93,13 +99,32 @@ const bannedWords = [
 ].map((word) => ({ word: word.toLowerCase() }));
 
 // ─── 3. Usuario administrador ─────────────────────────────────────────────────
-// La contraseña real la introduce Sandy cuando ejecute el seed.
-// Por defecto usamos "changeme123" como placeholder — Sandy debe cambiarla
-// corriendo el seed con la variable ADMIN_PASSWORD definida:
-//   ADMIN_PASSWORD="contraseña_real" pnpm run seed
+// Sin valores por defecto a propósito: un placeholder conocido (p. ej. el
+// "changeme123" que este script tenía antes) es una credencial pública en
+// cuanto el seed corre sin ADMIN_PASSWORD definida — y así fue como pasó.
+// El seed ahora falla en vez de crear una cuenta con una contraseña adivinable.
+//   ADMIN_USERNAME="usuario" ADMIN_PASSWORD="contraseña_real_y_larga" pnpm run seed
 
-const adminUsername = process.env.ADMIN_USERNAME ?? "anier";
-const adminPassword = process.env.ADMIN_PASSWORD ?? "changeme123";
+const MIN_ADMIN_PASSWORD_LENGTH = 16;
+
+const adminUsername = process.env.ADMIN_USERNAME;
+const adminPassword = process.env.ADMIN_PASSWORD;
+
+if (!adminUsername) {
+  throw new Error(
+    'ADMIN_USERNAME no está definida. Corre: ADMIN_USERNAME="usuario" ADMIN_PASSWORD="contraseña_real_y_larga" pnpm run seed',
+  );
+}
+if (!adminPassword) {
+  throw new Error(
+    'ADMIN_PASSWORD no está definida. Corre: ADMIN_USERNAME="usuario" ADMIN_PASSWORD="contraseña_real_y_larga" pnpm run seed',
+  );
+}
+if (adminPassword.length < MIN_ADMIN_PASSWORD_LENGTH) {
+  throw new Error(
+    `ADMIN_PASSWORD es demasiado corta (mínimo ${MIN_ADMIN_PASSWORD_LENGTH} caracteres).`,
+  );
+}
 
 // ─── Ejecución ────────────────────────────────────────────────────────────────
 
@@ -129,22 +154,45 @@ async function seed() {
   console.log(`   ✓ ${wordCount} palabras insertadas`);
 
   // 3. Usuario administrador
-  console.log("\n👤 Creando usuario administrador...");
+  console.log("\n👤 Configurando usuario administrador...");
   const passwordHash = await hash(adminPassword, 12);
   // El número 12 es el "salt rounds" — cuántas veces se aplica el hash.
   // 12 es el estándar recomendado: seguro sin ser demasiado lento.
 
+  const existing = await db
+    .select({ id: schema.adminUsersTable.id })
+    .from(schema.adminUsersTable)
+    .where(sql`${schema.adminUsersTable.username} = ${adminUsername}`)
+    .limit(1);
+  const isRotation = existing.length > 0;
+
+  // DO UPDATE (no DO NOTHING): re-correr el seed con una contraseña nueva
+  // debe reemplazar la anterior, no ser un no-op silencioso. Rotar la
+  // contraseña también incrementa session_version, invalidando cualquier
+  // sesión (cookie httpOnly) que siguiera activa con la credencial vieja —
+  // sin necesidad de rotar JWT_SECRET ni tocar al resto de admins.
   await db
     .insert(schema.adminUsersTable)
     .values({ username: adminUsername, passwordHash })
-    .onConflictDoNothing(); // no duplica si el username ya existe
+    .onConflictDoUpdate({
+      target: schema.adminUsersTable.username,
+      set: {
+        passwordHash,
+        sessionVersion: sql`${schema.adminUsersTable.sessionVersion} + 1`,
+      },
+    });
 
-  console.log(`   ✓ Usuario "${adminUsername}" creado`);
-
-  if (adminPassword === "changeme123") {
-    console.log("\n⚠️  AVISO: La contraseña es el placeholder 'changeme123'.");
-    console.log("   Para usar una contraseña real, corre:");
-    console.log('   ADMIN_PASSWORD="tu_contraseña" pnpm run seed\n');
+  // Registro de auditoría mínimo: quién y cuándo se rotó/creó la credencial.
+  // Va a stdout (logs de Vercel) — si se necesita un historial consultable
+  // más adelante, el siguiente paso natural es persistirlo en una tabla.
+  const actor = process.env.USER || process.env.USERNAME || "desconocido";
+  console.log(
+    `   ${isRotation ? "🔄 Contraseña rotada" : "✓ Usuario creado"} para "${adminUsername}" — ejecutado por "${actor}" el ${new Date().toISOString()}`,
+  );
+  if (isRotation) {
+    console.log(
+      "   Todas las sesiones activas de este usuario quedaron invalidadas.",
+    );
   }
 
   console.log("\n✅ Seed completado.");
