@@ -1,0 +1,46 @@
+name: Aplicar migraciones de base de datos
+
+# BORRADOR — pendiente de decisión del CTO antes de activarse en serio:
+#   - Requiere el secret MIGRATIONS_DATABASE_URL en GitHub (Settings > Secrets).
+#   - Ese secret debería apuntar a un rol de Postgres dedicado a migraciones,
+#     no a la cuenta que usa la aplicación en runtime (ver protocolo interno:
+#     "usar una cuenta PostgreSQL exclusiva para migraciones").
+#   - No hay estrategia de backup automático antes de migrar todavía —
+#     agregar ese paso (ej. snapshot/branch de Neon) antes de habilitar esto
+#     contra la base de datos real.
+#
+# Solo corre cuando cambian archivos de migración, y solo en main (post-merge,
+# ya con el PR aprobado) — nunca directo desde una rama de feature.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lib/db/drizzle/**"
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Version fijada explicitamente (igual que ci.yml) para evitar fallos
+      # de instalacion por incompatibilidad de lockfile si el runner
+      # resolviera otra version por defecto.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      # TODO (CTO): agregar aquí un paso de backup/snapshot antes de migrar.
+
+      - name: Aplicar migraciones
+        run: pnpm --filter db migrate
+        env:
+          DATABASE_URL: ${{ secrets.MIGRATIONS_DATABASE_URL }}
