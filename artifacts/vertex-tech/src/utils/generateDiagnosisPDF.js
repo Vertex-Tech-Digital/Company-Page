@@ -7,16 +7,8 @@ var __importDefault =
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateDiagnosisPDF = generateDiagnosisPDF;
 const react_1 = __importDefault(require("react"));
-const renderer_1 = require("@react-pdf/renderer");
 // @ts-ignore
 const invoice_pdf_js_1 = require("../../server/invoice-pdf.js");
-
-// Desactivar globalmente la rotura de palabras con guiones en React PDF
-try {
-  renderer_1.Font.registerHyphenationCallback((word) => [word]);
-} catch (e) {
-  // Evita errores de registro duplicado
-}
 
 /**
  * Genera el PDF de diagnóstico corporativo adaptando la API de invoice-pdf.js.
@@ -26,6 +18,16 @@ try {
  * @returns Promesa que resuelve a un Buffer con el PDF generado en memoria.
  */
 async function generateDiagnosisPDF(leadData, fullProblemsList) {
+  // Carga dinámica de @react-pdf/renderer para compatibilidad ESM en Vercel
+  const pdfRenderer = await import("@react-pdf/renderer");
+  const { View, Text, Font } = pdfRenderer.default || pdfRenderer;
+
+  try {
+    Font.registerHyphenationCallback((word) => [word]);
+  } catch (e) {
+    // Evita errores de registro duplicado
+  }
+
   const h = react_1.default.createElement;
   const servicePriority = {
     Automatización: 1,
@@ -115,7 +117,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
   const notesContent = [
     // --- SECCIÓN C: PROBLEMAS CONFIRMADOS ---
     h(
-      renderer_1.View,
+      View,
       {
         key: "sec-c-header",
         style: {
@@ -127,7 +129,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
         },
       },
       h(
-        renderer_1.Text,
+        Text,
         {
           style: {
             fontFamily: "Helvetica-Bold",
@@ -140,7 +142,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
     ),
     ...markedProblems.flatMap((p, idx) => [
       h(
-        renderer_1.View,
+        View,
         {
           key: `m-card-${idx}`,
           style: {
@@ -154,7 +156,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
         },
         [
           h(
-            renderer_1.Text,
+            Text,
             {
               key: `m-title-${idx}`,
               style: {
@@ -166,7 +168,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
             p.name,
           ),
           h(
-            renderer_1.Text,
+            Text,
             {
               key: `m-rec-${idx}`,
               style: {
@@ -186,7 +188,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
     ...(detectedProblems.length > 0 || leadData.freeText || leadData.free_text
       ? [
           h(
-            renderer_1.View,
+            View,
             {
               key: "sec-d-header",
               style: {
@@ -198,7 +200,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               },
             },
             h(
-              renderer_1.Text,
+              Text,
               {
                 style: {
                   fontFamily: "Helvetica-Bold",
@@ -212,7 +214,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           ...(detectedProblems.length > 0
             ? detectedProblems.flatMap((p, idx) => [
                 h(
-                  renderer_1.View,
+                  View,
                   {
                     key: `d-card-${idx}`,
                     style: {
@@ -226,7 +228,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                   },
                   [
                     h(
-                      renderer_1.Text,
+                      Text,
                       {
                         key: `d-title-${idx}`,
                         style: {
@@ -238,7 +240,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                       `Detectamos también que podrías estar experimentando: ${p.name}`,
                     ),
                     h(
-                      renderer_1.Text,
+                      Text,
                       {
                         key: `d-rec-${idx}`,
                         style: {
@@ -256,7 +258,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               ])
             : [
                 h(
-                  renderer_1.View,
+                  View,
                   {
                     key: "d-card-freetext",
                     style: {
@@ -270,7 +272,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                   },
                   [
                     h(
-                      renderer_1.Text,
+                      Text,
                       {
                         key: "d-title-freetext",
                         style: {
@@ -282,7 +284,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                       "Análisis de texto libre:",
                     ),
                     h(
-                      renderer_1.Text,
+                      Text,
                       {
                         key: "d-rec-freetext",
                         style: {
@@ -302,7 +304,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       : []),
     // --- SECCIÓN E: ROADMAP CONCEPTUAL Y CTA ---
     h(
-      renderer_1.View,
+      View,
       {
         key: "sec-e-header",
         style: {
@@ -314,7 +316,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
         },
       },
       h(
-        renderer_1.Text,
+        Text,
         {
           style: {
             fontFamily: "Helvetica-Bold",
@@ -326,7 +328,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       ),
     ),
     h(
-      renderer_1.Text,
+      Text,
       {
         key: "sec-e-intro",
         style: {
@@ -339,7 +341,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       "Roadmap en Fases:\n",
     ),
     h(
-      renderer_1.View,
+      View,
       {
         key: "sec-e-phases-container",
         style: {
@@ -349,7 +351,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       },
       uniqueServices.map((service, idx) =>
         h(
-          renderer_1.View,
+          View,
           {
             key: `service-row-${idx}`,
             style: {
@@ -360,7 +362,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           },
           [
             h(
-              renderer_1.Text,
+              Text,
               {
                 key: `service-title-${idx}`,
                 style: {
@@ -373,7 +375,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               `Fase ${idx + 1}: ${service}`,
             ),
             h(
-              renderer_1.Text,
+              Text,
               {
                 key: `service-desc-${idx}`,
                 style: {
@@ -392,7 +394,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       ),
     ),
     h(
-      renderer_1.View,
+      View,
       {
         key: "sec-e-cta-box",
         style: {
@@ -408,7 +410,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       },
       [
         h(
-          renderer_1.Text,
+          Text,
           {
             key: "sec-e-cta-title",
             style: {
@@ -421,7 +423,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           "Llamada a la Acción:",
         ),
         h(
-          renderer_1.Text,
+          Text,
           {
             key: "sec-e-cta-text",
             style: {
@@ -462,7 +464,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
     react_1.default.createElement = function (type, props, ...children) {
       if (
         type === "Text" ||
-        type === renderer_1.Text ||
+        type === Text ||
         (type && (type.displayName === "Text" || type.name === "Text"))
       ) {
         if (
@@ -472,7 +474,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           props.style.lineHeight === 1.5
         ) {
           return originalCreateElement(
-            renderer_1.View,
+            View,
             { style: { marginTop: 10 } },
             ...children,
           );
@@ -582,7 +584,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
         props.style.borderWidth === 1
       ) {
         return originalCreateElement(
-          renderer_1.View,
+          View,
           {
             style: {
               backgroundColor: "#f8fafc",
@@ -595,7 +597,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           },
           [
             originalCreateElement(
-              renderer_1.Text,
+              Text,
               {
                 key: "client-box-header",
                 style: {
@@ -610,7 +612,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               "B. METADATOS DEL LEAD / CLIENTE",
             ),
             originalCreateElement(
-              renderer_1.View,
+              View,
               {
                 key: "row-name",
                 style: {
@@ -622,7 +624,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               },
               [
                 originalCreateElement(
-                  renderer_1.Text,
+                  Text,
                   {
                     style: {
                       width: 140,
@@ -634,7 +636,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                   "Nombre de la Empresa:",
                 ),
                 originalCreateElement(
-                  renderer_1.Text,
+                  Text,
                   {
                     style: {
                       flex: 1,
@@ -648,7 +650,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               ],
             ),
             originalCreateElement(
-              renderer_1.View,
+              View,
               {
                 key: "row-sector",
                 style: {
@@ -660,7 +662,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               },
               [
                 originalCreateElement(
-                  renderer_1.Text,
+                  Text,
                   {
                     style: {
                       width: 140,
@@ -672,7 +674,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                   "Sector Industrial:",
                 ),
                 originalCreateElement(
-                  renderer_1.Text,
+                  Text,
                   {
                     style: {
                       flex: 1,
@@ -686,7 +688,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               ],
             ),
             originalCreateElement(
-              renderer_1.View,
+              View,
               {
                 key: "row-size",
                 style: {
@@ -698,7 +700,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               },
               [
                 originalCreateElement(
-                  renderer_1.Text,
+                  Text,
                   {
                     style: {
                       width: 140,
@@ -710,7 +712,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                   "Tamaño de la Empresa:",
                 ),
                 originalCreateElement(
-                  renderer_1.Text,
+                  Text,
                   {
                     style: {
                       flex: 1,
@@ -724,7 +726,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               ],
             ),
             originalCreateElement(
-              renderer_1.View,
+              View,
               {
                 key: "row-email",
                 style: {
@@ -736,7 +738,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               },
               [
                 originalCreateElement(
-                  renderer_1.Text,
+                  Text,
                   {
                     style: {
                       width: 140,
@@ -748,7 +750,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                   "Correo Electrónico:",
                 ),
                 originalCreateElement(
-                  renderer_1.Text,
+                  Text,
                   {
                     style: {
                       flex: 1,
@@ -763,14 +765,14 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
             ),
             leadData.phone
               ? originalCreateElement(
-                  renderer_1.View,
+                  View,
                   {
                     key: "row-phone",
                     style: { flexDirection: "row", paddingVertical: 4 },
                   },
                   [
                     originalCreateElement(
-                      renderer_1.Text,
+                      Text,
                       {
                         style: {
                           width: 140,
@@ -782,7 +784,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                       "Teléfono de Contacto:",
                     ),
                     originalCreateElement(
-                      renderer_1.Text,
+                      Text,
                       {
                         style: {
                           flex: 1,
