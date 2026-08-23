@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const nodemailer = require("nodemailer");
-const DOMPurify = require("isomorphic-dompurify");
+const xss = require("xss");
 const { drizzle } = require("drizzle-orm/neon-http");
 const { eq } = require("drizzle-orm");
 const {
@@ -25,9 +25,13 @@ const {
 
 const { analyzeFreeText } = require("../src/utils/analyzeFreeText");
 const { problemsData } = require("../src/data/problemsData");
-// generateDiagnosisPDF arrastra el stack de @react-pdf/renderer. Se carga de
-// forma perezosa dentro del handler para que un fallo ahí degrade a "correo sin
-// adjunto" en lugar de impedir que el módulo cargue y tumbar todo el endpoint.
+
+// Instancia de XSS configurada para descartar estrictamente todas las etiquetas
+const xssFilter = new xss.FilterXSS({
+  whiteList: {}, // Ningún tag HTML permitido
+  stripIgnoreTag: true, // Eliminar cualquier tag no permitido junto con su contenido malicioso
+  stripIgnoreTagBody: ["script", "style", "xml", "iframe", "object"],
+});
 
 // Definición local del esquema para evitar dependencias externas en producción
 const contactPreferenceEnum = pgEnum("contact_preference", [
@@ -96,16 +100,13 @@ if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
  * Evalúa el límite de tasa devolviendo el resultado detallado de Upstash.
  */
 async function checkRateLimit(ip) {
-  if (!ratelimit) return { success: true }; // Fallback si no están configuradas las variables de KV
+  if (!ratelimit) return { success: true };
   return await ratelimit.limit(ip);
 }
 
 function sanitizeString(str) {
   if (typeof str !== "string") return "";
-  return DOMPurify.sanitize(str, {
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-  }).trim();
+  return xssFilter.process(str).trim();
 }
 
 // Los datos del formulario se muestran como texto dentro de correos HTML.
@@ -138,10 +139,8 @@ module.exports = async function handler(req, res) {
   const rawIp =
     req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "127.0.0.1";
 
-  // Si la cabecera es un array o cadena separada por comas, extrae estrictamente la primera IP
   let clientIp = (Array.isArray(rawIp) ? rawIp[0] : rawIp).split(",")[0].trim();
 
-  // Normalizar direcciones IP locales (IPv6 a IPv4)
   if (clientIp === "::1" || clientIp === "::ffff:127.0.0.1") {
     clientIp = "127.0.0.1";
   }
@@ -149,7 +148,6 @@ module.exports = async function handler(req, res) {
   // Verificación de Rate Limit
   const { success, limit, remaining, reset } = await checkRateLimit(clientIp);
 
-  // Inyección de encabezados HTTP estándar de Rate Limit (si ratelimit está activo)
   if (limit !== undefined) {
     res.setHeader("X-RateLimit-Limit", limit);
     res.setHeader("X-RateLimit-Remaining", remaining);
@@ -285,7 +283,7 @@ module.exports = async function handler(req, res) {
     // D. Configuración y Envío de Correos mediante Nodemailer
     const gmailUser = process.env.GMAIL_USER;
     const gmailPass = process.env.GMAIL_APP_PASSWORD;
-    const companyEmail = process.env.EMAIL_INTERNAL_NOTIFICATION || gmailUser; // Fallback al propio usuario si no existe env
+    const companyEmail = process.env.EMAIL_INTERNAL_NOTIFICATION || gmailUser;
     let emailSent = false;
 
     if (
@@ -385,7 +383,6 @@ module.exports = async function handler(req, res) {
           }),
         ];
 
-        // Solo enviar email administrativo si tenemos un destinatario válido
         if (companyEmail && companyEmail.trim() !== "") {
           const markedProblemsNames = marked_problems
             .map((id) => {
