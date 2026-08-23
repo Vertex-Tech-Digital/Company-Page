@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, type PluginOption } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
@@ -17,7 +17,7 @@ export default defineConfig(async () => {
   // Se activa solo si @mdx-js/rollup está instalado; si falta, el resto de la
   // app sigue funcionando. Para activarlo:
   //   pnpm --filter @workspace/vertex-tech add -D @mdx-js/rollup
-  const plugins: any[] = [];
+  const plugins: PluginOption[] = [];
   try {
     const { default: mdx } = await import("@mdx-js/rollup");
     const { default: remarkGfm } = await import("remark-gfm");
