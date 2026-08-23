@@ -7,14 +7,17 @@ var __importDefault =
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateDiagnosisPDF = generateDiagnosisPDF;
 const react_1 = __importDefault(require("react"));
+const renderer_1 = require("@react-pdf/renderer");
 // @ts-ignore
 const invoice_pdf_js_1 = require("../../server/invoice-pdf.js");
+
 // Desactivar globalmente la rotura de palabras con guiones en React PDF
 try {
   renderer_1.Font.registerHyphenationCallback((word) => [word]);
 } catch (e) {
   // Evita errores de registro duplicado
 }
+
 /**
  * Genera el PDF de diagnóstico corporativo adaptando la API de invoice-pdf.js.
  *
@@ -43,6 +46,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
     "QA & Testing":
       "Aseguramiento de infraestructura. Auditorías exhaustivas de rendimiento y optimización de bases de datos/servidores para mitigar caídas de la web ante picos reales de tráfico.",
   };
+
   // 1. Mapeo de problemas y servicios
   const markedIds = leadData.markedProblems || leadData.marked_problems || [];
   const detectedIds =
@@ -53,11 +57,13 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
   const detectedProblems = detectedIds
     .map((id) => fullProblemsList.find((p) => p && Number(p.id) === Number(id)))
     .filter(Boolean);
+
   // Roadmap en Fases (Servicios Vertex únicos asociados)
   const allProblems = [...markedProblems, ...detectedProblems];
   const uniqueServices = Array.from(
     new Set(allProblems.map((p) => p.vertexService).filter(Boolean)),
   ).sort((a, b) => (servicePriority[a] || 99) - (servicePriority[b] || 99));
+
   // 2. CTA adaptado según preferencia de contacto
   const preference = (
     leadData.contactPreference ||
@@ -92,6 +98,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
     ctaText =
       "Un consultor de nuestro equipo te llamará en el horario más cómodo para evaluar juntos estas recomendaciones.";
   }
+
   // 3. Formatear la fecha
   const rawDate = leadData.createdAt || leadData.created_at || new Date();
   const dateObj = rawDate instanceof Date ? rawDate : new Date(rawDate);
@@ -100,9 +107,11 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
     month: "2-digit",
     year: "numeric",
   });
+
   // 4. Obtener la compañía emisora
   const companyInfo = (0, invoice_pdf_js_1.getCompany)();
-  // 5. Configurar los contenidos para la sección de Notas (Resultados del Diagnóstico con Maquetación Profesional)
+
+  // 5. Configurar los contenidos para la sección de Notas
   const notesContent = [
     // --- SECCIÓN C: PROBLEMAS CONFIRMADOS ---
     h(
@@ -123,7 +132,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           style: {
             fontFamily: "Helvetica-Bold",
             fontSize: 11,
-            color: "#1e3a8a", // Azul corporativo principal
+            color: "#1e3a8a",
           },
         },
         "C. DIAGNÓSTICO DE PROBLEMAS CONFIRMADOS",
@@ -135,9 +144,9 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
         {
           key: `m-card-${idx}`,
           style: {
-            backgroundColor: "#f8fafc", // Fondo gris muy claro
+            backgroundColor: "#f8fafc",
             borderLeftWidth: 3,
-            borderLeftColor: "#1e3a8a", // Borde azul marino
+            borderLeftColor: "#1e3a8a",
             padding: 10,
             borderRadius: 4,
             marginBottom: 10,
@@ -162,9 +171,9 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               key: `m-rec-${idx}`,
               style: {
                 fontSize: 9,
-                color: "#334155", // Gris oscuro para el cuerpo
+                color: "#334155",
                 marginTop: 6,
-                marginLeft: 12, // Sangría a la izquierda
+                marginLeft: 12,
                 lineHeight: 1.4,
               },
             },
@@ -209,7 +218,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                     style: {
                       backgroundColor: "#f8fafc",
                       borderLeftWidth: 3,
-                      borderLeftColor: "#d97706", // Borde ámbar para sugerencias inteligente
+                      borderLeftColor: "#d97706",
                       padding: 10,
                       borderRadius: 4,
                       marginBottom: 10,
@@ -236,7 +245,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                           fontSize: 9,
                           color: "#334155",
                           marginTop: 6,
-                          marginLeft: 12, // Sangría a la izquierda
+                          marginLeft: 12,
                           lineHeight: 1.4,
                         },
                       },
@@ -387,14 +396,14 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       {
         key: "sec-e-cta-box",
         style: {
-          backgroundColor: "#f8fafc", // Fondo gris claro
+          backgroundColor: "#f8fafc",
           borderColor: "#cbd5e1",
           borderWidth: 1,
           borderRadius: 6,
           padding: 12,
           marginTop: 14,
           borderLeftWidth: 4,
-          borderLeftColor: "#1e3a8a", // Acento azul marino izquierdo
+          borderLeftColor: "#1e3a8a",
         },
       },
       [
@@ -428,11 +437,12 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       ],
     ),
   ];
-  // Interceptar React.createElement de forma dinámica y controlada
+
   const originalCreateElement = react_1.default.createElement;
   const OriginalNumberFormat = Intl.NumberFormat;
+
   try {
-    // 6. Sobrescribir Intl.NumberFormat para evitar que se renderice cualquier símbolo de Euro (€) o precios
+    // 6. Sobrescribir Intl.NumberFormat para evitar que se renderice precios
     // @ts-ignore
     Intl.NumberFormat = function (locale, options) {
       if (
@@ -446,18 +456,15 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       }
       return new OriginalNumberFormat(locale, options);
     };
-    // 7. Sobrescribir React.createElement para adaptar e interceptar las etiquetas de la caja negra
+
+    // 7. Sobrescribir React.createElement para adaptar invoice-pdf.js
     // @ts-ignore
     react_1.default.createElement = function (type, props, ...children) {
-      // Si el elemento es un Text, interceptar y modificar etiquetas de texto específicas de invoice-pdf.js
       if (
         type === "Text" ||
         type === renderer_1.Text ||
         (type && (type.displayName === "Text" || type.name === "Text"))
       ) {
-        // Interceptar el contenedor de notas. En la caja negra, las notas se renderizan en un componente Text
-        // con el estilo notesText (que se reconoce porque tiene color: COLORS.muted y lineHeight: 1.5).
-        // Si no se cambia a View, todos los elementos View/Text internos se colapsan inline en un solo párrafo.
         if (
           props &&
           props.style &&
@@ -476,11 +483,9 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
             const cleanContent = content.replace(/NIF\/CIF:?/gi, "NIF:");
             return originalCreateElement(type, props, cleanContent);
           }
-          // Reemplazar título principal
           if (content === "FACTURA" || content === "INVOICE") {
             return originalCreateElement(type, props, "A. DIAGNÓSTICO TÉCNICO");
           }
-          // Reemplazar etiqueta Notas
           if (content === "Notas" || content === "Notes") {
             return originalCreateElement(
               type,
@@ -488,14 +493,12 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               "RESULTADOS DEL DIAGNÓSTICO",
             );
           }
-          // Cambiar etiquetas de metadatos de factura a diagnóstico
           if (content === "Nº de factura:" || content === "Invoice no.:") {
             return originalCreateElement(type, props, "ID de Lead:");
           }
           if (content === "Fecha de emisión:" || content === "Issue date:") {
             return originalCreateElement(type, props, "Fecha de Emisión:");
           }
-          // Eliminar prefijos de NIF/CIF o IAE del emisor para que no salgan vacíos
           if (
             content.startsWith("NIF:") ||
             content.startsWith("Tax ID:") ||
@@ -504,8 +507,6 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           ) {
             return null;
           }
-          // Reemplazar el email del emisor en el encabezado por el Origen del Reporte
-          // Asegurando un ancho máximo suficiente para evitar saltos de línea innecesarios.
           if (content === "vertextechdigital.com/diagnostico") {
             if (props && props.style && props.style.marginTop === 3) {
               return originalCreateElement(
@@ -527,6 +528,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           }
         }
       }
+
       // 8. Ocultar la cabecera de la tabla de facturación
       if (
         props &&
@@ -537,6 +539,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       ) {
         return null;
       }
+
       // 9. Ocultar filas de la tabla de facturación
       if (
         props &&
@@ -547,6 +550,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       ) {
         return null;
       }
+
       // 10. Ocultar el bloque de totales
       if (
         props &&
@@ -557,20 +561,20 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       ) {
         return null;
       }
-      // 11. Modificar dinámicamente los estilos para el título
+
+      // 11. Modificar estilos para el título
       if (props && props.style) {
-        // Título del documento (DIAGNÓSTICO TÉCNICO)
         if (props.style.fontSize === 22 && props.style.color === "#2563eb") {
           props.style = {
             ...props.style,
             fontSize: 12,
-            color: "#1e3a8a", // Azul corporativo marino
+            color: "#1e3a8a",
             fontFamily: "Helvetica-Bold",
           };
         }
       }
-      // 12. Interceptar el billedBox original para sustituirlo por una tabla formal limpia
-      // de datos de cliente estructurada en dos columnas con fondo gris claro.
+
+      // 12. Interceptar el billedBox original
       if (
         props &&
         props.style &&
@@ -581,7 +585,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           renderer_1.View,
           {
             style: {
-              backgroundColor: "#f8fafc", // Fondo gris claro corporativo
+              backgroundColor: "#f8fafc",
               borderColor: "#cbd5e1",
               borderWidth: 1,
               borderRadius: 6,
@@ -797,7 +801,8 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       }
       return originalCreateElement.apply(this, [type, props, ...children]);
     };
-    // 13. Estructurar los datos para pasar a la caja negra de invoice-pdf.js
+
+    // 13. Estructurar datos
     const invoiceNumber = `VT-LEAD-${leadData.id || "000"}`;
     const dataForInvoice = {
       language: "es",
@@ -819,22 +824,23 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
         address: leadData.size || "",
         email: leadData.email || "",
       },
-      items: [], // Vacío porque ocultamos la tabla
+      items: [],
       totals: {
         subtotal: 0,
         taxAmount: 0,
         total: 0,
       },
       taxRate: 0,
-      notes: notesContent, // Inyectamos nuestro árbol de componentes Text/View estilizados
+      notes: notesContent,
     };
+
     // Renderizar
     const resultBuffer = await (0, invoice_pdf_js_1.renderInvoicePdf)(
       dataForInvoice,
     );
     return resultBuffer;
   } finally {
-    // Restaurar los métodos globales modificados
+    // Restaurar los métodos globales
     react_1.default.createElement = originalCreateElement;
     Intl.NumberFormat = OriginalNumberFormat;
   }
