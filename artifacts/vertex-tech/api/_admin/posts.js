@@ -13,8 +13,8 @@
 //
 // Requiere sesión activa (cookie httpOnly admin_token, ver _auth.js)
 
-const { pool } = require("../server/db.js");
-const { verifyAuth } = require("./_auth");
+const { pool } = require("../../server/db.js");
+const { verifyAuth } = require("../_auth");
 
 // Convierte un título en un slug URL-friendly:
 //   "Mi Primer Artículo!" -> "mi-primer-articulo"

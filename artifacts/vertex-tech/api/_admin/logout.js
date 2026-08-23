@@ -7,7 +7,7 @@
 // solo porque la sesión ya no era válida.
 
 const jwt = require("jsonwebtoken");
-const { pool } = require("../server/db.js");
+const { pool } = require("../../server/db.js");
 const {
   parseCookies,
   getJwtSecret,
@@ -15,7 +15,7 @@ const {
   COOKIE_NAME,
   ISSUER,
   AUDIENCE,
-} = require("./_auth");
+} = require("../_auth");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {

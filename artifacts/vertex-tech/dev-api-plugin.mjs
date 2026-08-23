@@ -32,7 +32,23 @@ export function devApiPlugin() {
         const url = req.url || "";
         if (!url.startsWith("/api/")) return next();
 
-        const name = url.split("?")[0].replace(/^\/api\//, "");
+        const rawName = url.split("?")[0].replace(/^\/api\//, "");
+
+        // Réplica de los rewrites de vercel.json: los 7 endpoints de admin
+        // viven consolidados en un único archivo (api/admin.js) para no
+        // pasarse del límite de funciones serverless de Vercel — ver ese
+        // archivo y vercel.json.
+        let name = rawName;
+        let injectedAction = null;
+        const adminMatch = rawName.match(/^admin-(.+)$/);
+        if (adminMatch) {
+          name = "admin";
+          injectedAction = adminMatch[1];
+        } else if (rawName === "invoices/create") {
+          name = "admin";
+          injectedAction = "invoices-create";
+        }
+
         let file = path.join(root, "api", `${name}.js`);
         let isTs = false;
         if (!fs.existsSync(file)) {
@@ -53,6 +69,9 @@ export function devApiPlugin() {
           req.query = Object.fromEntries(params.entries());
         } else {
           req.query = {};
+        }
+        if (injectedAction) {
+          req.query.action = injectedAction;
         }
 
         // Shim de req/res al estilo de las funciones de Vercel.
@@ -102,7 +121,7 @@ export function devApiPlugin() {
 
           await handler(req, res);
         } catch (err) {
-          console.error(`[dev-api] error en /api/${name}:`, err);
+          console.error(`[dev-api] error en /api/${rawName}:`, err);
           if (!res.headersSent) {
             res.statusCode = 500;
             res.end(JSON.stringify({ error: "Dev API error" }));

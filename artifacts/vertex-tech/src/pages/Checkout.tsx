@@ -54,7 +54,14 @@ function CardPaymentForm({ amount }: { amount: number }) {
   const elements = useElements();
   const [isPaying, setIsPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [paid, setPaid] = useState(false);
+  // "succeeded" solo se alcanza cuando Stripe confirma el cobro en la propia
+  // respuesta de confirmPayment — confirmPayment puede resolver SIN error
+  // aunque el pago no haya terminado de completarse (ej. sigue "processing"
+  // para algunos métodos), así que la ausencia de error nunca es, por sí
+  // sola, motivo para mostrar éxito.
+  const [paymentStatus, setPaymentStatus] = useState<
+    "idle" | "succeeded" | "processing"
+  >("idle");
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
@@ -63,7 +70,7 @@ function CardPaymentForm({ amount }: { amount: number }) {
     setIsPaying(true);
     setError(null);
 
-    const { error: submitError } = await stripe.confirmPayment({
+    const { error: submitError, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         // Necesario por si el método de pago requiere redirección.
@@ -79,17 +86,47 @@ function CardPaymentForm({ amount }: { amount: number }) {
       return;
     }
 
-    setPaid(true);
+    if (paymentIntent?.status === "succeeded") {
+      setPaymentStatus("succeeded");
+    } else if (paymentIntent?.status === "processing") {
+      // Algunos métodos de pago liquidan de forma asíncrona: Stripe todavía
+      // no confirmó el cobro, pero tampoco falló. El webhook (fuente de
+      // verdad server-side) es el que termina de marcar la orden como
+      // pagada — acá solo evitamos prometerle al usuario algo que no pasó.
+      setPaymentStatus("processing");
+    } else {
+      // requires_action, requires_payment_method, o cualquier otro estado:
+      // confirmPayment no devolvió error, pero Stripe tampoco confirmó el
+      // cobro. No se muestra éxito.
+      setError(
+        "El pago no se pudo confirmar. Verifica los datos de tu tarjeta e inténtalo de nuevo.",
+      );
+    }
     setIsPaying(false);
   }
 
-  if (paid) {
+  if (paymentStatus === "succeeded") {
     return (
       <div className="flex flex-col items-center justify-center text-center py-10">
         <CheckCircle2 className="w-14 h-14 text-primary mb-5" />
         <h3 className="text-xl font-bold text-white mb-2">Pago completado</h3>
         <p className="text-muted-foreground text-sm">
           Gracias. Recibirás la factura por correo electrónico en breve.
+        </p>
+      </div>
+    );
+  }
+
+  if (paymentStatus === "processing") {
+    return (
+      <div className="flex flex-col items-center justify-center text-center py-10">
+        <Loader2 className="w-14 h-14 text-primary mb-5 animate-spin" />
+        <h3 className="text-xl font-bold text-white mb-2">
+          Procesando tu pago
+        </h3>
+        <p className="text-muted-foreground text-sm">
+          Puede tardar unos minutos. Te confirmaremos por correo electrónico en
+          cuanto se complete.
         </p>
       </div>
     );

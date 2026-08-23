@@ -3,7 +3,7 @@
 // cargar /admin para saber si ya hay una sesión activa — como el token vive
 // en una cookie httpOnly, JS no puede leerlo directamente (ver Admin.tsx).
 
-const { verifyAuth } = require("./_auth");
+const { verifyAuth } = require("../_auth");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "GET") {

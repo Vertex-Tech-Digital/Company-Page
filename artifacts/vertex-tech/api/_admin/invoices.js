@@ -4,13 +4,13 @@
 // El PDF no se almacena: se regenera al vuelo desde los datos guardados.
 // Requiere sesión activa (cookie httpOnly admin_token, ver _auth.js)
 
-const { pool } = require("../server/db.js");
-const { verifyAuth } = require("./_auth");
+const { pool } = require("../../server/db.js");
+const { verifyAuth } = require("../_auth");
 const {
   getCompany,
   renderInvoicePdf,
   toEsDate,
-} = require("../server/invoice-pdf.js");
+} = require("../../server/invoice-pdf.js");
 
 // Lee un parámetro de la query. En `pnpm dev` el plugin no rellena req.query,
 // así que lo parseamos de req.url (funciona igual en Vercel).
