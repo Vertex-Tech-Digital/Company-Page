@@ -106,7 +106,14 @@ async function checkRateLimit(ip) {
 
 function sanitizeString(str) {
   if (typeof str !== "string") return "";
-  return xssFilter.process(str).trim();
+  return (
+    xssFilter
+      .process(str)
+      // Los controles ASCII no son contenido válido para estos campos.
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u001F\u007F]/g, "")
+      .trim()
+  );
 }
 
 // Los datos del formulario se muestran como texto dentro de correos HTML.

@@ -10,6 +10,10 @@ const react_1 = __importDefault(require("react"));
 // @ts-ignore
 const invoice_pdf_js_1 = require("../../server/invoice-pdf.js");
 
+// El adaptador necesita parchear APIs globales mientras se renderiza el PDF.
+// Serializarlo evita que dos invocaciones se pisen entre sí.
+let pdfGenerationQueue = Promise.resolve();
+
 /**
  * Genera el PDF de diagnóstico corporativo adaptando la API de invoice-pdf.js.
  *
@@ -18,832 +22,851 @@ const invoice_pdf_js_1 = require("../../server/invoice-pdf.js");
  * @returns Promesa que resuelve a un Buffer con el PDF generado en memoria.
  */
 async function generateDiagnosisPDF(leadData, fullProblemsList) {
-  // Carga dinámica de @react-pdf/renderer para compatibilidad ESM en Vercel
-  const pdfRenderer = await import("@react-pdf/renderer");
-  const { View, Text, Font } = pdfRenderer.default || pdfRenderer;
+  const previousGeneration = pdfGenerationQueue;
+  let releaseGeneration;
+  pdfGenerationQueue = new Promise((resolve) => {
+    releaseGeneration = resolve;
+  });
+  await previousGeneration;
 
   try {
-    Font.registerHyphenationCallback((word) => [word]);
-  } catch (e) {
-    // Evita errores de registro duplicado
-  }
+    // Carga dinámica de @react-pdf/renderer para compatibilidad ESM en Vercel
+    const pdfRenderer = await import("@react-pdf/renderer");
+    const { View, Text, Font } = pdfRenderer.default || pdfRenderer;
 
-  const h = react_1.default.createElement;
-  const servicePriority = {
-    Automatización: 1,
-    "Integración de APIs": 2,
-    "Software a Medida": 3,
-    "Automatización con IA": 4,
-    "QA & Testing": 5,
-  };
-  const serviceDescriptions = {
-    Automatización:
-      "Establecimiento de flujos de trabajo iniciales. Sincronización automática de datos entre plataformas básicas para mitigar los errores humanos del copiado repetitivo.",
-    "Integración de APIs":
-      "Interconexión avanzada de ecosistemas. Construcción de puentes técnicos seguros para unificar herramientas independientes (TPV, pasarelas de pago, CRMs) sin sustituirlas.",
-    "Software a Medida":
-      "Digitalización del núcleo del negocio. Desarrollo de módulos core (motores de reserva propios, ERPs ligeros, control de stock automatizado) ajustados 100% a tus reglas operativas.",
-    "Automatización con IA":
-      "Inteligencia operativa avanzada. Implementación de asistentes virtuales autónomos y agentes LLM para clasificar información, resolver dudas de clientes y operar 24/7.",
-    "QA & Testing":
-      "Aseguramiento de infraestructura. Auditorías exhaustivas de rendimiento y optimización de bases de datos/servidores para mitigar caídas de la web ante picos reales de tráfico.",
-  };
+    try {
+      Font.registerHyphenationCallback((word) => [word]);
+    } catch {
+      // Evita errores de registro duplicado
+    }
 
-  // 1. Mapeo de problemas y servicios
-  const markedIds = leadData.markedProblems || leadData.marked_problems || [];
-  const detectedIds =
-    leadData.detectedProblems || leadData.detected_problems || [];
-  const markedProblems = markedIds
-    .map((id) => fullProblemsList.find((p) => p && Number(p.id) === Number(id)))
-    .filter(Boolean);
-  const detectedProblems = detectedIds
-    .map((id) => fullProblemsList.find((p) => p && Number(p.id) === Number(id)))
-    .filter(Boolean);
+    const h = react_1.default.createElement;
+    const servicePriority = {
+      Automatización: 1,
+      "Integración de APIs": 2,
+      "Software a Medida": 3,
+      "Automatización con IA": 4,
+      "QA & Testing": 5,
+    };
+    const serviceDescriptions = {
+      Automatización:
+        "Establecimiento de flujos de trabajo iniciales. Sincronización automática de datos entre plataformas básicas para mitigar los errores humanos del copiado repetitivo.",
+      "Integración de APIs":
+        "Interconexión avanzada de ecosistemas. Construcción de puentes técnicos seguros para unificar herramientas independientes (TPV, pasarelas de pago, CRMs) sin sustituirlas.",
+      "Software a Medida":
+        "Digitalización del núcleo del negocio. Desarrollo de módulos core (motores de reserva propios, ERPs ligeros, control de stock automatizado) ajustados 100% a tus reglas operativas.",
+      "Automatización con IA":
+        "Inteligencia operativa avanzada. Implementación de asistentes virtuales autónomos y agentes LLM para clasificar información, resolver dudas de clientes y operar 24/7.",
+      "QA & Testing":
+        "Aseguramiento de infraestructura. Auditorías exhaustivas de rendimiento y optimización de bases de datos/servidores para mitigar caídas de la web ante picos reales de tráfico.",
+    };
 
-  // Roadmap en Fases (Servicios Vertex únicos asociados)
-  const allProblems = [...markedProblems, ...detectedProblems];
-  const uniqueServices = Array.from(
-    new Set(allProblems.map((p) => p.vertexService).filter(Boolean)),
-  ).sort((a, b) => (servicePriority[a] || 99) - (servicePriority[b] || 99));
+    // 1. Mapeo de problemas y servicios
+    const markedIds = leadData.markedProblems || leadData.marked_problems || [];
+    const detectedIds =
+      leadData.detectedProblems || leadData.detected_problems || [];
+    const markedProblems = markedIds
+      .map((id) =>
+        fullProblemsList.find((p) => p && Number(p.id) === Number(id)),
+      )
+      .filter(Boolean);
+    const detectedProblems = detectedIds
+      .map((id) =>
+        fullProblemsList.find((p) => p && Number(p.id) === Number(id)),
+      )
+      .filter(Boolean);
 
-  // 2. CTA adaptado según preferencia de contacto
-  const preference = (
-    leadData.contactPreference ||
-    leadData.contact_preference ||
-    ""
-  )
-    .toLowerCase()
-    .trim();
-  let ctaText =
-    "Nos pondremos en contacto contigo pronto para profundizar en el roadmap y compartir los siguientes pasos.";
-  if (
-    preference === "email" ||
-    preference.includes("email") ||
-    preference.includes("correo")
-  ) {
-    ctaText =
-      "Seguiremos la conversación a través de este canal para resolver cualquier duda técnica sobre el informe.";
-  } else if (
-    preference === "cafe" ||
-    preference === "café" ||
-    preference.includes("cafe") ||
-    preference.includes("café")
-  ) {
-    ctaText =
-      "Nos coordinaremos pronto para tomar el café solicitado en Canarias y profundizar en los detalles de este roadmap.";
-  } else if (
-    preference === "llamada" ||
-    preference.includes("llamada") ||
-    preference.includes("telefono") ||
-    preference.includes("teléfono")
-  ) {
-    ctaText =
-      "Un consultor de nuestro equipo te llamará en el horario más cómodo para evaluar juntos estas recomendaciones.";
-  }
+    // Roadmap en Fases (Servicios Vertex únicos asociados)
+    const allProblems = [...markedProblems, ...detectedProblems];
+    const uniqueServices = Array.from(
+      new Set(allProblems.map((p) => p.vertexService).filter(Boolean)),
+    ).sort((a, b) => (servicePriority[a] || 99) - (servicePriority[b] || 99));
 
-  // 3. Formatear la fecha
-  const rawDate = leadData.createdAt || leadData.created_at || new Date();
-  const dateObj = rawDate instanceof Date ? rawDate : new Date(rawDate);
-  const formattedDate = dateObj.toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+    // 2. CTA adaptado según preferencia de contacto
+    const preference = (
+      leadData.contactPreference ||
+      leadData.contact_preference ||
+      ""
+    )
+      .toLowerCase()
+      .trim();
+    let ctaText =
+      "Nos pondremos en contacto contigo pronto para profundizar en el roadmap y compartir los siguientes pasos.";
+    if (
+      preference === "email" ||
+      preference.includes("email") ||
+      preference.includes("correo")
+    ) {
+      ctaText =
+        "Seguiremos la conversación a través de este canal para resolver cualquier duda técnica sobre el informe.";
+    } else if (
+      preference === "cafe" ||
+      preference === "café" ||
+      preference.includes("cafe") ||
+      preference.includes("café")
+    ) {
+      ctaText =
+        "Nos coordinaremos pronto para tomar el café solicitado en Canarias y profundizar en los detalles de este roadmap.";
+    } else if (
+      preference === "llamada" ||
+      preference.includes("llamada") ||
+      preference.includes("telefono") ||
+      preference.includes("teléfono")
+    ) {
+      ctaText =
+        "Un consultor de nuestro equipo te llamará en el horario más cómodo para evaluar juntos estas recomendaciones.";
+    }
 
-  // 4. Obtener la compañía emisora
-  const companyInfo = (0, invoice_pdf_js_1.getCompany)();
+    // 3. Formatear la fecha
+    const rawDate = leadData.createdAt || leadData.created_at || new Date();
+    const dateObj = rawDate instanceof Date ? rawDate : new Date(rawDate);
+    const formattedDate = dateObj.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
 
-  // 5. Configurar los contenidos para la sección de Notas
-  const notesContent = [
-    // --- SECCIÓN C: PROBLEMAS CONFIRMADOS ---
-    h(
-      View,
-      {
-        key: "sec-c-header",
-        style: {
-          borderBottomWidth: 1,
-          borderBottomColor: "#cbd5e1",
-          paddingBottom: 4,
-          marginTop: 10,
-          marginBottom: 10,
-        },
-      },
-      h(
-        Text,
-        {
-          style: {
-            fontFamily: "Helvetica-Bold",
-            fontSize: 11,
-            color: "#1e3a8a",
-          },
-        },
-        "C. DIAGNÓSTICO DE PROBLEMAS CONFIRMADOS",
-      ),
-    ),
-    ...markedProblems.flatMap((p, idx) => [
+    // 4. Obtener la compañía emisora
+    const companyInfo = (0, invoice_pdf_js_1.getCompany)();
+
+    // 5. Configurar los contenidos para la sección de Notas
+    const notesContent = [
+      // --- SECCIÓN C: PROBLEMAS CONFIRMADOS ---
       h(
         View,
         {
-          key: `m-card-${idx}`,
+          key: "sec-c-header",
           style: {
-            backgroundColor: "#f8fafc",
-            borderLeftWidth: 3,
-            borderLeftColor: "#1e3a8a",
-            padding: 10,
-            borderRadius: 4,
+            borderBottomWidth: 1,
+            borderBottomColor: "#cbd5e1",
+            paddingBottom: 4,
+            marginTop: 10,
             marginBottom: 10,
           },
         },
-        [
-          h(
-            Text,
-            {
-              key: `m-title-${idx}`,
-              style: {
-                fontFamily: "Helvetica-Bold",
-                fontSize: 11,
-                color: "#1e3a8a",
-              },
+        h(
+          Text,
+          {
+            style: {
+              fontFamily: "Helvetica-Bold",
+              fontSize: 11,
+              color: "#1e3a8a",
             },
-            p.name,
-          ),
-          h(
-            Text,
-            {
-              key: `m-rec-${idx}`,
-              style: {
-                fontSize: 9,
-                color: "#334155",
-                marginTop: 6,
-                marginLeft: 12,
-                lineHeight: 1.4,
-              },
-            },
-            `Recomendación: ${p.recommendation}`,
-          ),
-        ],
+          },
+          "C. DIAGNÓSTICO DE PROBLEMAS CONFIRMADOS",
+        ),
       ),
-    ]),
-    // --- SECCIÓN D: DETECCIÓN INTELIGENTE ---
-    ...(detectedProblems.length > 0 || leadData.freeText || leadData.free_text
-      ? [
-          h(
-            View,
-            {
-              key: "sec-d-header",
-              style: {
-                borderBottomWidth: 1,
-                borderBottomColor: "#cbd5e1",
-                paddingBottom: 4,
-                marginTop: 14,
-                marginBottom: 10,
-              },
+      ...markedProblems.flatMap((p, idx) => [
+        h(
+          View,
+          {
+            key: `m-card-${idx}`,
+            style: {
+              backgroundColor: "#f8fafc",
+              borderLeftWidth: 3,
+              borderLeftColor: "#1e3a8a",
+              padding: 10,
+              borderRadius: 4,
+              marginBottom: 10,
             },
+          },
+          [
             h(
               Text,
               {
+                key: `m-title-${idx}`,
                 style: {
                   fontFamily: "Helvetica-Bold",
                   fontSize: 11,
                   color: "#1e3a8a",
                 },
               },
-              "D. DETECCIÓN INTELIGENTE (SUGERENCIAS DEL MOTOR)",
-            ),
-          ),
-          ...(detectedProblems.length > 0
-            ? detectedProblems.flatMap((p, idx) => [
-                h(
-                  View,
-                  {
-                    key: `d-card-${idx}`,
-                    style: {
-                      backgroundColor: "#f8fafc",
-                      borderLeftWidth: 3,
-                      borderLeftColor: "#d97706",
-                      padding: 10,
-                      borderRadius: 4,
-                      marginBottom: 10,
-                    },
-                  },
-                  [
-                    h(
-                      Text,
-                      {
-                        key: `d-title-${idx}`,
-                        style: {
-                          fontFamily: "Helvetica-Bold",
-                          fontSize: 11,
-                          color: "#d97706",
-                        },
-                      },
-                      `Detectamos también que podrías estar experimentando: ${p.name}`,
-                    ),
-                    h(
-                      Text,
-                      {
-                        key: `d-rec-${idx}`,
-                        style: {
-                          fontSize: 9,
-                          color: "#334155",
-                          marginTop: 6,
-                          marginLeft: 12,
-                          lineHeight: 1.4,
-                        },
-                      },
-                      `Recomendación: ${p.recommendation}`,
-                    ),
-                  ],
-                ),
-              ])
-            : [
-                h(
-                  View,
-                  {
-                    key: "d-card-freetext",
-                    style: {
-                      backgroundColor: "#f8fafc",
-                      borderLeftWidth: 3,
-                      borderLeftColor: "#d97706",
-                      padding: 10,
-                      borderRadius: 4,
-                      marginBottom: 10,
-                    },
-                  },
-                  [
-                    h(
-                      Text,
-                      {
-                        key: "d-title-freetext",
-                        style: {
-                          fontFamily: "Helvetica-Bold",
-                          fontSize: 11,
-                          color: "#d97706",
-                        },
-                      },
-                      "Análisis de texto libre:",
-                    ),
-                    h(
-                      Text,
-                      {
-                        key: "d-rec-freetext",
-                        style: {
-                          fontSize: 9,
-                          color: "#334155",
-                          marginTop: 6,
-                          marginLeft: 12,
-                          lineHeight: 1.4,
-                        },
-                      },
-                      "Evaluando requerimientos adicionales basados en la solicitud del cliente.",
-                    ),
-                  ],
-                ),
-              ]),
-        ]
-      : []),
-    // --- SECCIÓN E: ROADMAP CONCEPTUAL Y CTA ---
-    h(
-      View,
-      {
-        key: "sec-e-header",
-        style: {
-          borderBottomWidth: 1,
-          borderBottomColor: "#cbd5e1",
-          paddingBottom: 4,
-          marginTop: 14,
-          marginBottom: 10,
-        },
-      },
-      h(
-        Text,
-        {
-          style: {
-            fontFamily: "Helvetica-Bold",
-            fontSize: 11,
-            color: "#1e3a8a",
-          },
-        },
-        "E. ROADMAP CONCEPTUAL Y LLAMADA A LA ACCIÓN (CTA)",
-      ),
-    ),
-    h(
-      Text,
-      {
-        key: "sec-e-intro",
-        style: {
-          fontFamily: "Helvetica-Bold",
-          fontSize: 9.5,
-          color: "#334155",
-          marginBottom: 8,
-        },
-      },
-      "Roadmap en Fases:\n",
-    ),
-    h(
-      View,
-      {
-        key: "sec-e-phases-container",
-        style: {
-          marginBottom: 14,
-          paddingLeft: 8,
-        },
-      },
-      uniqueServices.map((service, idx) =>
-        h(
-          View,
-          {
-            key: `service-row-${idx}`,
-            style: {
-              flexDirection: "column",
-              alignItems: "flex-start",
-              marginBottom: 8,
-            },
-          },
-          [
-            h(
-              Text,
-              {
-                key: `service-title-${idx}`,
-                style: {
-                  fontSize: 9.5,
-                  fontFamily: "Helvetica-Bold",
-                  color: "#1e3a8a",
-                  marginBottom: 2,
-                },
-              },
-              `Fase ${idx + 1}: ${service}`,
+              p.name,
             ),
             h(
               Text,
               {
-                key: `service-desc-${idx}`,
+                key: `m-rec-${idx}`,
                 style: {
-                  fontSize: 8.5,
-                  fontFamily: "Helvetica",
-                  color: "#475569",
+                  fontSize: 9,
+                  color: "#334155",
+                  marginTop: 6,
                   marginLeft: 12,
-                  lineHeight: 1.3,
+                  lineHeight: 1.4,
                 },
               },
-              serviceDescriptions[service] ||
-                "Planificación, desarrollo e implantación del servicio adaptado.",
+              `Recomendación: ${p.recommendation}`,
             ),
           ],
         ),
-      ),
-    ),
-    h(
-      View,
-      {
-        key: "sec-e-cta-box",
-        style: {
-          backgroundColor: "#f8fafc",
-          borderColor: "#cbd5e1",
-          borderWidth: 1,
-          borderRadius: 6,
-          padding: 12,
-          marginTop: 14,
-          borderLeftWidth: 4,
-          borderLeftColor: "#1e3a8a",
-        },
-      },
-      [
-        h(
-          Text,
-          {
-            key: "sec-e-cta-title",
-            style: {
-              fontFamily: "Helvetica-Bold",
-              fontSize: 10,
-              color: "#1e3a8a",
-              marginBottom: 4,
-            },
-          },
-          "Llamada a la Acción:",
-        ),
-        h(
-          Text,
-          {
-            key: "sec-e-cta-text",
-            style: {
-              fontSize: 9,
-              color: "#334155",
-              fontFamily: "Helvetica-Oblique",
-              lineHeight: 1.35,
-              width: "100%",
-            },
-          },
-          ctaText,
-        ),
-      ],
-    ),
-  ];
-
-  const originalCreateElement = react_1.default.createElement;
-  const OriginalNumberFormat = Intl.NumberFormat;
-
-  try {
-    // 6. Sobrescribir Intl.NumberFormat para evitar que se renderice precios
-    // @ts-ignore
-    Intl.NumberFormat = function (locale, options) {
-      if (
-        options &&
-        options.style === "currency" &&
-        options.currency === "EUR"
-      ) {
-        return {
-          format: () => "",
-        };
-      }
-      return new OriginalNumberFormat(locale, options);
-    };
-
-    // 7. Sobrescribir React.createElement para adaptar invoice-pdf.js
-    // @ts-ignore
-    react_1.default.createElement = function (type, props, ...children) {
-      if (
-        type === "Text" ||
-        type === Text ||
-        (type && (type.displayName === "Text" || type.name === "Text"))
-      ) {
-        if (
-          props &&
-          props.style &&
-          props.style.color === "#6b7280" &&
-          props.style.lineHeight === 1.5
-        ) {
-          return originalCreateElement(
-            View,
-            { style: { marginTop: 10 } },
-            ...children,
-          );
-        }
-        if (typeof children[0] === "string") {
-          const content = children[0];
-          if (content.includes("NIF/CIF") || content.includes("NIF/CIF:")) {
-            const cleanContent = content.replace(/NIF\/CIF:?/gi, "NIF:");
-            return originalCreateElement(type, props, cleanContent);
-          }
-          if (content === "FACTURA" || content === "INVOICE") {
-            return originalCreateElement(type, props, "A. DIAGNÓSTICO TÉCNICO");
-          }
-          if (content === "Notas" || content === "Notes") {
-            return originalCreateElement(
-              type,
-              props,
-              "RESULTADOS DEL DIAGNÓSTICO",
-            );
-          }
-          if (content === "Nº de factura:" || content === "Invoice no.:") {
-            return originalCreateElement(type, props, "ID de Lead:");
-          }
-          if (content === "Fecha de emisión:" || content === "Issue date:") {
-            return originalCreateElement(type, props, "Fecha de Emisión:");
-          }
-          if (
-            content.startsWith("NIF:") ||
-            content.startsWith("Tax ID:") ||
-            content.startsWith("Epígrafe IAE:") ||
-            content.startsWith("Business activity code:")
-          ) {
-            return null;
-          }
-          if (content === "vertextechdigital.com/diagnostico") {
-            if (props && props.style && props.style.marginTop === 3) {
-              return originalCreateElement(
-                type,
+      ]),
+      // --- SECCIÓN D: DETECCIÓN INTELIGENTE ---
+      ...(detectedProblems.length > 0 || leadData.freeText || leadData.free_text
+        ? [
+            h(
+              View,
+              {
+                key: "sec-d-header",
+                style: {
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#cbd5e1",
+                  paddingBottom: 4,
+                  marginTop: 14,
+                  marginBottom: 10,
+                },
+              },
+              h(
+                Text,
                 {
-                  ...props,
                   style: {
-                    ...props.style,
-                    color: "#475569",
-                    fontSize: 8.5,
-                    fontFamily: "Helvetica",
-                    marginTop: 4,
-                    maxWidth: 400,
+                    fontFamily: "Helvetica-Bold",
+                    fontSize: 11,
+                    color: "#1e3a8a",
                   },
                 },
-                "Enlace público de origen: vertextechdigital.com/diagnostico",
+                "D. DETECCIÓN INTELIGENTE (SUGERENCIAS DEL MOTOR)",
+              ),
+            ),
+            ...(detectedProblems.length > 0
+              ? detectedProblems.flatMap((p, idx) => [
+                  h(
+                    View,
+                    {
+                      key: `d-card-${idx}`,
+                      style: {
+                        backgroundColor: "#f8fafc",
+                        borderLeftWidth: 3,
+                        borderLeftColor: "#d97706",
+                        padding: 10,
+                        borderRadius: 4,
+                        marginBottom: 10,
+                      },
+                    },
+                    [
+                      h(
+                        Text,
+                        {
+                          key: `d-title-${idx}`,
+                          style: {
+                            fontFamily: "Helvetica-Bold",
+                            fontSize: 11,
+                            color: "#d97706",
+                          },
+                        },
+                        `Detectamos también que podrías estar experimentando: ${p.name}`,
+                      ),
+                      h(
+                        Text,
+                        {
+                          key: `d-rec-${idx}`,
+                          style: {
+                            fontSize: 9,
+                            color: "#334155",
+                            marginTop: 6,
+                            marginLeft: 12,
+                            lineHeight: 1.4,
+                          },
+                        },
+                        `Recomendación: ${p.recommendation}`,
+                      ),
+                    ],
+                  ),
+                ])
+              : [
+                  h(
+                    View,
+                    {
+                      key: "d-card-freetext",
+                      style: {
+                        backgroundColor: "#f8fafc",
+                        borderLeftWidth: 3,
+                        borderLeftColor: "#d97706",
+                        padding: 10,
+                        borderRadius: 4,
+                        marginBottom: 10,
+                      },
+                    },
+                    [
+                      h(
+                        Text,
+                        {
+                          key: "d-title-freetext",
+                          style: {
+                            fontFamily: "Helvetica-Bold",
+                            fontSize: 11,
+                            color: "#d97706",
+                          },
+                        },
+                        "Análisis de texto libre:",
+                      ),
+                      h(
+                        Text,
+                        {
+                          key: "d-rec-freetext",
+                          style: {
+                            fontSize: 9,
+                            color: "#334155",
+                            marginTop: 6,
+                            marginLeft: 12,
+                            lineHeight: 1.4,
+                          },
+                        },
+                        "Evaluando requerimientos adicionales basados en la solicitud del cliente.",
+                      ),
+                    ],
+                  ),
+                ]),
+          ]
+        : []),
+      // --- SECCIÓN E: ROADMAP CONCEPTUAL Y CTA ---
+      h(
+        View,
+        {
+          key: "sec-e-header",
+          style: {
+            borderBottomWidth: 1,
+            borderBottomColor: "#cbd5e1",
+            paddingBottom: 4,
+            marginTop: 14,
+            marginBottom: 10,
+          },
+        },
+        h(
+          Text,
+          {
+            style: {
+              fontFamily: "Helvetica-Bold",
+              fontSize: 11,
+              color: "#1e3a8a",
+            },
+          },
+          "E. ROADMAP CONCEPTUAL Y LLAMADA A LA ACCIÓN (CTA)",
+        ),
+      ),
+      h(
+        Text,
+        {
+          key: "sec-e-intro",
+          style: {
+            fontFamily: "Helvetica-Bold",
+            fontSize: 9.5,
+            color: "#334155",
+            marginBottom: 8,
+          },
+        },
+        "Roadmap en Fases:\n",
+      ),
+      h(
+        View,
+        {
+          key: "sec-e-phases-container",
+          style: {
+            marginBottom: 14,
+            paddingLeft: 8,
+          },
+        },
+        uniqueServices.map((service, idx) =>
+          h(
+            View,
+            {
+              key: `service-row-${idx}`,
+              style: {
+                flexDirection: "column",
+                alignItems: "flex-start",
+                marginBottom: 8,
+              },
+            },
+            [
+              h(
+                Text,
+                {
+                  key: `service-title-${idx}`,
+                  style: {
+                    fontSize: 9.5,
+                    fontFamily: "Helvetica-Bold",
+                    color: "#1e3a8a",
+                    marginBottom: 2,
+                  },
+                },
+                `Fase ${idx + 1}: ${service}`,
+              ),
+              h(
+                Text,
+                {
+                  key: `service-desc-${idx}`,
+                  style: {
+                    fontSize: 8.5,
+                    fontFamily: "Helvetica",
+                    color: "#475569",
+                    marginLeft: 12,
+                    lineHeight: 1.3,
+                  },
+                },
+                serviceDescriptions[service] ||
+                  "Planificación, desarrollo e implantación del servicio adaptado.",
+              ),
+            ],
+          ),
+        ),
+      ),
+      h(
+        View,
+        {
+          key: "sec-e-cta-box",
+          style: {
+            backgroundColor: "#f8fafc",
+            borderColor: "#cbd5e1",
+            borderWidth: 1,
+            borderRadius: 6,
+            padding: 12,
+            marginTop: 14,
+            borderLeftWidth: 4,
+            borderLeftColor: "#1e3a8a",
+          },
+        },
+        [
+          h(
+            Text,
+            {
+              key: "sec-e-cta-title",
+              style: {
+                fontFamily: "Helvetica-Bold",
+                fontSize: 10,
+                color: "#1e3a8a",
+                marginBottom: 4,
+              },
+            },
+            "Llamada a la Acción:",
+          ),
+          h(
+            Text,
+            {
+              key: "sec-e-cta-text",
+              style: {
+                fontSize: 9,
+                color: "#334155",
+                fontFamily: "Helvetica-Oblique",
+                lineHeight: 1.35,
+                width: "100%",
+              },
+            },
+            ctaText,
+          ),
+        ],
+      ),
+    ];
+
+    const originalCreateElement = react_1.default.createElement;
+    const OriginalNumberFormat = Intl.NumberFormat;
+
+    try {
+      // 6. Sobrescribir Intl.NumberFormat para evitar que se renderice precios
+      // @ts-ignore
+      Intl.NumberFormat = function (locale, options) {
+        if (
+          options &&
+          options.style === "currency" &&
+          options.currency === "EUR"
+        ) {
+          return {
+            format: () => "",
+          };
+        }
+        return new OriginalNumberFormat(locale, options);
+      };
+
+      // 7. Sobrescribir React.createElement para adaptar invoice-pdf.js
+      // @ts-ignore
+      react_1.default.createElement = function (type, props, ...children) {
+        if (
+          type === "Text" ||
+          type === Text ||
+          (type && (type.displayName === "Text" || type.name === "Text"))
+        ) {
+          if (
+            props &&
+            props.style &&
+            props.style.color === "#6b7280" &&
+            props.style.lineHeight === 1.5
+          ) {
+            return originalCreateElement(
+              View,
+              { style: { marginTop: 10 } },
+              ...children,
+            );
+          }
+          if (typeof children[0] === "string") {
+            const content = children[0];
+            if (content.includes("NIF/CIF") || content.includes("NIF/CIF:")) {
+              const cleanContent = content.replace(/NIF\/CIF:?/gi, "NIF:");
+              return originalCreateElement(type, props, cleanContent);
+            }
+            if (content === "FACTURA" || content === "INVOICE") {
+              return originalCreateElement(
+                type,
+                props,
+                "A. DIAGNÓSTICO TÉCNICO",
               );
+            }
+            if (content === "Notas" || content === "Notes") {
+              return originalCreateElement(
+                type,
+                props,
+                "RESULTADOS DEL DIAGNÓSTICO",
+              );
+            }
+            if (content === "Nº de factura:" || content === "Invoice no.:") {
+              return originalCreateElement(type, props, "ID de Lead:");
+            }
+            if (content === "Fecha de emisión:" || content === "Issue date:") {
+              return originalCreateElement(type, props, "Fecha de Emisión:");
+            }
+            if (
+              content.startsWith("NIF:") ||
+              content.startsWith("Tax ID:") ||
+              content.startsWith("Epígrafe IAE:") ||
+              content.startsWith("Business activity code:")
+            ) {
+              return null;
+            }
+            if (content === "vertextechdigital.com/diagnostico") {
+              if (props && props.style && props.style.marginTop === 3) {
+                return originalCreateElement(
+                  type,
+                  {
+                    ...props,
+                    style: {
+                      ...props.style,
+                      color: "#475569",
+                      fontSize: 8.5,
+                      fontFamily: "Helvetica",
+                      marginTop: 4,
+                      maxWidth: 400,
+                    },
+                  },
+                  "Enlace público de origen: vertextechdigital.com/diagnostico",
+                );
+              }
             }
           }
         }
-      }
 
-      // 8. Ocultar la cabecera de la tabla de facturación
-      if (
-        props &&
-        props.style &&
-        props.style.flexDirection === "row" &&
-        props.style.borderBottomWidth === 1 &&
-        props.style.paddingBottom === 6
-      ) {
-        return null;
-      }
-
-      // 9. Ocultar filas de la tabla de facturación
-      if (
-        props &&
-        props.style &&
-        props.style.flexDirection === "row" &&
-        props.style.paddingVertical === 6 &&
-        props.style.borderBottomWidth === 1
-      ) {
-        return null;
-      }
-
-      // 10. Ocultar el bloque de totales
-      if (
-        props &&
-        props.style &&
-        props.style.marginTop === 16 &&
-        props.style.alignSelf === "flex-end" &&
-        props.style.width === 240
-      ) {
-        return null;
-      }
-
-      // 11. Modificar estilos para el título
-      if (props && props.style) {
-        if (props.style.fontSize === 22 && props.style.color === "#2563eb") {
-          props.style = {
-            ...props.style,
-            fontSize: 12,
-            color: "#1e3a8a",
-            fontFamily: "Helvetica-Bold",
-          };
+        // 8. Ocultar la cabecera de la tabla de facturación
+        if (
+          props &&
+          props.style &&
+          props.style.flexDirection === "row" &&
+          props.style.borderBottomWidth === 1 &&
+          props.style.paddingBottom === 6
+        ) {
+          return null;
         }
-      }
 
-      // 12. Interceptar el billedBox original
-      if (
-        props &&
-        props.style &&
-        props.style.borderRadius === 4 &&
-        props.style.borderWidth === 1
-      ) {
-        return originalCreateElement(
-          View,
-          {
-            style: {
-              backgroundColor: "#f8fafc",
-              borderColor: "#cbd5e1",
-              borderWidth: 1,
-              borderRadius: 6,
-              padding: 12,
-              marginBottom: 16,
+        // 9. Ocultar filas de la tabla de facturación
+        if (
+          props &&
+          props.style &&
+          props.style.flexDirection === "row" &&
+          props.style.paddingVertical === 6 &&
+          props.style.borderBottomWidth === 1
+        ) {
+          return null;
+        }
+
+        // 10. Ocultar el bloque de totales
+        if (
+          props &&
+          props.style &&
+          props.style.marginTop === 16 &&
+          props.style.alignSelf === "flex-end" &&
+          props.style.width === 240
+        ) {
+          return null;
+        }
+
+        // 11. Modificar estilos para el título
+        if (props && props.style) {
+          if (props.style.fontSize === 22 && props.style.color === "#2563eb") {
+            props.style = {
+              ...props.style,
+              fontSize: 12,
+              color: "#1e3a8a",
+              fontFamily: "Helvetica-Bold",
+            };
+          }
+        }
+
+        // 12. Interceptar el billedBox original
+        if (
+          props &&
+          props.style &&
+          props.style.borderRadius === 4 &&
+          props.style.borderWidth === 1
+        ) {
+          return originalCreateElement(
+            View,
+            {
+              style: {
+                backgroundColor: "#f8fafc",
+                borderColor: "#cbd5e1",
+                borderWidth: 1,
+                borderRadius: 6,
+                padding: 12,
+                marginBottom: 16,
+              },
             },
-          },
-          [
-            originalCreateElement(
-              Text,
-              {
-                key: "client-box-header",
-                style: {
-                  fontSize: 8.5,
-                  fontFamily: "Helvetica-Bold",
-                  color: "#64748b",
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                  marginBottom: 8,
+            [
+              originalCreateElement(
+                Text,
+                {
+                  key: "client-box-header",
+                  style: {
+                    fontSize: 8.5,
+                    fontFamily: "Helvetica-Bold",
+                    color: "#64748b",
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    marginBottom: 8,
+                  },
                 },
-              },
-              "B. METADATOS DEL LEAD / CLIENTE",
-            ),
-            originalCreateElement(
-              View,
-              {
-                key: "row-name",
-                style: {
-                  flexDirection: "row",
-                  borderBottomWidth: 0.5,
-                  borderBottomColor: "#e2e8f0",
-                  paddingVertical: 4,
+                "B. METADATOS DEL LEAD / CLIENTE",
+              ),
+              originalCreateElement(
+                View,
+                {
+                  key: "row-name",
+                  style: {
+                    flexDirection: "row",
+                    borderBottomWidth: 0.5,
+                    borderBottomColor: "#e2e8f0",
+                    paddingVertical: 4,
+                  },
                 },
-              },
-              [
-                originalCreateElement(
-                  Text,
-                  {
-                    style: {
-                      width: 140,
-                      fontFamily: "Helvetica-Bold",
-                      fontSize: 9,
-                      color: "#475569",
-                    },
-                  },
-                  "Nombre de la Empresa:",
-                ),
-                originalCreateElement(
-                  Text,
-                  {
-                    style: {
-                      flex: 1,
-                      fontSize: 9,
-                      color: "#1e293b",
-                      fontFamily: "Helvetica",
-                    },
-                  },
-                  leadData.companyName || leadData.company_name || "",
-                ),
-              ],
-            ),
-            originalCreateElement(
-              View,
-              {
-                key: "row-sector",
-                style: {
-                  flexDirection: "row",
-                  borderBottomWidth: 0.5,
-                  borderBottomColor: "#e2e8f0",
-                  paddingVertical: 4,
-                },
-              },
-              [
-                originalCreateElement(
-                  Text,
-                  {
-                    style: {
-                      width: 140,
-                      fontFamily: "Helvetica-Bold",
-                      fontSize: 9,
-                      color: "#475569",
-                    },
-                  },
-                  "Sector Industrial:",
-                ),
-                originalCreateElement(
-                  Text,
-                  {
-                    style: {
-                      flex: 1,
-                      fontSize: 9,
-                      color: "#1e293b",
-                      fontFamily: "Helvetica",
-                    },
-                  },
-                  leadData.sector || "",
-                ),
-              ],
-            ),
-            originalCreateElement(
-              View,
-              {
-                key: "row-size",
-                style: {
-                  flexDirection: "row",
-                  borderBottomWidth: 0.5,
-                  borderBottomColor: "#e2e8f0",
-                  paddingVertical: 4,
-                },
-              },
-              [
-                originalCreateElement(
-                  Text,
-                  {
-                    style: {
-                      width: 140,
-                      fontFamily: "Helvetica-Bold",
-                      fontSize: 9,
-                      color: "#475569",
-                    },
-                  },
-                  "Tamaño de la Empresa:",
-                ),
-                originalCreateElement(
-                  Text,
-                  {
-                    style: {
-                      flex: 1,
-                      fontSize: 9,
-                      color: "#1e293b",
-                      fontFamily: "Helvetica",
-                    },
-                  },
-                  leadData.size || "",
-                ),
-              ],
-            ),
-            originalCreateElement(
-              View,
-              {
-                key: "row-email",
-                style: {
-                  flexDirection: "row",
-                  borderBottomWidth: leadData.phone ? 0.5 : 0,
-                  borderBottomColor: "#e2e8f0",
-                  paddingVertical: 4,
-                },
-              },
-              [
-                originalCreateElement(
-                  Text,
-                  {
-                    style: {
-                      width: 140,
-                      fontFamily: "Helvetica-Bold",
-                      fontSize: 9,
-                      color: "#475569",
-                    },
-                  },
-                  "Correo Electrónico:",
-                ),
-                originalCreateElement(
-                  Text,
-                  {
-                    style: {
-                      flex: 1,
-                      fontSize: 9,
-                      color: "#1e293b",
-                      fontFamily: "Helvetica",
-                    },
-                  },
-                  leadData.email || "",
-                ),
-              ],
-            ),
-            leadData.phone
-              ? originalCreateElement(
-                  View,
-                  {
-                    key: "row-phone",
-                    style: { flexDirection: "row", paddingVertical: 4 },
-                  },
-                  [
-                    originalCreateElement(
-                      Text,
-                      {
-                        style: {
-                          width: 140,
-                          fontFamily: "Helvetica-Bold",
-                          fontSize: 9,
-                          color: "#475569",
-                        },
+                [
+                  originalCreateElement(
+                    Text,
+                    {
+                      style: {
+                        width: 140,
+                        fontFamily: "Helvetica-Bold",
+                        fontSize: 9,
+                        color: "#475569",
                       },
-                      "Teléfono de Contacto:",
-                    ),
-                    originalCreateElement(
-                      Text,
-                      {
-                        style: {
-                          flex: 1,
-                          fontSize: 9,
-                          color: "#1e293b",
-                          fontFamily: "Helvetica",
-                        },
+                    },
+                    "Nombre de la Empresa:",
+                  ),
+                  originalCreateElement(
+                    Text,
+                    {
+                      style: {
+                        flex: 1,
+                        fontSize: 9,
+                        color: "#1e293b",
+                        fontFamily: "Helvetica",
                       },
-                      leadData.phone,
-                    ),
-                  ],
-                )
-              : null,
-          ].filter(Boolean),
-        );
-      }
-      return originalCreateElement.apply(this, [type, props, ...children]);
-    };
+                    },
+                    leadData.companyName || leadData.company_name || "",
+                  ),
+                ],
+              ),
+              originalCreateElement(
+                View,
+                {
+                  key: "row-sector",
+                  style: {
+                    flexDirection: "row",
+                    borderBottomWidth: 0.5,
+                    borderBottomColor: "#e2e8f0",
+                    paddingVertical: 4,
+                  },
+                },
+                [
+                  originalCreateElement(
+                    Text,
+                    {
+                      style: {
+                        width: 140,
+                        fontFamily: "Helvetica-Bold",
+                        fontSize: 9,
+                        color: "#475569",
+                      },
+                    },
+                    "Sector Industrial:",
+                  ),
+                  originalCreateElement(
+                    Text,
+                    {
+                      style: {
+                        flex: 1,
+                        fontSize: 9,
+                        color: "#1e293b",
+                        fontFamily: "Helvetica",
+                      },
+                    },
+                    leadData.sector || "",
+                  ),
+                ],
+              ),
+              originalCreateElement(
+                View,
+                {
+                  key: "row-size",
+                  style: {
+                    flexDirection: "row",
+                    borderBottomWidth: 0.5,
+                    borderBottomColor: "#e2e8f0",
+                    paddingVertical: 4,
+                  },
+                },
+                [
+                  originalCreateElement(
+                    Text,
+                    {
+                      style: {
+                        width: 140,
+                        fontFamily: "Helvetica-Bold",
+                        fontSize: 9,
+                        color: "#475569",
+                      },
+                    },
+                    "Tamaño de la Empresa:",
+                  ),
+                  originalCreateElement(
+                    Text,
+                    {
+                      style: {
+                        flex: 1,
+                        fontSize: 9,
+                        color: "#1e293b",
+                        fontFamily: "Helvetica",
+                      },
+                    },
+                    leadData.size || "",
+                  ),
+                ],
+              ),
+              originalCreateElement(
+                View,
+                {
+                  key: "row-email",
+                  style: {
+                    flexDirection: "row",
+                    borderBottomWidth: leadData.phone ? 0.5 : 0,
+                    borderBottomColor: "#e2e8f0",
+                    paddingVertical: 4,
+                  },
+                },
+                [
+                  originalCreateElement(
+                    Text,
+                    {
+                      style: {
+                        width: 140,
+                        fontFamily: "Helvetica-Bold",
+                        fontSize: 9,
+                        color: "#475569",
+                      },
+                    },
+                    "Correo Electrónico:",
+                  ),
+                  originalCreateElement(
+                    Text,
+                    {
+                      style: {
+                        flex: 1,
+                        fontSize: 9,
+                        color: "#1e293b",
+                        fontFamily: "Helvetica",
+                      },
+                    },
+                    leadData.email || "",
+                  ),
+                ],
+              ),
+              leadData.phone
+                ? originalCreateElement(
+                    View,
+                    {
+                      key: "row-phone",
+                      style: { flexDirection: "row", paddingVertical: 4 },
+                    },
+                    [
+                      originalCreateElement(
+                        Text,
+                        {
+                          style: {
+                            width: 140,
+                            fontFamily: "Helvetica-Bold",
+                            fontSize: 9,
+                            color: "#475569",
+                          },
+                        },
+                        "Teléfono de Contacto:",
+                      ),
+                      originalCreateElement(
+                        Text,
+                        {
+                          style: {
+                            flex: 1,
+                            fontSize: 9,
+                            color: "#1e293b",
+                            fontFamily: "Helvetica",
+                          },
+                        },
+                        leadData.phone,
+                      ),
+                    ],
+                  )
+                : null,
+            ].filter(Boolean),
+          );
+        }
+        return originalCreateElement.apply(this, [type, props, ...children]);
+      };
 
-    // 13. Estructurar datos
-    const invoiceNumber = `VT-LEAD-${leadData.id || "000"}`;
-    const dataForInvoice = {
-      language: "es",
-      invoiceNumber: invoiceNumber,
-      issueDate: formattedDate,
-      company: {
-        companyName: "Vertex Tech Digital",
-        nif:
-          process.env.VITE_COMPANY_TAX_ID ||
-          process.env.COMPANY_TAX_ID ||
-          "[Tax ID]",
-        address: "",
-        email: "vertextechdigital.com/diagnostico",
-        iae: "",
-      },
-      client: {
-        legalName: leadData.companyName || leadData.company_name || "",
-        nif: leadData.sector || "",
-        address: leadData.size || "",
-        email: leadData.email || "",
-      },
-      items: [],
-      totals: {
-        subtotal: 0,
-        taxAmount: 0,
-        total: 0,
-      },
-      taxRate: 0,
-      notes: notesContent,
-    };
+      // 13. Estructurar datos
+      const invoiceNumber = `VT-LEAD-${leadData.id || "000"}`;
+      const dataForInvoice = {
+        language: "es",
+        invoiceNumber: invoiceNumber,
+        issueDate: formattedDate,
+        company: {
+          companyName: "Vertex Tech Digital",
+          nif:
+            process.env.VITE_COMPANY_TAX_ID ||
+            process.env.COMPANY_TAX_ID ||
+            "[Tax ID]",
+          address: "",
+          email: "vertextechdigital.com/diagnostico",
+          iae: "",
+        },
+        client: {
+          legalName: leadData.companyName || leadData.company_name || "",
+          nif: leadData.sector || "",
+          address: leadData.size || "",
+          email: leadData.email || "",
+        },
+        items: [],
+        totals: {
+          subtotal: 0,
+          taxAmount: 0,
+          total: 0,
+        },
+        taxRate: 0,
+        notes: notesContent,
+      };
 
-    // Renderizar
-    const resultBuffer = await (0, invoice_pdf_js_1.renderInvoicePdf)(
-      dataForInvoice,
-    );
-    return resultBuffer;
+      // Renderizar
+      const resultBuffer = await (0, invoice_pdf_js_1.renderInvoicePdf)(
+        dataForInvoice,
+      );
+      return resultBuffer;
+    } finally {
+      // Restaurar los métodos globales
+      react_1.default.createElement = originalCreateElement;
+      Intl.NumberFormat = OriginalNumberFormat;
+    }
   } finally {
-    // Restaurar los métodos globales
-    react_1.default.createElement = originalCreateElement;
-    Intl.NumberFormat = OriginalNumberFormat;
+    releaseGeneration();
   }
 }
