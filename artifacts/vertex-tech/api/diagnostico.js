@@ -9,6 +9,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const nodemailer = require("nodemailer");
+const DOMPurify = require("isomorphic-dompurify");
 const { drizzle } = require("drizzle-orm/neon-http");
 const { eq } = require("drizzle-orm");
 const {
@@ -99,15 +100,11 @@ async function checkRateLimit(ip) {
   return await ratelimit.limit(ip);
 }
 
-async function sanitizeString(str) {
+function sanitizeString(str) {
   if (typeof str !== "string") return "";
-  const sanitizeHtmlModule = await import("sanitize-html");
-  const sanitizeHtml = sanitizeHtmlModule.default || sanitizeHtmlModule;
-
-  return sanitizeHtml(str, {
-    allowedTags: [],
-    allowedAttributes: {},
-    disallowedTagsMode: "discard",
+  return DOMPurify.sanitize(str, {
+    ALLOWED_TAGS: [],
+    ALLOWED_ATTR: [],
   }).trim();
 }
 
@@ -218,13 +215,13 @@ module.exports = async function handler(req, res) {
     }
 
     // Sanitización
-    const cleanCompanyName = await sanitizeString(company_name);
-    const cleanSector = await sanitizeString(sector);
-    const cleanSize = await sanitizeString(size);
-    const cleanEmail = await sanitizeString(email);
-    const cleanFreeText = await sanitizeString(free_text);
-    const cleanContactPreference = await sanitizeString(contact_preference);
-    const cleanPhone = phone ? await sanitizeString(phone) : "";
+    const cleanCompanyName = sanitizeString(company_name);
+    const cleanSector = sanitizeString(sector);
+    const cleanSize = sanitizeString(size);
+    const cleanEmail = sanitizeString(email);
+    const cleanFreeText = sanitizeString(free_text);
+    const cleanContactPreference = sanitizeString(contact_preference);
+    const cleanPhone = phone ? sanitizeString(phone) : "";
     const htmlCompanyName = escapeHtml(cleanCompanyName);
     const htmlSector = escapeHtml(cleanSector);
     const htmlSize = escapeHtml(cleanSize);
