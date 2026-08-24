@@ -1,4 +1,4 @@
-import { defineConfig, type PluginOption } from "vite";
+import { defineConfig, type PluginOption, type UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@mdx-js/rollup";
@@ -6,7 +6,9 @@ import remarkGfm from "remark-gfm";
 import path from "path";
 import { devApiPlugin } from "./dev-api-plugin.mjs";
 
-export default defineConfig(async () => {
+// Retorno anotado: aplica tipado contextual y evita que literales como
+// allowedHosts: true se ensanchen a boolean (incompatible con Vite 7).
+export default defineConfig(async (): Promise<UserConfig> => {
   const isReplit = process.env.REPL_ID !== undefined;
   const isVercel = process.env.VERCEL === "1";
 
