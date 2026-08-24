@@ -7,6 +7,7 @@ import {
   integer,
   text,
   boolean,
+  jsonb,
   index,
 } from "drizzle-orm/pg-core";
 
@@ -21,6 +22,11 @@ export const leadStatusEnum = pgEnum("lead_status", [
   "contactado",
   "en_proceso",
   "cerrado",
+]);
+
+export const diagnosisSourceEnum = pgEnum("diagnosis_source", [
+  "ai",
+  "fallback",
 ]);
 
 export const leadsTable = pgTable(
@@ -41,6 +47,10 @@ export const leadsTable = pgTable(
     contactPreference: contactPreferenceEnum("contact_preference").notNull(),
     status: leadStatusEnum("status").notNull().default("nuevo"),
     pdfSent: boolean("pdf_sent").notNull().default(true),
+    diagnosisSource: diagnosisSourceEnum("diagnosis_source"),
+    aiDiagnosis: text("ai_diagnosis"),
+    aiRoadmap: jsonb("ai_roadmap"),
+    aiModel: varchar("ai_model", { length: 100 }),
   },
   (table) => [
     index("leads_email_idx").on(table.email),

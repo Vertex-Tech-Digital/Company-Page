@@ -7,7 +7,7 @@ var __importDefault =
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateDiagnosisPDF = generateDiagnosisPDF;
 const react_1 = __importDefault(require("react"));
-// @ts-ignore
+// @ts-expect-error -- módulo JS sin tipos
 const invoice_pdf_js_1 = require("../../server/invoice-pdf.js");
 
 // El adaptador necesita parchear APIs globales mientras se renderiza el PDF.
@@ -75,6 +75,21 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
         fullProblemsList.find((p) => p && Number(p.id) === Number(id)),
       )
       .filter(Boolean);
+    const aiResult =
+      leadData.diagnosisSource === "ai" && leadData.aiRoadmap
+        ? leadData.aiRoadmap
+        : null;
+    const aiProblems = Array.isArray(aiResult?.problems)
+      ? aiResult.problems
+      : [];
+    const aiProblemById = new Map(
+      aiProblems.map((problem) => [Number(problem.problem_id), problem]),
+    );
+    const aiServiceById = new Map(
+      (Array.isArray(aiResult?.services) ? aiResult.services : []).map(
+        (item) => [Number(item.problem_id), item.service],
+      ),
+    );
 
     // Roadmap en Fases (Servicios Vertex únicos asociados)
     const allProblems = [...markedProblems, ...detectedProblems];
@@ -126,21 +141,17 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       year: "numeric",
     });
 
-    // 4. Obtener la compañía emisora
-    const companyInfo = (0, invoice_pdf_js_1.getCompany)();
-
-    // 5. Configurar los contenidos para la sección de Notas
-    const notesContent = [
-      // --- SECCIÓN C: PROBLEMAS CONFIRMADOS ---
+    // 4. Configurar los contenidos para la sección de Notas
+    const sectionHeader = (key, label, marginTop) =>
       h(
         View,
         {
-          key: "sec-c-header",
+          key,
           style: {
             borderBottomWidth: 1,
             borderBottomColor: "#cbd5e1",
             paddingBottom: 4,
-            marginTop: 10,
+            marginTop,
             marginBottom: 10,
           },
         },
@@ -153,24 +164,308 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
               color: "#1e3a8a",
             },
           },
-          "C. DIAGNÓSTICO DE PROBLEMAS CONFIRMADOS",
+          label,
         ),
-      ),
-      ...markedProblems.flatMap((p, idx) => [
+      );
+
+    const ctaBox = h(
+      View,
+      {
+        key: "sec-e-cta-box",
+        style: {
+          backgroundColor: "#f8fafc",
+          borderColor: "#cbd5e1",
+          borderWidth: 1,
+          borderRadius: 6,
+          padding: 12,
+          marginTop: 4,
+          borderLeftWidth: 4,
+          borderLeftColor: "#1e3a8a",
+        },
+      },
+      [
         h(
-          View,
+          Text,
           {
-            key: `m-card-${idx}`,
+            key: "sec-e-cta-title",
             style: {
-              backgroundColor: "#f8fafc",
-              borderLeftWidth: 3,
-              borderLeftColor: "#1e3a8a",
-              padding: 10,
-              borderRadius: 4,
-              marginBottom: 10,
+              fontFamily: "Helvetica-Bold",
+              fontSize: 10,
+              color: "#1e3a8a",
+              marginBottom: 4,
             },
           },
-          [
+          "Llamada a la Acción:",
+        ),
+        h(
+          Text,
+          {
+            key: "sec-e-cta-text",
+            style: {
+              fontSize: 9,
+              color: "#334155",
+              fontFamily: "Helvetica-Oblique",
+              lineHeight: 1.35,
+              width: "100%",
+            },
+          },
+          ctaText,
+        ),
+      ],
+    );
+
+    const problemCard = ({ keyPrefix, accentColor, children }) =>
+      h(
+        View,
+        {
+          key: `${keyPrefix}-card`,
+          style: {
+            backgroundColor: "#f8fafc",
+            borderLeftWidth: 3,
+            borderLeftColor: accentColor,
+            padding: 10,
+            borderRadius: 4,
+            marginBottom: 10,
+          },
+        },
+        children,
+      );
+
+    const cardText = (key, content) =>
+      h(
+        Text,
+        {
+          key,
+          style: {
+            fontSize: 9,
+            color: "#334155",
+            marginTop: 6,
+            marginLeft: 12,
+            lineHeight: 1.4,
+          },
+        },
+        content,
+      );
+
+    // Divide el roadmap continuo del LLM ("Fase 1: ... Fase 2: ...") en
+    // líneas independientes. Devuelve null si el texto no sigue el patrón.
+    const parseRoadmapPhases = (roadmapText) => {
+      const phases = String(roadmapText || "")
+        .split(/(?=Fase\s+\d+\s*:)/i)
+        .map((phase) => phase.trim())
+        .filter(Boolean);
+      const hasPhasePattern = phases.some((phase) =>
+        /^Fase\s+\d+\s*:/i.test(phase),
+      );
+      return hasPhasePattern ? phases : null;
+    };
+
+    const roadmapBlock = (key, roadmapText) => {
+      const phases = parseRoadmapPhases(roadmapText);
+
+      if (!phases) {
+        return cardText(
+          key,
+          `Plan de Acción: ${String(roadmapText || "").trim()}`,
+        );
+      }
+
+      return h(
+        View,
+        {
+          key,
+          style: {
+            marginTop: 6,
+            marginLeft: 12,
+            marginBottom: 4,
+          },
+        },
+        [
+          h(
+            Text,
+            {
+              key: `${key}-title`,
+              style: {
+                fontFamily: "Helvetica-Bold",
+                fontSize: 9,
+                color: "#334155",
+                marginBottom: 2,
+                lineHeight: 1.4,
+              },
+            },
+            "Plan de Acción:",
+          ),
+          ...phases.map((phase, phaseIdx) =>
+            h(
+              Text,
+              {
+                key: `${key}-fase-${phaseIdx}`,
+                style: {
+                  fontSize: 9,
+                  color: "#334155",
+                  marginBottom: phaseIdx === phases.length - 1 ? 0 : 3,
+                  lineHeight: 1.4,
+                },
+              },
+              `• ${phase}`,
+            ),
+          ),
+        ],
+      );
+    };
+
+    // --- RAMA IA: Resumen ejecutivo + lista única de problemas (sin duplicados) ---
+    const aiNotesContent = () => [
+      sectionHeader("sec-c-header", "C. RESUMEN EJECUTIVO", 10),
+      h(
+        View,
+        {
+          key: "executive-summary-box",
+          style: {
+            backgroundColor: "#eff6ff",
+            borderLeftWidth: 3,
+            borderLeftColor: "#2563eb",
+            padding: 10,
+            borderRadius: 4,
+            marginBottom: 10,
+          },
+        },
+        h(
+          Text,
+          {
+            key: "executive-summary-text",
+            style: {
+              fontSize: 9.5,
+              color: "#1e293b",
+              lineHeight: 1.45,
+            },
+          },
+          String(aiResult.diagnosis || ""),
+        ),
+      ),
+      sectionHeader(
+        "sec-d-header",
+        "D. DIAGNÓSTICO DE PROBLEMAS Y PLAN DE ACCIÓN",
+        14,
+      ),
+      ...allProblems.map((problem, idx) => {
+        const aiProblem = aiProblemById.get(Number(problem.id));
+        const isConfirmed = markedProblems.some(
+          (marked) => Number(marked.id) === Number(problem.id),
+        );
+        const badgeLabel = isConfirmed ? "Confirmado" : "Sugerido";
+        const accentColor = isConfirmed ? "#1e3a8a" : "#d97706";
+
+        if (!aiProblem) {
+          return problemCard({
+            keyPrefix: `p-${idx}`,
+            accentColor,
+            children: [
+              h(
+                Text,
+                {
+                  key: `p-title-${idx}`,
+                  style: {
+                    fontFamily: "Helvetica-Bold",
+                    fontSize: 11,
+                    color: accentColor,
+                  },
+                },
+                `${problem.name} (${badgeLabel})`,
+              ),
+              roadmapBlock(`p-rec-${idx}`, problem.recommendation),
+              cardText(
+                `p-svc-${idx}`,
+                `Servicio Vertex: ${problem.vertexService}`,
+              ),
+            ],
+          });
+        }
+
+        return problemCard({
+          keyPrefix: `p-${idx}`,
+          accentColor,
+          children: [
+            h(
+              View,
+              {
+                key: `p-title-row-${idx}`,
+                style: {
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                },
+              },
+              [
+                h(
+                  Text,
+                  {
+                    key: `p-title-${idx}`,
+                    style: {
+                      fontFamily: "Helvetica-Bold",
+                      fontSize: 11,
+                      color: "#1e3a8a",
+                      flex: 1,
+                    },
+                  },
+                  problem.name,
+                ),
+                h(
+                  View,
+                  {
+                    key: `p-badge-${idx}`,
+                    style: {
+                      backgroundColor: isConfirmed ? "#dbeafe" : "#fef3c7",
+                      paddingHorizontal: 6,
+                      paddingVertical: 2,
+                      borderRadius: 3,
+                      marginLeft: 8,
+                    },
+                  },
+                  h(
+                    Text,
+                    {
+                      style: {
+                        fontSize: 7.5,
+                        fontFamily: "Helvetica-Bold",
+                        color: accentColor,
+                      },
+                    },
+                    badgeLabel,
+                  ),
+                ),
+              ],
+            ),
+            cardText(
+              `p-diagnosis-${idx}`,
+              `Impacto Operativo: ${String(aiProblem.diagnosis || "")}`,
+            ),
+            roadmapBlock(`p-roadmap-${idx}`, aiProblem.roadmap),
+            cardText(
+              `p-service-${idx}`,
+              `Servicio Vertex: ${
+                aiServiceById.get(Number(problem.id)) || problem.vertexService
+              }`,
+            ),
+          ],
+        });
+      }),
+      sectionHeader("sec-e-header", "E. PRÓXIMOS PASOS", 14),
+      ctaBox,
+    ];
+
+    // --- RAMA FALLBACK: secciones clásicas con recomendaciones estáticas ---
+    const fallbackNotesContent = () => [
+      sectionHeader(
+        "sec-c-header",
+        "C. DIAGNÓSTICO DE PROBLEMAS CONFIRMADOS",
+        10,
+      ),
+      ...markedProblems.map((problem, idx) =>
+        problemCard({
+          keyPrefix: `m-${idx}`,
+          accentColor: "#1e3a8a",
+          children: [
             h(
               Text,
               {
@@ -181,68 +476,28 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                   color: "#1e3a8a",
                 },
               },
-              p.name,
+              `${problem.name} (Confirmado)`,
             ),
-            h(
-              Text,
-              {
-                key: `m-rec-${idx}`,
-                style: {
-                  fontSize: 9,
-                  color: "#334155",
-                  marginTop: 6,
-                  marginLeft: 12,
-                  lineHeight: 1.4,
-                },
-              },
-              `Recomendación: ${p.recommendation}`,
+            cardText(
+              `m-rec-${idx}`,
+              `Recomendación: ${problem.recommendation}`,
             ),
           ],
-        ),
-      ]),
-      // --- SECCIÓN D: DETECCIÓN INTELIGENTE ---
+        }),
+      ),
       ...(detectedProblems.length > 0 || leadData.freeText || leadData.free_text
         ? [
-            h(
-              View,
-              {
-                key: "sec-d-header",
-                style: {
-                  borderBottomWidth: 1,
-                  borderBottomColor: "#cbd5e1",
-                  paddingBottom: 4,
-                  marginTop: 14,
-                  marginBottom: 10,
-                },
-              },
-              h(
-                Text,
-                {
-                  style: {
-                    fontFamily: "Helvetica-Bold",
-                    fontSize: 11,
-                    color: "#1e3a8a",
-                  },
-                },
-                "D. DETECCIÓN INTELIGENTE (SUGERENCIAS DEL MOTOR)",
-              ),
+            sectionHeader(
+              "sec-d-header",
+              "D. DETECCIÓN INTELIGENTE (SUGERENCIAS DEL MOTOR)",
+              14,
             ),
             ...(detectedProblems.length > 0
-              ? detectedProblems.flatMap((p, idx) => [
-                  h(
-                    View,
-                    {
-                      key: `d-card-${idx}`,
-                      style: {
-                        backgroundColor: "#f8fafc",
-                        borderLeftWidth: 3,
-                        borderLeftColor: "#d97706",
-                        padding: 10,
-                        borderRadius: 4,
-                        marginBottom: 10,
-                      },
-                    },
-                    [
+              ? detectedProblems.map((problem, idx) =>
+                  problemCard({
+                    keyPrefix: `d-${idx}`,
+                    accentColor: "#d97706",
+                    children: [
                       h(
                         Text,
                         {
@@ -253,40 +508,20 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                             color: "#d97706",
                           },
                         },
-                        `Detectamos también que podrías estar experimentando: ${p.name}`,
+                        `Detectamos también que podrías estar experimentando: ${problem.name} (Sugerido)`,
                       ),
-                      h(
-                        Text,
-                        {
-                          key: `d-rec-${idx}`,
-                          style: {
-                            fontSize: 9,
-                            color: "#334155",
-                            marginTop: 6,
-                            marginLeft: 12,
-                            lineHeight: 1.4,
-                          },
-                        },
-                        `Recomendación: ${p.recommendation}`,
+                      cardText(
+                        `d-rec-${idx}`,
+                        `Recomendación: ${problem.recommendation}`,
                       ),
                     ],
-                  ),
-                ])
+                  }),
+                )
               : [
-                  h(
-                    View,
-                    {
-                      key: "d-card-freetext",
-                      style: {
-                        backgroundColor: "#f8fafc",
-                        borderLeftWidth: 3,
-                        borderLeftColor: "#d97706",
-                        padding: 10,
-                        borderRadius: 4,
-                        marginBottom: 10,
-                      },
-                    },
-                    [
+                  problemCard({
+                    keyPrefix: "d-freetext",
+                    accentColor: "#d97706",
+                    children: [
                       h(
                         Text,
                         {
@@ -299,49 +534,19 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
                         },
                         "Análisis de texto libre:",
                       ),
-                      h(
-                        Text,
-                        {
-                          key: "d-rec-freetext",
-                          style: {
-                            fontSize: 9,
-                            color: "#334155",
-                            marginTop: 6,
-                            marginLeft: 12,
-                            lineHeight: 1.4,
-                          },
-                        },
+                      cardText(
+                        "d-rec-freetext",
                         "Evaluando requerimientos adicionales basados en la solicitud del cliente.",
                       ),
                     ],
-                  ),
+                  }),
                 ]),
           ]
         : []),
-      // --- SECCIÓN E: ROADMAP CONCEPTUAL Y CTA ---
-      h(
-        View,
-        {
-          key: "sec-e-header",
-          style: {
-            borderBottomWidth: 1,
-            borderBottomColor: "#cbd5e1",
-            paddingBottom: 4,
-            marginTop: 14,
-            marginBottom: 10,
-          },
-        },
-        h(
-          Text,
-          {
-            style: {
-              fontFamily: "Helvetica-Bold",
-              fontSize: 11,
-              color: "#1e3a8a",
-            },
-          },
-          "E. ROADMAP CONCEPTUAL Y LLAMADA A LA ACCIÓN (CTA)",
-        ),
+      sectionHeader(
+        "sec-e-header",
+        "E. ROADMAP CONCEPTUAL Y LLAMADA A LA ACCIÓN (CTA)",
+        14,
       ),
       h(
         Text,
@@ -409,59 +614,17 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
           ),
         ),
       ),
-      h(
-        View,
-        {
-          key: "sec-e-cta-box",
-          style: {
-            backgroundColor: "#f8fafc",
-            borderColor: "#cbd5e1",
-            borderWidth: 1,
-            borderRadius: 6,
-            padding: 12,
-            marginTop: 14,
-            borderLeftWidth: 4,
-            borderLeftColor: "#1e3a8a",
-          },
-        },
-        [
-          h(
-            Text,
-            {
-              key: "sec-e-cta-title",
-              style: {
-                fontFamily: "Helvetica-Bold",
-                fontSize: 10,
-                color: "#1e3a8a",
-                marginBottom: 4,
-              },
-            },
-            "Llamada a la Acción:",
-          ),
-          h(
-            Text,
-            {
-              key: "sec-e-cta-text",
-              style: {
-                fontSize: 9,
-                color: "#334155",
-                fontFamily: "Helvetica-Oblique",
-                lineHeight: 1.35,
-                width: "100%",
-              },
-            },
-            ctaText,
-          ),
-        ],
-      ),
+      ctaBox,
     ];
+
+    const notesContent = aiResult ? aiNotesContent() : fallbackNotesContent();
 
     const originalCreateElement = react_1.default.createElement;
     const OriginalNumberFormat = Intl.NumberFormat;
 
     try {
       // 6. Sobrescribir Intl.NumberFormat para evitar que se renderice precios
-      // @ts-ignore
+      // @ts-expect-error -- parche intencional de API global durante el render
       Intl.NumberFormat = function (locale, options) {
         if (
           options &&
@@ -476,7 +639,7 @@ async function generateDiagnosisPDF(leadData, fullProblemsList) {
       };
 
       // 7. Sobrescribir React.createElement para adaptar invoice-pdf.js
-      // @ts-ignore
+      // @ts-expect-error -- parche intencional de createElement durante el render
       react_1.default.createElement = function (type, props, ...children) {
         if (
           type === "Text" ||

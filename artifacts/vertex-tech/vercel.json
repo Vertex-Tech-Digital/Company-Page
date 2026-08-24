@@ -4,7 +4,7 @@
   "installCommand": "pnpm install --no-frozen-lockfile",
   "functions": {
     "api/diagnostico.js": {
-      "maxDuration": 15,
+      "maxDuration": 60,
       "memory": 1024
     }
   },
