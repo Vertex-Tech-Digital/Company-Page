@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, Link2, Share2 } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface CasoShareProps {
   title: string;
@@ -77,6 +78,7 @@ function TelegramIcon({ className }: { className?: string }) {
 // Comparte el link del caso en redes sociales + copiar al portapapeles.
 export function CasoShare({ title }: CasoShareProps) {
   const [copied, setCopied] = useState(false);
+  const { t } = useLanguage();
 
   const pageUrl =
     typeof window !== "undefined"
@@ -138,7 +140,7 @@ export function CasoShare({ title }: CasoShareProps) {
     >
       <span className="flex items-center gap-1.5 text-xs text-muted-foreground uppercase tracking-widest mr-2">
         <Share2 className="w-3.5 h-3.5" />
-        Compartir
+        {t("casos.share")}
       </span>
 
       {networks.map((net) => (
@@ -147,8 +149,8 @@ export function CasoShare({ title }: CasoShareProps) {
           href={net.href}
           target="_blank"
           rel="noopener noreferrer"
-          title={`Compartir en ${net.name}`}
-          aria-label={`Compartir en ${net.name}`}
+          title={`${t("casos.shareOn")} ${net.name}`}
+          aria-label={`${t("casos.shareOn")} ${net.name}`}
           className="p-2 rounded-lg border border-border text-muted-foreground hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-colors"
         >
           {net.icon}
@@ -157,8 +159,8 @@ export function CasoShare({ title }: CasoShareProps) {
 
       <button
         onClick={copyLink}
-        title="Copiar enlace"
-        aria-label="Copiar enlace"
+        title={t("casos.copyLink")}
+        aria-label={t("casos.copyLink")}
         className={`p-2 rounded-lg border transition-colors ${
           copied
             ? "border-green-500/40 text-green-400 bg-green-400/10"

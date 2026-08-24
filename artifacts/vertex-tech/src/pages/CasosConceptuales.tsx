@@ -1,10 +1,11 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Briefcase } from "lucide-react";
+import { Briefcase, Loader2 } from "lucide-react";
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
 import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 import { CasoCard, type CasoPreview } from "@/components/sections/CasoCard";
-import { casos } from "@/content/casos";
+import { getCasos } from "@/content/casos";
 import { useLanguage } from "@/context/LanguageContext";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -21,19 +22,32 @@ function formatDate(dateStr: string, lang: string): string {
 // ── Componente principal ─────────────────────────────────────────────────────
 
 // Listado público de Casos Conceptuales: ejemplos estáticos (MDX) que sirven
-// de guía a los clientes. Sin base de datos — el contenido vive en el repo.
+// de guía a los clientes. Sin base de datos — el contenido vive en el repo
+// y se carga dinámicamente (chunks por caso).
 export default function CasosConceptuales() {
   const { lang } = useLanguage();
+  const [previews, setPreviews] = useState<CasoPreview[] | null>(null);
 
-  const previews: CasoPreview[] = casos.map((caso) => ({
-    slug: caso.slug,
-    coverImage: caso.cover,
-    pseudonym: caso.pseudonym,
-    tags: caso.tags,
-    title: caso.title,
-    excerpt: caso.excerpt,
-    date: formatDate(caso.date, lang),
-  }));
+  useEffect(() => {
+    let alive = true;
+    getCasos(lang).then((casos) => {
+      if (!alive) return;
+      setPreviews(
+        casos.map((caso) => ({
+          slug: caso.slug,
+          coverImage: caso.cover,
+          pseudonym: caso.pseudonym,
+          tags: caso.tags,
+          title: caso.title,
+          excerpt: caso.excerpt,
+          date: formatDate(caso.date, lang),
+        })),
+      );
+    });
+    return () => {
+      alive = false;
+    };
+  }, [lang]);
 
   return (
     <main className="min-h-screen text-foreground font-sans">
@@ -88,8 +102,18 @@ export default function CasosConceptuales() {
       {/* Grid de casos */}
       <section className="pb-24 relative z-10">
         <div className="container mx-auto px-6">
+          {/* Estado: cargando chunks MDX */}
+          {previews === null && (
+            <div className="py-20 flex justify-center">
+              <Loader2
+                className="w-8 h-8 animate-spin text-primary"
+                aria-label={lang === "es" ? "Cargando" : "Loading"}
+              />
+            </div>
+          )}
+
           {/* Estado: sin casos */}
-          {previews.length === 0 && (
+          {previews !== null && previews.length === 0 && (
             <div className="text-center py-20 text-muted-foreground">
               <Briefcase className="w-10 h-10 mx-auto mb-3 opacity-30" />
               <p data-testid="casos-empty">
@@ -101,7 +125,7 @@ export default function CasosConceptuales() {
           )}
 
           {/* Grid de cards */}
-          {previews.length > 0 && (
+          {previews !== null && previews.length > 0 && (
             <div className="grid sm:grid-cols-2 gap-8">
               {previews.map((caso, index) => (
                 <CasoCard key={caso.slug} caso={caso} index={index} />

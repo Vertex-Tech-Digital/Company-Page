@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { AlertCircle, ArrowLeft, Calendar, User } from "lucide-react";
+import { AlertCircle, ArrowLeft, Calendar, Loader2, User } from "lucide-react";
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
 import { ScrollTopButton } from "@/components/sections/ScrollTopButton";
 import { CasoShare } from "@/components/sections/CasoShare";
-import { getCasoBySlug } from "@/content/casos";
+import { getCasoBySlug, type CasoEntry } from "@/content/casos";
 import { useLanguage } from "@/context/LanguageContext";
 
 function formatDate(dateStr: string, lang: string): string {
@@ -30,7 +30,24 @@ export default function CasoConceptual() {
   const [matched, params] = useRoute("/casos-conceptuales/:slug");
   const slug = matched ? params?.slug : null;
 
-  const caso = slug ? getCasoBySlug(slug) : undefined;
+  // null = cargando chunk MDX · undefined = no encontrado
+  const [caso, setCaso] = useState<CasoEntry | null | undefined>(null);
+
+  // Carga dinámica del caso al cambiar el slug o el idioma
+  useEffect(() => {
+    let alive = true;
+    if (!slug) {
+      setCaso(undefined);
+      return;
+    }
+    setCaso(null);
+    getCasoBySlug(slug, lang).then((c) => {
+      if (alive) setCaso(c ?? undefined);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [slug, lang]);
 
   // Scroll al inicio al cambiar de caso
   useEffect(() => {
@@ -39,6 +56,22 @@ export default function CasoConceptual() {
 
   function backToList() {
     setLocation("/casos-conceptuales");
+  }
+
+  // ── Estado: cargando ───────────────────────────────────────────────────────
+  if (caso === null) {
+    return (
+      <main className="min-h-screen text-foreground font-sans">
+        <PageNavbar />
+        <div className="py-40 flex justify-center">
+          <Loader2
+            className="w-8 h-8 animate-spin text-primary"
+            aria-label={lang === "es" ? "Cargando" : "Loading"}
+          />
+        </div>
+        <Footer />
+      </main>
+    );
   }
 
   // ── Estado: no encontrado ────────────────────────────────────────────────────
