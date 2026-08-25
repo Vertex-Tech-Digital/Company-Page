@@ -41,7 +41,7 @@ export function Navbar() {
   const navLinks = [
     { id: "inicio", href: "#inicio" },
     { id: "servicios", href: "#servicios" },
-    { id: "proyectos", href: "#proyectos" },
+    // { id: "proyectos", href: "#proyectos" }, // oculto temporalmente
     { id: "metodologia", href: "#metodologia" },
   ];
 

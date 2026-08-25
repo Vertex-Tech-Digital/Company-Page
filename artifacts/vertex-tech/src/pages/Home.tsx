@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/sections/Navbar";
 import { Hero } from "@/components/sections/Hero";
 import { Services } from "@/components/sections/Services";
-import { Projects } from "@/components/sections/Projects";
+// import { Projects } from "@/components/sections/Projects"; // oculto temporalmente
 import { Methodology } from "@/components/sections/Methodology";
 import { WhyUs } from "@/components/sections/WhyUs";
 import { Contact } from "@/components/sections/Contact";
@@ -36,7 +36,7 @@ export default function Home() {
         <Navbar />
         <Hero />
         <Services />
-        <Projects />
+        {/* <Projects /> oculto temporalmente */}
         <Methodology />
         <WhyUs />
         <Contact />
