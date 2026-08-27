@@ -60,8 +60,12 @@ export function Navbar() {
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        // Sin backdrop-blur por debajo de md (768px): este navbar queda fijo
+        // sobre el canvas de ParticleNetwork, que se redibuja 60x/seg. El
+        // backdrop-filter tiene que re-muestrear ese fondo en cada frame, así
+        // que en pantallas chicas se cambia por un fondo sólido (sin blur).
         isScrolled
-          ? "bg-background/80 backdrop-blur-md border-b border-border/50"
+          ? "bg-background/95 md:bg-background/80 md:backdrop-blur-md border-b border-border/50"
           : "bg-transparent"
       }`}
     >
