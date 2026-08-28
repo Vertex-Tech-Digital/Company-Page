@@ -21,10 +21,14 @@ const {
   integer,
   text,
   boolean,
+  jsonb,
 } = require("drizzle-orm/pg-core");
 
-const { analyzeFreeText } = require("../src/utils/analyzeFreeText");
 const { problemsData } = require("../src/data/problemsData");
+const {
+  validateInputRequirements,
+} = require("../src/utils/diagnosisValidation");
+const { resolveDiagnosis } = require("../src/utils/diagnosisEngine");
 
 // Instancia de XSS configurada para descartar estrictamente todas las etiquetas
 const xssFilter = new xss.FilterXSS({
@@ -47,6 +51,8 @@ const leadStatusEnum = pgEnum("lead_status", [
   "cerrado",
 ]);
 
+const diagnosisSourceEnum = pgEnum("diagnosis_source", ["ai", "fallback"]);
+
 const leadsTable = pgTable("leads", {
   id: uuid("id").primaryKey().defaultRandom(),
   createdAt: timestamp("created_at", { withTimezone: true })
@@ -63,6 +69,10 @@ const leadsTable = pgTable("leads", {
   contactPreference: contactPreferenceEnum("contact_preference").notNull(),
   status: leadStatusEnum("status").notNull().default("nuevo"),
   pdfSent: boolean("pdf_sent").notNull().default(false),
+  diagnosisSource: diagnosisSourceEnum("diagnosis_source"),
+  aiDiagnosis: text("ai_diagnosis"),
+  aiRoadmap: jsonb("ai_roadmap"),
+  aiModel: varchar("ai_model", { length: 100 }),
 });
 
 let dbInstance = null;
@@ -76,7 +86,7 @@ function getDatabaseClient() {
       connectionString.trim() === ""
     ) {
       throw new Error(
-        `La variable de entorno DATABASE_URL no es válida o está vacía: "${connectionString}"`,
+        "Configuración de base de datos no disponible o inválida",
       );
     }
     dbInstance = drizzle(connectionString);
@@ -227,6 +237,13 @@ module.exports = async function handler(req, res) {
     const cleanFreeText = sanitizeString(free_text);
     const cleanContactPreference = sanitizeString(contact_preference);
     const cleanPhone = phone ? sanitizeString(phone) : "";
+    const inputError = validateInputRequirements(
+      marked_problems,
+      cleanFreeText,
+    );
+    if (inputError) {
+      return res.status(400).json({ error: inputError });
+    }
     const htmlCompanyName = escapeHtml(cleanCompanyName);
     const htmlSector = escapeHtml(cleanSector);
     const htmlSize = escapeHtml(cleanSize);
@@ -235,8 +252,22 @@ module.exports = async function handler(req, res) {
     const htmlContactPreference = escapeHtml(cleanContactPreference);
     const htmlFreeText = escapeHtml(cleanFreeText);
 
-    // 3. Procesamiento
-    const detectedProblems = analyzeFreeText(cleanFreeText, marked_problems);
+    // 3. Procesamiento: pipeline en cascada resiliente
+    // (Gemini -> OpenRouter -> Fallback determinista local). Nunca lanza 500
+    // por fallo de IA: el lead se captura igualmente con source 'fallback'.
+    const diagnosis = await resolveDiagnosis({
+      formData: {
+        company_name: cleanCompanyName,
+        sector: cleanSector,
+        size: cleanSize,
+        free_text: cleanFreeText,
+      },
+      markedProblemIds: marked_problems,
+    });
+    const diagnosisSource = diagnosis.source;
+    const { detectedProblems, aiDiagnosis, aiRoadmap, aiModel, aiProvider } =
+      diagnosis;
+
     const db = getDatabaseClient();
 
     // Insertar inicialmente con pdfSent = false
@@ -254,6 +285,10 @@ module.exports = async function handler(req, res) {
         contactPreference: cleanContactPreference,
         status: "nuevo",
         pdfSent: false,
+        diagnosisSource,
+        aiDiagnosis,
+        aiRoadmap,
+        aiModel,
       })
       .returning();
 
@@ -269,6 +304,9 @@ module.exports = async function handler(req, res) {
       phone: cleanPhone,
       contactPreference: cleanContactPreference,
       createdAt: insertedLead.createdAt,
+      diagnosisSource,
+      aiDiagnosis,
+      aiRoadmap,
     };
 
     let pdfBuffer = null;
@@ -428,6 +466,7 @@ module.exports = async function handler(req, res) {
                     <tr><td style="padding: 6px; font-weight: bold;">Problemas Detectados:</td><td>${htmlDetectedProblemsNames || "Ninguno detectado automáticamente"}</td></tr>
                     <tr><td style="padding: 6px; font-weight: bold;">PDF Generado:</td><td>${pdfAttached ? "Sí" : "Falló (Ver logs)"}</td></tr>
                   </table>
+                  <p><strong>Origen del diagnóstico:</strong> ${escapeHtml(diagnosisSource)}${aiProvider ? ` (${escapeHtml(aiProvider)}${aiModel ? ` · ${escapeHtml(aiModel)}` : ""})` : ""}</p>
                   <p><strong>Mensaje del cliente:</strong></p>
                   <blockquote style="background: #f3f4f6; padding: 10px; border-left: 4px solid #2563eb;">${htmlFreeText || "Sin comentarios."}</blockquote>
                 </div>
@@ -474,3 +513,4 @@ module.exports = async function handler(req, res) {
 module.exports.escapeHtml = escapeHtml;
 module.exports.sanitizeHeaderValue = sanitizeHeaderValue;
 module.exports.sanitizeString = sanitizeString;
+module.exports.getDatabaseClient = getDatabaseClient;

@@ -6,7 +6,8 @@
     "dev": "vite --config vite.config.mts --host 0.0.0.0",
     "build": "vite build --config vite.config.mts",
     "serve": "vite preview --config vite.config.mts --host 0.0.0.0",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/**/*.test.js"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -78,6 +79,7 @@
     "zod": "catalog:"
   },
   "dependencies": {
+    "@google/genai": "^2.19.0",
     "@stripe/react-stripe-js": "^6.6.0",
     "@stripe/stripe-js": "^9.8.0",
     "@tiptap/extension-character-count": "^3.27.4",
