@@ -83,7 +83,7 @@ export function CasoShare({ title }: CasoShareProps) {
   const pageUrl =
     typeof window !== "undefined"
       ? window.location.href
-      : "https://vertextech.digital/casos-conceptuales";
+      : "https://vertextechdigital.com/casos-conceptuales";
   const encodedUrl = encodeURIComponent(pageUrl);
   const encodedTitle = encodeURIComponent(title);
 

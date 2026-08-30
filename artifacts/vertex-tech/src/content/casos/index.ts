@@ -35,6 +35,11 @@ export interface CasoMeta {
   cover: string;
 }
 
+/** Metadata ligera de un caso, tal como la expone el listado (sin body) */
+export interface CasoPreviewData extends CasoMeta {
+  slug: string;
+}
+
 export interface CasoEntry extends CasoMeta {
   slug: string;
   Component: ComponentType;
@@ -45,14 +50,12 @@ interface MdxModule {
   default: ComponentType;
 }
 
-interface LoadedFile {
-  slug: string;
-  lang: CaseLanguage;
-  meta: CasoMeta;
-  Component: ComponentType;
-}
-
-const modules = import.meta.glob<MdxModule>("./*.mdx");
+// Metadata única del listado: `import: "meta"` tree-shakea el body del MDX,
+// de modo que el listado no descarga ni compila el cuerpo de los casos.
+type MetaModule = { meta: CasoMeta };
+const metaModules = import.meta.glob<MetaModule>("./*.mdx", { import: "meta" });
+// Módulo completo (body + meta) solo para la página de detalle individual.
+const fullModules = import.meta.glob<MdxModule>("./*.mdx");
 
 function parsePath(path: string): { slug: string; lang: CaseLanguage } {
   const file = path.split("/").pop() ?? "";
@@ -71,40 +74,47 @@ function score(lang: CaseLanguage, wanted: CaseLanguage): number {
 /**
  * Todos los casos, ordenados por fecha descendente, en el idioma pedido.
  * Si un caso no tiene traducción para `lang`, cae a la versión española.
+ *
+ * Devuelve SOLO metadata (sin `Component`): el body se carga únicamente en la
+ * página de detalle a través de `getCasoBySlug`. Esto evita descargar y
+ * compilar el contenido de todos los MDX para renderizar el listado.
  */
 export async function getCasos(
   lang: CaseLanguage = "es",
-): Promise<CasoEntry[]> {
-  const loaded: LoadedFile[] = await Promise.all(
-    Object.entries(modules).map(async ([path, load]) => {
+): Promise<CasoPreviewData[]> {
+  const loaded = await Promise.all(
+    Object.entries(metaModules).map(async ([path, load]) => {
       const { slug, lang: fileLang } = parsePath(path);
-      const mod = await load();
-      return { slug, lang: fileLang, meta: mod.meta, Component: mod.default };
+      const { meta } = await load();
+      return { slug, lang: fileLang, meta };
     }),
   );
 
-  const bestBySlug = new Map<string, LoadedFile>();
-  for (const file of loaded) {
-    const current = bestBySlug.get(file.slug);
-    if (!current || score(file.lang, lang) > score(current.lang, lang)) {
-      bestBySlug.set(file.slug, file);
+  const bestBySlug = new Map<
+    string,
+    { slug: string; meta: CasoMeta; lang: CaseLanguage }
+  >();
+  for (const { slug, lang: fileLang, meta } of loaded) {
+    const current = bestBySlug.get(slug);
+    if (!current || score(fileLang, lang) > score(current.lang, lang)) {
+      bestBySlug.set(slug, { slug, meta, lang: fileLang });
     }
   }
 
   return [...bestBySlug.values()]
-    .map(({ slug, meta, Component }) => ({ slug, ...meta, Component }))
+    .map(({ slug, meta }) => ({ slug, ...meta }))
     .sort((a, b) => b.date.localeCompare(a.date));
 }
 
 /**
  * Un caso por slug en el idioma pedido (undefined si no existe).
- * Solo carga del disco los chunks necesarios para ese slug.
+ * Carga del disco los chunks necesarios (body + meta) para ese slug.
  */
 export async function getCasoBySlug(
   slug: string,
   lang: CaseLanguage = "es",
 ): Promise<CasoEntry | undefined> {
-  const candidates = Object.entries(modules).filter(
+  const candidates = Object.entries(fullModules).filter(
     ([path]) => parsePath(path).slug === slug,
   );
   if (candidates.length === 0) return undefined;
