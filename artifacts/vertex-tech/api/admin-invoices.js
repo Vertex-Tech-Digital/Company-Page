@@ -1,5 +1,6 @@
 // GET /api/admin-invoices            -> lista de facturas emitidas (metadatos)
-// GET /api/admin-invoices?id=5&pdf=1 -> regenera y devuelve el PDF (base64) de esa factura
+// GET /api/admin-invoices?id=5&pdf=1 -> devuelve el PDF de esa factura como
+//                                       application/pdf (binario, no base64)
 //
 // El PDF no se almacena: se regenera al vuelo desde los datos guardados.
 // Requiere: Authorization: Bearer <token>
@@ -68,10 +69,17 @@ module.exports = async function handler(req, res) {
         taxRate: Number(inv.tax_rate),
         totals,
       });
-      return res.status(200).json({
-        invoiceNumber: inv.invoice_number,
-        pdfBase64: pdf.toString("base64"),
-      });
+      // Se devuelve el PDF como binario en vez de base64 dentro de un JSON:
+      // evita inflar ~33% el tamaño y que un documento fiscal completo viaje
+      // dentro de una respuesta JSON cacheable. Las cabeceras de no-store ya
+      // las puso verifyAuth.
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="Factura-${inv.invoice_number}.pdf"`,
+      );
+      res.setHeader("Content-Length", pdf.length);
+      return res.status(200).end(pdf);
     }
 
     // ── Listado de facturas emitidas ──────────────────────────────────────────

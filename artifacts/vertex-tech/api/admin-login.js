@@ -13,6 +13,7 @@
 const { pool } = require("../server/db.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { setNoStoreHeaders } = require("./_auth");
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -21,6 +22,11 @@ function getJwtSecret() {
 }
 
 module.exports = async function handler(req, res) {
+  // Esta ruta no pasa por verifyAuth (es la que emite el token), así que
+  // pone las cabeceras por su cuenta: la respuesta lleva un JWT y no debe
+  // quedar en el caché del navegador ni de ningún proxy intermedio.
+  setNoStoreHeaders(res);
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }

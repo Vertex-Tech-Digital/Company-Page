@@ -8,7 +8,29 @@
 
 const jwt = require("jsonwebtoken");
 
+// Impide que las respuestas administrativas (NIF, razón social, facturas,
+// importes) queden almacenadas en el navegador o en cualquier proxy/CDN
+// intermedio, desde donde podrían servirse a otro usuario.
+//
+// - no-store: no guardar la respuesta en ningún caché, ni en disco ni en RAM.
+// - no-cache / must-revalidate: revalidar siempre contra el origen.
+// - private: refuerza que ningún caché compartido (proxy, CDN) la guarde.
+// - Pragma/Expires: equivalentes en HTTP/1.0, para proxies antiguos que
+//   ignoran Cache-Control.
+function setNoStoreHeaders(res) {
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, private",
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+}
+
 function verifyAuth(req, res) {
+  // Se aplican antes de cualquier return: tanto la respuesta con datos como
+  // los 401 de credenciales inválidas salen con las cabeceras puestas.
+  setNoStoreHeaders(res);
+
   const authHeader = req.headers?.authorization ?? "";
 
   if (!authHeader.startsWith("Bearer ")) {
@@ -29,4 +51,4 @@ function verifyAuth(req, res) {
   }
 }
 
-module.exports = { verifyAuth };
+module.exports = { verifyAuth, setNoStoreHeaders };
