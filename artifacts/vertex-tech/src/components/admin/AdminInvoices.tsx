@@ -29,6 +29,7 @@ const LIST_ENDPOINT = `${import.meta.env.BASE_URL}api/admin-invoices`;
 
 type LineItem = { description: string; quantity: number; unitPrice: number };
 interface CreateInvoiceResponse {
+  id: number;
   invoiceNumber: string;
   status: string;
   issueDate: string;
@@ -37,7 +38,6 @@ interface CreateInvoiceResponse {
   total: number;
   emailSent?: boolean;
   pdfError?: boolean;
-  pdfBase64?: string;
 }
 interface InvoiceRow {
   id: number;
@@ -52,9 +52,23 @@ interface InvoiceRow {
 
 const emptyItem: LineItem = { description: "", quantity: 1, unitPrice: 0 };
 
-function downloadPdf(base64: string, invoiceNumber: string) {
-  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-  const blob = new Blob([bytes], { type: "application/pdf" });
+// Descarga el PDF desde la ruta autenticada, que ahora lo devuelve como
+// application/pdf binario (antes venía en base64 dentro de un JSON).
+async function downloadInvoicePdf(
+  id: number,
+  invoiceNumber: string,
+  token: string,
+) {
+  const res = await fetch(`${LIST_ENDPOINT}?id=${id}&pdf=1`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    // Los errores del endpoint siguen viniendo en JSON.
+    const d = await res.json().catch(() => ({}));
+    throw new Error(d.error || "No se pudo generar el PDF.");
+  }
+
+  const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -476,7 +490,7 @@ function InvoiceForm({ token }: { token: string }) {
         </Button>
       </form>
 
-      {lastInvoice?.pdfBase64 && (
+      {lastInvoice && !lastInvoice.pdfError && (
         <div className="mt-6 flex items-center justify-between bg-card/50 border border-border p-4 rounded-xl">
           <span className="text-sm text-white">
             Factura <b>{lastInvoice.invoiceNumber}</b> generada.
@@ -486,9 +500,24 @@ function InvoiceForm({ token }: { token: string }) {
             variant="outline"
             size="sm"
             className="gap-1"
-            onClick={() =>
-              downloadPdf(lastInvoice.pdfBase64!, lastInvoice.invoiceNumber)
-            }
+            onClick={async () => {
+              try {
+                await downloadInvoicePdf(
+                  lastInvoice.id,
+                  lastInvoice.invoiceNumber,
+                  token,
+                );
+              } catch (e) {
+                toast({
+                  variant: "destructive",
+                  title: "Error",
+                  description:
+                    e instanceof Error
+                      ? e.message
+                      : "No se pudo descargar el PDF.",
+                });
+              }
+            }}
           >
             <Download className="w-4 h-4" /> Descargar PDF
           </Button>
@@ -518,13 +547,7 @@ function InvoicesList({ token }: { token: string }) {
   async function download(id: number, invoiceNumber: string) {
     setDownloadingId(id);
     try {
-      const res = await fetch(`${LIST_ENDPOINT}?id=${id}&pdf=1`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const d = await res.json().catch(() => ({}));
-      if (!res.ok || !d.pdfBase64)
-        throw new Error(d.error || "No se pudo generar el PDF.");
-      downloadPdf(d.pdfBase64, invoiceNumber);
+      await downloadInvoicePdf(id, invoiceNumber, token);
     } catch (e) {
       toast({
         variant: "destructive",
