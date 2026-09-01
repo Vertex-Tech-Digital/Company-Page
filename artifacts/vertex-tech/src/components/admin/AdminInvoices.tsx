@@ -69,7 +69,7 @@ function isoToEs(iso: string) {
   return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
 }
 
-export function AdminInvoices({ token }: { token: string }) {
+export function AdminInvoices() {
   const [tab, setTab] = useState<"emit" | "list">("emit");
 
   return (
@@ -93,16 +93,12 @@ export function AdminInvoices({ token }: { token: string }) {
         </Button>
       </div>
 
-      {tab === "emit" ? (
-        <InvoiceForm token={token} />
-      ) : (
-        <InvoicesList token={token} />
-      )}
+      {tab === "emit" ? <InvoiceForm /> : <InvoicesList />}
     </div>
   );
 }
 
-function InvoiceForm({ token }: { token: string }) {
+function InvoiceForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -147,10 +143,8 @@ function InvoiceForm({ token }: { token: string }) {
     ): Promise<CreateInvoiceResponse> => {
       const res = await fetch(CREATE_ENDPOINT, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           client: { legalName, nif, email, address },
           items,
@@ -498,7 +492,7 @@ function InvoiceForm({ token }: { token: string }) {
   );
 }
 
-function InvoicesList({ token }: { token: string }) {
+function InvoicesList() {
   const { toast } = useToast();
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
@@ -506,7 +500,7 @@ function InvoicesList({ token }: { token: string }) {
     queryKey: ["admin-invoices"],
     queryFn: async (): Promise<InvoiceRow[]> => {
       const res = await fetch(LIST_ENDPOINT, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       const d = await res.json().catch(() => ({}));
       if (!res.ok)
@@ -519,7 +513,7 @@ function InvoicesList({ token }: { token: string }) {
     setDownloadingId(id);
     try {
       const res = await fetch(`${LIST_ENDPOINT}?id=${id}&pdf=1`, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       const d = await res.json().catch(() => ({}));
       if (!res.ok || !d.pdfBase64)

@@ -1,9 +1,9 @@
-const { pool } = require("../server/db.js");
-const { verifyAuth } = require("./_auth");
+const { pool } = require("../../server/db.js");
+const { verifyAuth } = require("../_auth");
 
 module.exports = async function handler(req, res) {
   // Verificar autenticación en todos los métodos
-  const payload = verifyAuth(req, res);
+  const payload = await verifyAuth(req, res);
   if (!payload) return;
 
   if (!process.env.DATABASE_URL) {

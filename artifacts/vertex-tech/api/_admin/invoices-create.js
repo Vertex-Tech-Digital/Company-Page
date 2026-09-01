@@ -117,7 +117,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
 
-  const auth = verifyAuth(req, res);
+  const auth = await verifyAuth(req, res);
   if (!auth) return; // verifyAuth ya respondió 401
 
   if (!process.env.DATABASE_URL) {

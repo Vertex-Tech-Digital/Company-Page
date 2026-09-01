@@ -32,7 +32,23 @@ export function devApiPlugin() {
         const url = req.url || "";
         if (!url.startsWith("/api/")) return next();
 
-        const name = url.split("?")[0].replace(/^\/api\//, "");
+        const rawName = url.split("?")[0].replace(/^\/api\//, "");
+
+        // Réplica de los rewrites de vercel.json: los 7 endpoints de admin
+        // viven consolidados en un único archivo (api/admin.js) para no
+        // pasarse del límite de funciones serverless de Vercel — ver ese
+        // archivo y vercel.json.
+        let name = rawName;
+        let injectedAction = null;
+        const adminMatch = rawName.match(/^admin-(.+)$/);
+        if (adminMatch) {
+          name = "admin";
+          injectedAction = adminMatch[1];
+        } else if (rawName === "invoices/create") {
+          name = "admin";
+          injectedAction = "invoices-create";
+        }
+
         let file = path.join(root, "api", `${name}.js`);
         let isTs = false;
         if (!fs.existsSync(file)) {
@@ -54,27 +70,11 @@ export function devApiPlugin() {
         } else {
           req.query = {};
         }
-
-        // Body JSON (las funciones esperan req.body ya parseado, estilo Vercel).
-        // Incluye POST, PUT y PATCH — todos pueden llevar body.
-        let body = {};
-        if (
-          req.method === "POST" ||
-          req.method === "PUT" ||
-          req.method === "PATCH"
-        ) {
-          const chunks = [];
-          for await (const chunk of req) chunks.push(chunk);
-          const raw = Buffer.concat(chunks).toString("utf8");
-          try {
-            body = raw ? JSON.parse(raw) : {};
-          } catch {
-            body = {};
-          }
+        if (injectedAction) {
+          req.query.action = injectedAction;
         }
 
         // Shim de req/res al estilo de las funciones de Vercel.
-        req.body = body;
         res.status = (code) => {
           res.statusCode = code;
           return res;
@@ -93,9 +93,35 @@ export function devApiPlugin() {
           delete require.cache[require.resolve(file)];
           const handlerModule = require(file);
           const handler = handlerModule.default || handlerModule;
+
+          // Réplica del convenio de Vercel: un handler puede exportar
+          // `config.api.bodyParser = false` para leer el body crudo él
+          // mismo (necesario para verificar firmas, ej. stripe-webhook.js).
+          // Si no, parseamos JSON como siempre.
+          const bodyParserDisabled =
+            handlerModule.config?.api?.bodyParser === false;
+
+          if (
+            !bodyParserDisabled &&
+            (req.method === "POST" ||
+              req.method === "PUT" ||
+              req.method === "PATCH")
+          ) {
+            const chunks = [];
+            for await (const chunk of req) chunks.push(chunk);
+            const raw = Buffer.concat(chunks).toString("utf8");
+            try {
+              req.body = raw ? JSON.parse(raw) : {};
+            } catch {
+              req.body = {};
+            }
+          } else if (!bodyParserDisabled) {
+            req.body = {};
+          }
+
           await handler(req, res);
         } catch (err) {
-          console.error(`[dev-api] error en /api/${name}:`, err);
+          console.error(`[dev-api] error en /api/${rawName}:`, err);
           if (!res.headersSent) {
             res.statusCode = 500;
             res.end(JSON.stringify({ error: "Dev API error" }));

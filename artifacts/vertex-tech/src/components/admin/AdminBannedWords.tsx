@@ -17,11 +17,7 @@ interface BannedWord {
   created_at: string;
 }
 
-interface AdminBannedWordsProps {
-  token: string;
-}
-
-export function AdminBannedWords({ token }: AdminBannedWordsProps) {
+export function AdminBannedWords() {
   const [words, setWords] = useState<BannedWord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +36,7 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
     setError(null);
     try {
       const res = await fetch("/api/admin-moderation?resource=words", {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
@@ -50,7 +46,7 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchWords();
@@ -94,7 +90,7 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
         `/api/admin-moderation?resource=words&id=${id}`,
         {
           method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         },
       );
       if (!delRes.ok)
@@ -103,10 +99,8 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
       // 2. Insertar la nueva
       const addRes = await fetch("/api/admin-moderation?resource=words", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ word: trimmed }),
       });
       const addData = await addRes.json();
@@ -140,10 +134,8 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
     try {
       const res = await fetch("/api/admin-moderation?resource=words", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ word: newWord.trim() }),
       });
       const data = await res.json();
@@ -168,7 +160,7 @@ export function AdminBannedWords({ token }: AdminBannedWordsProps) {
     try {
       const res = await fetch(`/api/admin-moderation?resource=words&id=${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       if (!res.ok) throw new Error();
       setWords((prev) => prev.filter((w) => w.id !== id));
