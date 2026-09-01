@@ -1,0 +1,55 @@
+export const meta = {
+  title:
+    "The illusion of “good enough”: the cost of cosmetic web building without technical architecture",
+  excerpt:
+    "She contracted what looked like an all-in-one digital service. What she received was a pretty façade with no engineering behind it: email that lost messages, redundant domains, and a platform that could not be scaled.",
+  pseudonym: "Entrepreneurship",
+  tags: ["Technology", "Services", "Entrepreneurship"],
+  date: "2026-08-22",
+  cover: "/images/casos/caso-conceptual-no1/portada.webp",
+};
+
+## Prologue: the “all-in-one” trap and the entrepreneur's illusion
+
+Every business venture is born with an immense dose of excitement. When someone close to us decided to take the leap and open the doors of her own business —a carefully curated shop focused on botany and natural decoration—, she knew that a digital presence was not a luxury, but a pressing necessity.
+
+With no prior experience in the tech sector and driven by the urgency to get started, she made a mistake that is extremely common among entrepreneurs: searching the internet and being swayed by attractive advertising claims. She found a provider promising a comprehensive service: brand design, «professional» website development, SEO positioning, and systems setup. To anyone outside the industry, the proposal seemed perfect, and the fee —although considerable— was justified by the promise of delivering a complete system ready to invoice.
+
+What she did not know —and what the advertising never made clear— was that on the other side there was no engineering or software development team, but a graphic designer who, emboldened by how easy modern page builders make things look, had taken on a technical role for which they were not qualified. The result was a beautiful façade on foundations of clay which, shortly after going live, began to crack.
+
+> **Transparency note:** we have the explicit authorization of the protagonist of this story to share and analyze her case in a fully anonymized form. This exercise is not intended to single anyone out or assign personal blame, but to serve as reflection, guidance, and a learning lesson so that she herself —and other entrepreneurs— can learn to identify the right professionals for their business's real needs.
+
+## Project context and commercial promise
+
+The entrepreneur contracted what she believed would be her company's digital infrastructure. After paying an initial invoice and committing to recurring fees, the engagement was structured as follows:
+
+- **Visual identity design: €380** (logo creation, color palette, and graphic application manual).
+- **Web «development» and page building: €350** (creation of a website based on visual builders and templates).
+- **Maintenance, domain, and hosting: €145/year** (recurring subscription to mail servers, hosting, and domain management).
+
+At first glance, the delivered website «worked»: it looked nice in a browser, its colors matched the physical shop, and the logo looked professional. However, the gap between the visual appearance and the underlying engineering soon began to cause serious operational problems.
+
+## Technical analysis: role invasion and technical debt
+
+This case perfectly illustrates the phenomenon of **cross-role invasion**: when visual communication specialists take on system and server architecture without applying software engineering protocols or standards.
+
+| Technical dimension      | Delivered solution (non-technical provider)                                                                         | Structural risk and engineering impact                                                                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Email infrastructure     | Exclusive use of the POP3 protocol (restricting IMAP), with credentials sent in plain text by email.                | Impossible to keep the inbox in sync between mobile phone and the shop's computer. Once emails were downloaded on one device, they vanished from the others, with a high risk of permanently losing customer data and quotes. |
+| Domain strategy and SEO  | Recommendation to buy multiple secondary domains to create parallel «mini-websites» with manual redirects.          | Generated unnecessary recurring fixed costs. Instead of improving SEO, this practice harms rankings due to duplicated content and the lack of proper canonical URLs.                                                          |
+| Web architecture         | Deployment mounted on provisional test subfolders (`/wordpress24/`), heavily reliant on third-party visual plugins. | Complete absence of optimized native code. The website was extremely heavy, slow on mobile devices, and dependent on plugin updates that could break it at any moment.                                                        |
+| Security and maintenance | No Zero Trust security policies, no properly isolated certificates, and no staging environments.                    | Vulnerable to code injection, and prone to full site collapse under any traffic spike or automatic server update.                                                                                                             |
+
+## Commercial impact and financial lesson
+
+What began as a «quick and affordable» solution turned into a daily drag on the shop:
+
+1. **Operational frustration:** managing customer orders was chaotic due to emails being lost as a result of the POP3 configuration.
+2. **Inefficient recurring spend:** the client remained tied to annual invoices for redundant domains that brought no value or real traffic to the website.
+3. **Total loss of the investment:** when the shop needed to evolve —adding a payment gateway and an interactive catalogue with inventory control— extending the existing website proved impossible. The work had to be discarded entirely and the platform rebuilt from scratch under real engineering principles.
+
+## Conclusion and industry connection
+
+This real-world case backs up the conclusions drawn in our blog article «The AI paradox and digital intrusism»: cosmetic work is no substitute for engineering.
+
+Entrusting your company's technology architecture to unqualified profiles —no matter how attractive their ads may be— usually ends in a trap of technical debt and duplicated costs. We hope this experience serves as a lesson for future entrepreneurs: when it comes to building the infrastructure your business will run on, researching, verifying credentials, and hiring true software engineering professionals is not an expense —it is the only real safeguard for your investment.

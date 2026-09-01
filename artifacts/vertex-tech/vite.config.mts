@@ -1,19 +1,30 @@
-import { defineConfig } from "vite";
+import { defineConfig, type PluginOption, type UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import mdx from "@mdx-js/rollup";
+import remarkGfm from "remark-gfm";
 import path from "path";
 import { devApiPlugin } from "./dev-api-plugin.mjs";
 
-const isReplit = process.env.REPL_ID !== undefined;
-const isVercel = process.env.VERCEL === "1";
+// Retorno anotado: aplica tipado contextual y evita que literales como
+// allowedHosts: true se ensanchen a boolean (incompatible con Vite 7).
+export default defineConfig(async (): Promise<UserConfig> => {
+  const isReplit = process.env.REPL_ID !== undefined;
+  const isVercel = process.env.VERCEL === "1";
 
-const rawPort = process.env.PORT;
-const port = rawPort ? Number(rawPort) : 3000;
+  const rawPort = process.env.PORT;
+  const port = rawPort ? Number(rawPort) : 3000;
 
-const basePath = process.env.BASE_PATH ?? "/";
+  const basePath = process.env.BASE_PATH ?? "/";
 
-export default defineConfig(async () => {
-  const plugins: any[] = [react(), tailwindcss(), devApiPlugin()];
+  // Plugin MDX para los casos conceptuales estáticos (src/content/casos/*.mdx).
+  // Dependencia obligatoria: si falta el paquete, el build falla explícitamente.
+  const plugins: PluginOption[] = [
+    { enforce: "pre", ...mdx({ remarkPlugins: [remarkGfm] }) },
+    react(),
+    tailwindcss(),
+    devApiPlugin(),
+  ];
 
   if (isReplit && !isVercel) {
     const { default: runtimeErrorOverlay } =

@@ -142,7 +142,7 @@ export function Footer() {
               */}
               {[
                 { href: "#servicios", label: t("nav.servicios") },
-                { href: "#proyectos", label: t("nav.proyectos") },
+                // { href: "#proyectos", label: t("nav.proyectos") }, // oculto temporalmente
                 { href: "#metodologia", label: t("nav.metodologia") },
                 { href: "#contacto", label: t("nav.contactar") },
               ].map(({ href, label }) => (
