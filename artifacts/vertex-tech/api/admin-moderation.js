@@ -134,6 +134,17 @@ module.exports = async function handler(req, res) {
           return res.status(404).json({ error: "Comentario no encontrado" });
         }
 
+        console.info(
+          JSON.stringify({
+            logType: "audit",
+            action: "COMMENT_MODERATED",
+            status: "SUCCESS",
+            commentId: id,
+            moderationStatus: status,
+            timestamp: new Date().toISOString(),
+          }),
+        );
+
         return res.status(200).json({
           success: true,
           comment: result.rows[0],
@@ -143,7 +154,15 @@ module.exports = async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     }
   } catch (err) {
-    console.error("Error en admin-moderation:", err);
+    console.error(
+      JSON.stringify({
+        logType: "technical",
+        action: "ADMIN_MODERATION",
+        status: "FAILURE",
+        error: err instanceof Error ? err.message : "Internal Server Error",
+        timestamp: new Date().toISOString(),
+      }),
+    );
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 };

@@ -11,6 +11,10 @@ const {
   stripControlCharacters,
   sanitizeString,
   escapeHtml,
+  maskEmail,
+  maskPhone,
+  maskNif,
+  maskName,
   contactPreSchema,
   contactPostSchema,
   normalizeContactInput,
@@ -125,6 +129,35 @@ test("Sanitización: escapeHtml escapa caracteres especiales para prevención XS
     escaped,
     "&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp; &#39;test&#39;",
   );
+});
+
+// ─── Enmascaramiento de PII para Logs Operativos y Auditoría ───────────────
+
+test("PII Masking: enmascara emails correctamente", () => {
+  assert.equal(maskEmail("carlos@gmail.com"), "c***@gmail.com");
+  assert.equal(maskEmail("al@empresa.com"), "a*@empresa.com");
+  assert.equal(maskEmail("a@b.com"), "*@b.com");
+  assert.equal(maskEmail(""), "[REDACTED_EMAIL]");
+  assert.equal(maskEmail(null), "[REDACTED_EMAIL]");
+});
+
+test("PII Masking: enmascara teléfonos correctamente", () => {
+  const masked = maskPhone("+34 600 123 456");
+  assert.equal(masked, "+34 ***56");
+  assert.equal(maskPhone("123"), "[REDACTED_PHONE]");
+  assert.equal(maskPhone(null), "[REDACTED_PHONE]");
+});
+
+test("PII Masking: enmascara NIF correctamente", () => {
+  assert.equal(maskNif("12345678Z"), "123****Z");
+  assert.equal(maskNif("B12345674"), "B12****4");
+  assert.equal(maskNif("12"), "[REDACTED_NIF]");
+});
+
+test("PII Masking: enmascara nombres de personas y empresas correctamente", () => {
+  assert.equal(maskName("Carlos Santana"), "C*** S***");
+  assert.equal(maskName("Juan"), "J***");
+  assert.equal(maskName(""), "[REDACTED_NAME]");
 });
 
 // ─── Validación de Teléfonos ────────────────────────────────────────────────

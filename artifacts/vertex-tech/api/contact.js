@@ -6,6 +6,8 @@ const {
   normalizeContactInput,
   formatZodError,
   escapeHtml,
+  maskEmail,
+  maskName,
 } = require("./_validation");
 
 module.exports = async function handler(req, res) {
@@ -76,8 +78,30 @@ module.exports = async function handler(req, res) {
         </div>
       `,
     });
+
+    console.info(
+      JSON.stringify({
+        logType: "audit",
+        action: "CONTACT_FORM_SUBMITTED",
+        status: "SUCCESS",
+        actor: {
+          name: maskName(name),
+          email: maskEmail(email),
+          company: company ? maskName(company) : undefined,
+        },
+        timestamp: new Date().toISOString(),
+      }),
+    );
   } catch (err) {
-    console.error("Email send error:", err);
+    console.error(
+      JSON.stringify({
+        logType: "technical",
+        action: "CONTACT_FORM_SUBMITTED",
+        status: "FAILURE",
+        error: err instanceof Error ? err.message : "Failed to send email",
+        timestamp: new Date().toISOString(),
+      }),
+    );
     return res.status(500).json({ error: "Failed to send email" });
   }
 

@@ -9,6 +9,8 @@ const {
   commentPostSchema,
   normalizeCommentInput,
   formatZodError,
+  maskEmail,
+  maskName,
 } = require("./_validation");
 
 // ─── Filtro de palabras prohibidas ──────────────────────────────────────────
@@ -86,6 +88,21 @@ module.exports = async function handler(req, res) {
 
     const commentId = insertResult.rows[0].id;
 
+    console.info(
+      JSON.stringify({
+        logType: "audit",
+        action: "COMMENT_SUBMITTED",
+        status: "SUCCESS",
+        postId,
+        commentId,
+        actor: {
+          name: maskName(authorName),
+          email: maskEmail(authorEmail),
+        },
+        timestamp: new Date().toISOString(),
+      }),
+    );
+
     return res.status(201).json({
       success: true,
       commentId,
@@ -93,7 +110,15 @@ module.exports = async function handler(req, res) {
         "Tu comentario ha sido recibido y está pendiente de moderación. Aparecerá en breve si es aprobado.",
     });
   } catch (err) {
-    console.error("Error al guardar comentario:", err);
+    console.error(
+      JSON.stringify({
+        logType: "technical",
+        action: "COMMENT_SUBMITTED",
+        status: "FAILURE",
+        error: err instanceof Error ? err.message : "Internal Server Error",
+        timestamp: new Date().toISOString(),
+      }),
+    );
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 };

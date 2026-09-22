@@ -34,6 +34,9 @@ const {
   formatZodError,
   sanitizeString,
   escapeHtml,
+  maskEmail,
+  maskPhone,
+  maskName,
 } = require("./_validation");
 
 // Definición local del esquema para evitar dependencias externas en producción
@@ -431,6 +434,21 @@ module.exports = async function handler(req, res) {
       );
     }
 
+    console.info(
+      JSON.stringify({
+        logType: "audit",
+        action: "DIAGNOSIS_SUBMITTED",
+        status: "SUCCESS",
+        leadId: insertedLead.id,
+        actor: {
+          company: maskName(cleanCompanyName),
+          email: maskEmail(cleanEmail),
+          phone: cleanPhone ? maskPhone(cleanPhone) : undefined,
+        },
+        timestamp: new Date().toISOString(),
+      }),
+    );
+
     return res.status(201).json({
       success: true,
       leadId: insertedLead.id,
@@ -441,10 +459,18 @@ module.exports = async function handler(req, res) {
         : "Diagnóstico registrado exitosamente en el sistema.",
     });
   } catch (error) {
-    console.error("[Diagnostico API Error]:", error);
+    console.error(
+      JSON.stringify({
+        logType: "technical",
+        action: "DIAGNOSIS_SUBMITTED",
+        status: "FAILURE",
+        error: error instanceof Error ? error.message : "Internal Server Error",
+        timestamp: new Date().toISOString(),
+      }),
+    );
     return res
       .status(500)
-      .json({ error: error.message || "Internal Server Error" });
+      .json({ error: "Error interno al procesar el diagnóstico" });
   }
 };
 

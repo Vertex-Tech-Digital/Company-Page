@@ -13,6 +13,7 @@
 const { pool } = require("../server/db.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { maskName } = require("./_validation");
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -48,6 +49,16 @@ module.exports = async function handler(req, res) {
     // Respuesta genérica tanto si el usuario no existe como si la
     // contraseña es incorrecta — no damos pistas sobre cuál falló
     if (result.rows.length === 0) {
+      console.warn(
+        JSON.stringify({
+          logType: "audit",
+          action: "ADMIN_LOGIN",
+          status: "FAILURE",
+          actor: { username: maskName(username) },
+          reason: "USER_NOT_FOUND",
+          timestamp: new Date().toISOString(),
+        }),
+      );
       return res.status(401).json({ error: "Credenciales incorrectas" });
     }
 
@@ -55,6 +66,16 @@ module.exports = async function handler(req, res) {
     const passwordValid = await bcrypt.compare(password, user.password_hash);
 
     if (!passwordValid) {
+      console.warn(
+        JSON.stringify({
+          logType: "audit",
+          action: "ADMIN_LOGIN",
+          status: "FAILURE",
+          actor: { username: maskName(username) },
+          reason: "INVALID_PASSWORD",
+          timestamp: new Date().toISOString(),
+        }),
+      );
       return res.status(401).json({ error: "Credenciales incorrectas" });
     }
 
@@ -65,9 +86,27 @@ module.exports = async function handler(req, res) {
       { expiresIn: "8h" },
     );
 
+    console.info(
+      JSON.stringify({
+        logType: "audit",
+        action: "ADMIN_LOGIN",
+        status: "SUCCESS",
+        actor: { username: user.username },
+        timestamp: new Date().toISOString(),
+      }),
+    );
+
     return res.status(200).json({ token });
   } catch (err) {
-    console.error("Error en login:", err);
+    console.error(
+      JSON.stringify({
+        logType: "technical",
+        action: "ADMIN_LOGIN",
+        status: "FAILURE",
+        error: err instanceof Error ? err.message : "Internal Server Error",
+        timestamp: new Date().toISOString(),
+      }),
+    );
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 };

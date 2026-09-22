@@ -91,6 +91,50 @@ function escapeHtml(value) {
   });
 }
 
+// ─── Enmascaramiento y Redacción de PII para Logs Operativos ────────────────
+function maskEmail(email) {
+  if (!email || typeof email !== "string") return "[REDACTED_EMAIL]";
+  const trimmed = email.trim();
+  const atIndex = trimmed.indexOf("@");
+  if (atIndex <= 0) return "[REDACTED_EMAIL]";
+
+  const localPart = trimmed.slice(0, atIndex);
+  const domainPart = trimmed.slice(atIndex);
+
+  if (localPart.length === 1) {
+    return `*${domainPart}`;
+  }
+  if (localPart.length === 2) {
+    return `${localPart[0]}*${domainPart}`;
+  }
+  return `${localPart[0]}***${domainPart}`;
+}
+
+function maskPhone(phone) {
+  if (!phone || typeof phone !== "string") return "[REDACTED_PHONE]";
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 4) return "[REDACTED_PHONE]";
+
+  const start = phone.slice(0, 4);
+  const end = phone.slice(-2);
+  return `${start}***${end}`;
+}
+
+function maskNif(nif) {
+  if (!nif || typeof nif !== "string") return "[REDACTED_NIF]";
+  const clean = nif.trim();
+  if (clean.length < 4) return "[REDACTED_NIF]";
+  const start = clean.slice(0, 3);
+  const end = clean.slice(-1);
+  return `${start}****${end}`;
+}
+
+function maskName(name) {
+  if (!name || typeof name !== "string") return "[REDACTED_NAME]";
+  const words = name.trim().split(/\s+/);
+  return words.map((w) => (w.length > 0 ? `${w[0]}***` : "")).join(" ");
+}
+
 // ─── Algoritmo Oficial de Validación NIF / NIE / CIF Español ───────────────────
 const DNI_LETTERS = "TRWAGMYFPDXBNJZSQVHLCKE";
 const CIF_CONTROL_LETTERS = "JABCDEFGHI";
@@ -584,6 +628,10 @@ module.exports = {
   stripControlCharacters,
   sanitizeString,
   escapeHtml,
+  maskEmail,
+  maskPhone,
+  maskNif,
+  maskName,
   validateSpanishNif,
   validateClientTaxId,
   formatZodError,

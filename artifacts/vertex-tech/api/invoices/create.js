@@ -14,6 +14,9 @@ const {
   invoiceCreatePostSchema,
   normalizeInvoiceCreateInput,
   formatZodError,
+  maskEmail,
+  maskName,
+  maskNif,
 } = require("../_validation");
 
 /*
@@ -236,6 +239,21 @@ module.exports = async function handler(req, res) {
     console.error("Invoice email error:", err);
     emailSent = false;
   }
+
+  console.info(
+    JSON.stringify({
+      logType: "audit",
+      action: "INVOICE_CREATED",
+      status: "SUCCESS",
+      invoiceNumber,
+      actor: {
+        clientName: maskName(client.legalName),
+        clientNif: maskNif(client.nif),
+        clientEmail: maskEmail(client.email),
+      },
+      timestamp: new Date().toISOString(),
+    }),
+  );
 
   return res.status(200).json({
     invoiceNumber,
