@@ -7,6 +7,14 @@ const {
   renderInvoicePdf,
   toEsDate,
 } = require("../../server/invoice-pdf.js");
+const {
+  enforceBodyLimit,
+  INVOICE_MAX_BODY_BYTES,
+  invoiceCreatePreSchema,
+  invoiceCreatePostSchema,
+  normalizeInvoiceCreateInput,
+  formatZodError,
+} = require("../_validation");
 
 /*
  * Serverless Function (estilo Vercel) — POST /api/invoices/create
@@ -32,8 +40,6 @@ async function sendInvoiceEmail({
   const gmailPass = process.env.GMAIL_APP_PASSWORD;
   if (!gmailUser || !gmailPass) throw new Error("Email service not configured");
 
-  // Escape hatch SOLO para desarrollo tras un proxy/antivirus que intercepta TLS.
-  // NUNCA activar en producción (no poner INVOICE_SMTP_INSECURE_TLS en Vercel).
   const insecureTls = process.env.INVOICE_SMTP_INSECURE_TLS === "true";
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -69,32 +75,6 @@ async function sendInvoiceEmail({
   });
 }
 
-/* ── Validación ──────────────────────────────────────────────────────────────── */
-function validate(body) {
-  const client = body && body.client;
-  if (!client || typeof client !== "object")
-    return "Faltan los datos del cliente.";
-  if (!client.legalName || String(client.legalName).trim().length < 2)
-    return "Razón social inválida.";
-  if (!client.nif || String(client.nif).trim().length < 1)
-    return "NIF/CIF inválido.";
-  if (!client.email || !String(client.email).includes("@"))
-    return "Email de facturación inválido.";
-  if (!client.address || String(client.address).trim().length < 1)
-    return "Dirección inválida.";
-  if (!Array.isArray(body.items) || body.items.length < 1)
-    return "La factura necesita al menos una línea.";
-  for (const it of body.items) {
-    if (!it || String(it.description || "").trim().length < 1)
-      return "Cada línea necesita descripción.";
-    if (!Number.isFinite(Number(it.quantity)) || Number(it.quantity) <= 0)
-      return "Las cantidades deben ser mayores que 0.";
-    if (!Number.isFinite(Number(it.unitPrice)) || Number(it.unitPrice) < 0)
-      return "Precios unitarios inválidos.";
-  }
-  return null;
-}
-
 // Calcula el siguiente número VT-<AÑO>-<NNN> dentro de una transacción ya bloqueada.
 async function nextInvoiceNumber(dbClient, year) {
   const prefix = `VT-${year}-`;
@@ -120,32 +100,36 @@ module.exports = async function handler(req, res) {
   const auth = verifyAuth(req, res);
   if (!auth) return; // verifyAuth ya respondió 401
 
+  // 1. Límite de tamaño del body
+  if (!enforceBodyLimit(req, res, INVOICE_MAX_BODY_BYTES)) return;
+
   if (!process.env.DATABASE_URL) {
     return res.status(500).json({ error: "Base de datos no configurada" });
   }
 
-  const body = req.body || {};
-  const error = validate(body);
-  if (error) return res.status(400).json({ error });
+  // 2. Validación pre-normalización (tipos, presencia y límites de tamaño)
+  const preResult = invoiceCreatePreSchema.safeParse(req.body ?? {});
+  if (!preResult.success) {
+    return res.status(400).json({
+      error: formatZodError(preResult.error),
+      details: preResult.error.issues,
+    });
+  }
 
+  // 3. Normalización y saneamiento
+  const normalized = normalizeInvoiceCreateInput(preResult.data);
+
+  // 4. Validación post-normalización (NIF español, taxRate no negativo, fecha ISO)
+  const postResult = invoiceCreatePostSchema.safeParse(normalized);
+  if (!postResult.success) {
+    return res.status(400).json({
+      error: formatZodError(postResult.error),
+      details: postResult.error.issues,
+    });
+  }
+
+  const { client, items, taxRate, language, dueDate, notes } = postResult.data;
   const company = getCompany();
-  const language = body.language === "en" ? "en" : "es";
-  const taxRate = Number.isFinite(Number(body.taxRate))
-    ? Number(body.taxRate)
-    : 7;
-  const client = {
-    legalName: String(body.client.legalName).trim(),
-    nif: String(body.client.nif).trim(),
-    email: String(body.client.email).trim(),
-    address: String(body.client.address).trim(),
-  };
-  const items = body.items.map((it) => ({
-    description: String(it.description).trim(),
-    quantity: Number(it.quantity),
-    unitPrice: Number(it.unitPrice),
-  }));
-  const notes = body.notes ? String(body.notes) : undefined;
-  const dueDate = body.dueDate ? String(body.dueDate) : null;
   const issueDate = new Date().toISOString().slice(0, 10);
   const totals = calculateTotals(items, taxRate);
 

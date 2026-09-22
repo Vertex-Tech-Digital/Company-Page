@@ -57,6 +57,7 @@ export function devApiPlugin() {
 
         // Body JSON (las funciones esperan req.body ya parseado, estilo Vercel).
         // Incluye POST, PUT y PATCH — todos pueden llevar body.
+        const MAX_BODY_BYTES = 512 * 1024; // 512 KB
         let body = {};
         if (
           req.method === "POST" ||
@@ -64,7 +65,29 @@ export function devApiPlugin() {
           req.method === "PATCH"
         ) {
           const chunks = [];
-          for await (const chunk of req) chunks.push(chunk);
+          let totalBytes = 0;
+          let payloadTooLarge = false;
+
+          for await (const chunk of req) {
+            totalBytes += chunk.length;
+            if (totalBytes > MAX_BODY_BYTES) {
+              payloadTooLarge = true;
+              break;
+            }
+            chunks.push(chunk);
+          }
+
+          if (payloadTooLarge) {
+            res.statusCode = 413;
+            res.setHeader("Content-Type", "application/json");
+            res.end(
+              JSON.stringify({
+                error: "Payload Too Large: el tamaño de la petición supera 512 KB.",
+              }),
+            );
+            return;
+          }
+
           const raw = Buffer.concat(chunks).toString("utf8");
           try {
             body = raw ? JSON.parse(raw) : {};

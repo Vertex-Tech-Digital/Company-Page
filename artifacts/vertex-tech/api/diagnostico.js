@@ -25,17 +25,16 @@ const {
 } = require("drizzle-orm/pg-core");
 
 const { problemsData } = require("../src/data/problemsData");
-const {
-  validateInputRequirements,
-} = require("../src/utils/diagnosisValidation");
 const { resolveDiagnosis } = require("../src/utils/diagnosisEngine");
-
-// Instancia de XSS configurada para descartar estrictamente todas las etiquetas
-const xssFilter = new xss.FilterXSS({
-  whiteList: {}, // Ningún tag HTML permitido
-  stripIgnoreTag: true, // Eliminar cualquier tag no permitido junto con su contenido malicioso
-  stripIgnoreTagBody: ["script", "style", "xml", "iframe", "object"],
-});
+const {
+  enforceBodyLimit,
+  diagnosticoPreSchema,
+  diagnosticoPostSchema,
+  normalizeDiagnosticoInput,
+  formatZodError,
+  sanitizeString,
+  escapeHtml,
+} = require("./_validation");
 
 // Definición local del esquema para evitar dependencias externas en producción
 const contactPreferenceEnum = pgEnum("contact_preference", [
@@ -114,33 +113,6 @@ async function checkRateLimit(ip) {
   return await ratelimit.limit(ip);
 }
 
-function sanitizeString(str) {
-  if (typeof str !== "string") return "";
-  return (
-    xssFilter
-      .process(str)
-      // Los controles ASCII no son contenido válido para estos campos.
-      // eslint-disable-next-line no-control-regex
-      .replace(/[\u0000-\u001F\u007F]/g, "")
-      .trim()
-  );
-}
-
-// Los datos del formulario se muestran como texto dentro de correos HTML.
-// Escapar en el punto de salida evita depender de una regex como filtro XSS.
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (character) => {
-    const entities = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    };
-    return entities[character];
-  });
-}
-
 function sanitizeHeaderValue(value) {
   return String(value ?? "")
     .replace(/[\r\n]/g, " ")
@@ -151,6 +123,9 @@ module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  // Límite de tamaño del body
+  if (!enforceBodyLimit(req, res)) return;
 
   // 1. Extracción y Saneamiento Seguro de IP
   const rawIp =
@@ -178,77 +153,40 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // 2. Validación de Entrada
+    // 2. Validación de Entrada (Pre y Post Normalización con Zod)
+    const preResult = diagnosticoPreSchema.safeParse(req.body ?? {});
+    if (!preResult.success) {
+      return res.status(400).json({
+        error: "Datos de entrada inválidos o incompletos.",
+        details: formatZodError(preResult.error),
+      });
+    }
+
+    const normalized = normalizeDiagnosticoInput(preResult.data);
+    const postResult = diagnosticoPostSchema.safeParse(normalized);
+    if (!postResult.success) {
+      return res.status(400).json({
+        error: formatZodError(postResult.error),
+        details: postResult.error.issues,
+      });
+    }
+
     const {
-      company_name,
-      sector,
-      size,
-      email,
+      company_name: cleanCompanyName,
+      sector: cleanSector,
+      size: cleanSize,
+      email: cleanEmail,
+      free_text: cleanFreeText,
+      contact_preference: cleanContactPreference,
+      phone: cleanPhone,
       marked_problems,
-      free_text,
-      contact_preference,
-      phone,
-    } = req.body ?? {};
+    } = postResult.data;
 
-    if (
-      !company_name ||
-      typeof company_name !== "string" ||
-      company_name.length > 100 ||
-      !sector ||
-      typeof sector !== "string" ||
-      sector.length > 50 ||
-      !size ||
-      typeof size !== "string" ||
-      ![
-        "1-9 empleados",
-        "10-49 empleados",
-        "50-249 empleados",
-        "250+ empleados",
-      ].includes(size) ||
-      !email ||
-      typeof email !== "string" ||
-      email.length > 255 ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-      !Array.isArray(marked_problems) ||
-      !marked_problems.every(
-        (id) =>
-          Number.isInteger(id) &&
-          problemsData.some((problem) => problem.id === id),
-      ) ||
-      typeof free_text !== "string" ||
-      free_text.length > 5000 ||
-      !contact_preference ||
-      typeof contact_preference !== "string" ||
-      !["cafe", "llamada", "email"].includes(contact_preference) ||
-      (phone !== undefined &&
-        phone !== null &&
-        (typeof phone !== "string" || phone.length > 20))
-    ) {
-      return res
-        .status(400)
-        .json({ error: "Datos de entrada inválidos o incompletos." });
-    }
-
-    // Sanitización
-    const cleanCompanyName = sanitizeString(company_name);
-    const cleanSector = sanitizeString(sector);
-    const cleanSize = sanitizeString(size);
-    const cleanEmail = sanitizeString(email);
-    const cleanFreeText = sanitizeString(free_text);
-    const cleanContactPreference = sanitizeString(contact_preference);
-    const cleanPhone = phone ? sanitizeString(phone) : "";
-    const inputError = validateInputRequirements(
-      marked_problems,
-      cleanFreeText,
-    );
-    if (inputError) {
-      return res.status(400).json({ error: inputError });
-    }
     const htmlCompanyName = escapeHtml(cleanCompanyName);
     const htmlSector = escapeHtml(cleanSector);
     const htmlSize = escapeHtml(cleanSize);
     const htmlEmail = escapeHtml(cleanEmail);
-    const htmlPhone = escapeHtml(cleanPhone);
+    const htmlPhone = escapeHtml(cleanPhone || "");
     const htmlContactPreference = escapeHtml(cleanContactPreference);
     const htmlFreeText = escapeHtml(cleanFreeText);
 
