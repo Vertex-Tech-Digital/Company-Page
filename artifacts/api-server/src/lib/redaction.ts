@@ -64,7 +64,7 @@ const PII_KEYS = new Set([
   "secret",
   "authorization",
   "cookie",
-  "set-cookie",
+  "setcookie",
   "address",
   "message",
   "freetext",
