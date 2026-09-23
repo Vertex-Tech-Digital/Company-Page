@@ -1,14 +1,16 @@
 import { Router, type IRouter } from "express";
 import nodemailer from "nodemailer";
 import { z } from "zod";
+import { auditLogger } from "../lib/logger";
+import { maskEmail, maskName } from "../lib/redaction";
 
 const router: IRouter = Router();
 
 const ContactSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  company: z.string().optional(),
-  message: z.string().min(10),
+  name: z.string().min(2).max(100),
+  email: z.string().email().max(255),
+  company: z.string().max(100).optional(),
+  message: z.string().min(10).max(5000),
 });
 
 router.post("/contact", async (req, res) => {
@@ -74,10 +76,29 @@ router.post("/contact", async (req, res) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    req.log.info({ name, email }, "Contact email sent");
+    // Registro en log de auditoría sin PII en texto plano
+    auditLogger.info(
+      {
+        action: "CONTACT_FORM_SUBMITTED",
+        status: "SUCCESS",
+        actor: {
+          name: maskName(name),
+          email: maskEmail(email),
+          company: company ? maskName(company) : undefined,
+        },
+      },
+      "Contact email dispatched successfully",
+    );
     res.json({ success: true });
   } catch (err) {
-    req.log.error({ err }, "Failed to send contact email");
+    req.log.error(
+      {
+        err: err instanceof Error ? err.message : "Unknown error",
+        action: "CONTACT_FORM_SUBMITTED",
+        status: "FAILURE",
+      },
+      "Failed to send contact email",
+    );
     res
       .status(500)
       .json({ error: "No se pudo enviar el email. Inténtalo de nuevo." });

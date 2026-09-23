@@ -1,24 +1,17 @@
 // POST /api/comments
 // Recibe un comentario nuevo, aplica el filtro de palabras prohibidas,
-// y lo guarda con estado "pending" para que Anier lo modere.
-//
-// Body esperado:
-// {
-//   "postId": 1,
-//   "authorName": "Juan",
-//   "authorEmail": "juan@ejemplo.com",
-//   "content": "Gran artículo, muy útil."
-// }
+// y lo guarda con estado "pending" para que el administrador lo modere.
 
 const { pool } = require("../server/db.js");
-
-// ─── Validación básica ───────────────────────────────────────────────────────
-
-function isValidEmail(email) {
-  return (
-    typeof email === "string" && email.includes("@") && email.includes(".")
-  );
-}
+const {
+  enforceBodyLimit,
+  commentPreSchema,
+  commentPostSchema,
+  normalizeCommentInput,
+  formatZodError,
+  maskEmail,
+  maskName,
+} = require("./_validation");
 
 // ─── Filtro de palabras prohibidas ──────────────────────────────────────────
 
@@ -42,71 +35,74 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  // 1. Límite de tamaño del body
+  if (!enforceBodyLimit(req, res)) return;
+
   if (!process.env.DATABASE_URL) {
     return res.status(500).json({ error: "Base de datos no configurada" });
   }
 
-  const { postId, authorName, authorEmail, content } = req.body ?? {};
+  // 2. Validación pre-normalización (tipos y límites crudos)
+  const preResult = commentPreSchema.safeParse(req.body ?? {});
+  if (!preResult.success) {
+    return res.status(400).json({
+      error: "Datos inválidos",
+      details: formatZodError(preResult.error),
+    });
+  }
 
-  // Validaciones
-  if (!postId || typeof postId !== "number") {
-    return res.status(400).json({ error: "postId inválido" });
+  // 3. Normalización y saneamiento
+  const normalized = normalizeCommentInput(preResult.data);
+
+  // 4. Validación post-normalización (email válido, longitud de contenido tras saneamiento)
+  const postResult = commentPostSchema.safeParse(normalized);
+  if (!postResult.success) {
+    return res.status(400).json({
+      error: "Datos inválidos",
+      details: formatZodError(postResult.error),
+    });
   }
-  if (
-    !authorName ||
-    typeof authorName !== "string" ||
-    authorName.trim().length < 2
-  ) {
-    return res
-      .status(400)
-      .json({ error: "El nombre es requerido (mínimo 2 caracteres)" });
-  }
-  if (!isValidEmail(authorEmail)) {
-    return res.status(400).json({ error: "El email no es válido" });
-  }
-  if (!content || typeof content !== "string" || content.trim().length < 5) {
-    return res
-      .status(400)
-      .json({ error: "El comentario es requerido (mínimo 5 caracteres)" });
-  }
-  if (content.trim().length > 2000) {
-    return res
-      .status(400)
-      .json({ error: "El comentario no puede superar los 2000 caracteres" });
-  }
+
+  const { postId, authorName, authorEmail, content } = postResult.data;
 
   try {
     // Verificar que el post existe
-    const postResult = await pool.query(
+    const postResultDb = await pool.query(
       "SELECT id FROM posts WHERE id = $1 LIMIT 1",
       [postId],
     );
-    if (postResult.rows.length === 0) {
+    if (postResultDb.rows.length === 0) {
       return res.status(404).json({ error: "El post no existe" });
     }
 
     // Aplicar filtro de palabras prohibidas
-    const { flagged, matches } = await checkBannedWords(pool, content);
+    const { flagged } = await checkBannedWords(pool, content);
 
     // Insertar comentario con estado "pending" siempre
-    // (incluso los flagged pasan a moderación, Anier decide)
     const insertResult = await pool.query(
       `INSERT INTO comments (post_id, author_name, author_email, content, status, flagged)
        VALUES ($1, $2, $3, $4, 'pending', $5)
        RETURNING id`,
-      [
-        postId,
-        authorName.trim(),
-        authorEmail.trim().toLowerCase(),
-        content.trim(),
-        flagged,
-      ],
+      [postId, authorName, authorEmail, content, flagged],
     );
 
     const commentId = insertResult.rows[0].id;
 
-    // Respuesta al usuario — no le decimos si fue flagged
-    // para no dar pistas a quienes intentan saltarse el filtro
+    console.info(
+      JSON.stringify({
+        logType: "audit",
+        action: "COMMENT_SUBMITTED",
+        status: "SUCCESS",
+        postId,
+        commentId,
+        actor: {
+          name: maskName(authorName),
+          email: maskEmail(authorEmail),
+        },
+        timestamp: new Date().toISOString(),
+      }),
+    );
+
     return res.status(201).json({
       success: true,
       commentId,
@@ -114,7 +110,15 @@ module.exports = async function handler(req, res) {
         "Tu comentario ha sido recibido y está pendiente de moderación. Aparecerá en breve si es aprobado.",
     });
   } catch (err) {
-    console.error("Error al guardar comentario:", err);
+    console.error(
+      JSON.stringify({
+        logType: "technical",
+        action: "COMMENT_SUBMITTED",
+        status: "FAILURE",
+        error: err instanceof Error ? err.message : "Internal Server Error",
+        timestamp: new Date().toISOString(),
+      }),
+    );
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 };

@@ -23,7 +23,7 @@ function verifyAuth(req, res) {
     if (!secret) throw new Error("JWT_SECRET no configurado");
     const payload = jwt.verify(token, secret);
     return payload;
-  } catch (err) {
+  } catch (_err) {
     res.status(401).json({ error: "Token inválido o expirado" });
     return null;
   }
