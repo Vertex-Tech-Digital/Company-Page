@@ -54,7 +54,10 @@ export const logger = pino({
         .toLowerCase()
         .replace(/[-_]/g, "");
       if (typeof val === "string") {
-        if (val.includes("***") || val.startsWith("[REDACTED")) {
+        if (
+          ["email", "phone", "telephone", "nif", "cif", "nie", "dni", "name", "fullname", "firstname", "lastname"].includes(lastKey) &&
+          (val.includes("***") || val.startsWith("[REDACTED"))
+        ) {
           return val;
         }
         if (lastKey === "email") return maskEmail(val);
