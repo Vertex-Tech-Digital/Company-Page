@@ -59,4 +59,3 @@ test("redactPii: anonimiza recursivamente objetos complejos", () => {
   assert.equal(redacted.details.nif, "123****Z");
   assert.equal(redacted.details.token, "[REDACTED]");
 });
-

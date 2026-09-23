@@ -82,7 +82,8 @@ export function devApiPlugin() {
             res.setHeader("Content-Type", "application/json");
             res.end(
               JSON.stringify({
-                error: "Payload Too Large: el tamaño de la petición supera 512 KB.",
+                error:
+                  "Payload Too Large: el tamaño de la petición supera 512 KB.",
               }),
             );
             return;
