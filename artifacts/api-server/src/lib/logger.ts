@@ -55,7 +55,19 @@ export const logger = pino({
         .replace(/[-_]/g, "");
       if (typeof val === "string") {
         if (
-          ["email", "phone", "telephone", "nif", "cif", "nie", "dni", "name", "fullname", "firstname", "lastname"].includes(lastKey) &&
+          [
+            "email",
+            "phone",
+            "telephone",
+            "nif",
+            "cif",
+            "nie",
+            "dni",
+            "name",
+            "fullname",
+            "firstname",
+            "lastname",
+          ].includes(lastKey) &&
           (val.includes("***") || val.startsWith("[REDACTED"))
         ) {
           return val;
