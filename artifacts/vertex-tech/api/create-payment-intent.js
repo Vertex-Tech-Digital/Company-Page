@@ -1,4 +1,11 @@
 const Stripe = require("stripe");
+const {
+  enforceBodyLimit,
+  paymentIntentPreSchema,
+  paymentIntentPostSchema,
+  normalizePaymentIntentInput,
+  formatZodError,
+} = require("./_validation");
 
 // Importe mínimo y máximo permitidos (en céntimos) para el cobro variable.
 const MIN_AMOUNT = 100; //   1,00 €
@@ -6,10 +13,6 @@ const MAX_AMOUNT = 5000000; // 50.000,00 €
 
 /**
  * Recupera el client_secret asociado a una factura ya finalizada.
- *
- * Stripe ha cambiado el nombre del campo entre versiones de la API: las
- * versiones recientes exponen `confirmation_secret`, las anteriores usaban
- * `payment_intent`. Intentamos ambos para no acoplarnos a una versión concreta.
  */
 async function getInvoiceClientSecret(stripe, invoiceId) {
   try {
@@ -42,22 +45,33 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { name, email, amount } = req.body ?? {};
+  // 1. Límite de tamaño del body
+  if (!enforceBodyLimit(req, res)) return;
 
-  // --- Validación ---
-  if (!name || typeof name !== "string" || name.trim().length < 2) {
-    return res.status(400).json({ error: "Nombre inválido" });
-  }
-  if (!email || typeof email !== "string" || !email.includes("@")) {
-    return res.status(400).json({ error: "Email inválido" });
+  // 2. Validación pre-normalización (tipos y límites crudos)
+  const preResult = paymentIntentPreSchema.safeParse(req.body ?? {});
+  if (!preResult.success) {
+    return res.status(400).json({
+      error: "Datos inválidos",
+      details: formatZodError(preResult.error),
+    });
   }
 
-  // El importe llega en euros (number) y lo convertimos a céntimos en el servidor.
-  const euros = Number(amount);
-  if (!Number.isFinite(euros) || euros <= 0) {
-    return res.status(400).json({ error: "Importe inválido" });
+  // 3. Normalización y saneamiento
+  const normalized = normalizePaymentIntentInput(preResult.data);
+
+  // 4. Validación post-normalización (email válido, importes finitos y acotados)
+  const postResult = paymentIntentPostSchema.safeParse(normalized);
+  if (!postResult.success) {
+    return res.status(400).json({
+      error: "Datos inválidos",
+      details: formatZodError(postResult.error),
+    });
   }
+
+  const { name, email, amount: euros } = postResult.data;
   const amountCents = Math.round(euros * 100);
+
   if (amountCents < MIN_AMOUNT || amountCents > MAX_AMOUNT) {
     return res.status(400).json({
       error: `El importe debe estar entre ${MIN_AMOUNT / 100} € y ${MAX_AMOUNT / 100} €`,
@@ -89,7 +103,6 @@ module.exports = async function handler(req, res) {
     });
 
     // 3) Concepto a facturar, adjuntado explícitamente a esta factura
-    //    (evita depender del auto-adjuntado de items "pendientes").
     await stripe.invoiceItems.create({
       customer: customer.id,
       invoice: draft.id,
@@ -99,7 +112,6 @@ module.exports = async function handler(req, res) {
     });
 
     // 4) Finalizar la factura genera el PDF y el client_secret de pago.
-    //    Al completarse el pago, Stripe envía la factura al email del cliente.
     await stripe.invoices.finalizeInvoice(draft.id);
 
     const clientSecret = await getInvoiceClientSecret(stripe, draft.id);

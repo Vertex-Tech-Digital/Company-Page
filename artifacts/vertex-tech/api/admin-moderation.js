@@ -1,10 +1,21 @@
 const { pool } = require("../server/db.js");
 const { verifyAuth } = require("./_auth");
+const {
+  enforceBodyLimit,
+  moderationWordPreSchema,
+  moderationWordPostSchema,
+  moderationStatusSchema,
+  formatZodError,
+  sanitizeString,
+} = require("./_validation");
 
 module.exports = async function handler(req, res) {
   // Verificar autenticación en todos los métodos
   const payload = verifyAuth(req, res);
   if (!payload) return;
+
+  // Límite de tamaño del body
+  if (!enforceBodyLimit(req, res)) return;
 
   if (!process.env.DATABASE_URL) {
     return res.status(500).json({ error: "Base de datos no configurada" });
@@ -24,15 +35,24 @@ module.exports = async function handler(req, res) {
 
       // ── POST: agregar palabra ───────────────────────────────────────────────
       if (req.method === "POST") {
-        const { word } = req.body ?? {};
-
-        if (!word || typeof word !== "string" || word.trim().length < 2) {
-          return res
-            .status(400)
-            .json({ error: "La palabra debe tener al menos 2 caracteres" });
+        const preResult = moderationWordPreSchema.safeParse(req.body ?? {});
+        if (!preResult.success) {
+          return res.status(400).json({
+            error: formatZodError(preResult.error),
+          });
         }
 
-        const normalized = word.trim().toLowerCase();
+        const cleanWord = sanitizeString(preResult.data.word).toLowerCase();
+        const postResult = moderationWordPostSchema.safeParse({
+          word: cleanWord,
+        });
+        if (!postResult.success) {
+          return res.status(400).json({
+            error: formatZodError(postResult.error),
+          });
+        }
+
+        const normalized = postResult.data.word;
 
         const result = await pool.query(
           `INSERT INTO banned_words (word)
@@ -56,7 +76,7 @@ module.exports = async function handler(req, res) {
       // ── DELETE: eliminar palabra ────────────────────────────────────────────
       if (req.method === "DELETE") {
         const id = parseInt(req.query?.id, 10);
-        if (!id || isNaN(id)) {
+        if (!id || isNaN(id) || id <= 0) {
           return res.status(400).json({ error: "ID inválido" });
         }
 
@@ -92,16 +112,18 @@ module.exports = async function handler(req, res) {
       // ── PATCH: aprobar o rechazar ───────────────────────────────────────────
       if (req.method === "PATCH") {
         const id = parseInt(req.query?.id, 10);
-        if (!id || isNaN(id)) {
+        if (!id || isNaN(id) || id <= 0) {
           return res.status(400).json({ error: "ID de comentario inválido" });
         }
 
-        const { status } = req.body ?? {};
-        if (status !== "approved" && status !== "rejected") {
-          return res
-            .status(400)
-            .json({ error: "El status debe ser 'approved' o 'rejected'" });
+        const statusResult = moderationStatusSchema.safeParse(req.body ?? {});
+        if (!statusResult.success) {
+          return res.status(400).json({
+            error: formatZodError(statusResult.error),
+          });
         }
+
+        const { status } = statusResult.data;
 
         const result = await pool.query(
           `UPDATE comments SET status = $1 WHERE id = $2 RETURNING id, status`,
@@ -112,6 +134,17 @@ module.exports = async function handler(req, res) {
           return res.status(404).json({ error: "Comentario no encontrado" });
         }
 
+        console.info(
+          JSON.stringify({
+            logType: "audit",
+            action: "COMMENT_MODERATED",
+            status: "SUCCESS",
+            commentId: id,
+            moderationStatus: status,
+            timestamp: new Date().toISOString(),
+          }),
+        );
+
         return res.status(200).json({
           success: true,
           comment: result.rows[0],
@@ -121,7 +154,15 @@ module.exports = async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     }
   } catch (err) {
-    console.error("Error en admin-moderation:", err);
+    console.error(
+      JSON.stringify({
+        logType: "technical",
+        action: "ADMIN_MODERATION",
+        status: "FAILURE",
+        error: err instanceof Error ? err.message : "Internal Server Error",
+        timestamp: new Date().toISOString(),
+      }),
+    );
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 };

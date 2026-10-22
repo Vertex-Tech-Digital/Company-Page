@@ -39,9 +39,13 @@ module.exports = async function handler(req, res) {
 
     // ── Regenerar el PDF de una factura concreta ──────────────────────────────
     if (id && wantPdf) {
+      const numId = parseInt(id, 10);
+      if (!numId || isNaN(numId) || numId <= 0) {
+        return res.status(400).json({ error: "ID de factura inválido" });
+      }
       const r = await pool.query(
         "SELECT * FROM invoices WHERE id = $1 LIMIT 1",
-        [Number(id)],
+        [numId],
       );
       if (r.rows.length === 0)
         return res.status(404).json({ error: "Factura no encontrada" });
