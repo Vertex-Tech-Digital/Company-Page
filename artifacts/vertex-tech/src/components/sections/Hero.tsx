@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { ArrowRight } from "lucide-react";
+// import { ArrowRight } from "lucide-react"; // oculto temporalmente
 import { Button } from "@/components/ui/button";
 import { WireframeCube } from "./WireframeCube";
 import { useLanguage } from "@/context/LanguageContext";
@@ -63,7 +63,7 @@ export function Hero() {
                 <Link href="/diagnostico">{t("hero.cta.audit")}</Link>
               </Button>
               <Button
-                onClick={() => scrollTo("#proyectos")}
+                onClick={() => scrollTo("#contacto")}
                 variant="outline"
                 size="lg"
                 className="border-border hover:bg-white/5 text-base px-8 h-14"
@@ -71,6 +71,7 @@ export function Hero() {
               >
                 {t("hero.cta.primary")}
               </Button>
+              {/* Enlace a proyectos oculto temporalmente
               <a
                 href="#proyectos"
                 onClick={(e) => {
@@ -83,6 +84,7 @@ export function Hero() {
                 <span>{t("hero.cta.secondary")}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </a>
+              */}
             </div>
           </motion.div>
 

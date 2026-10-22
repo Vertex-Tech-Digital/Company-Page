@@ -23,6 +23,8 @@ const BlogPost = lazy(() => import("@/pages/BlogPost"));
 const Checkout = lazy(() => import("@/pages/Checkout"));
 const Admin = lazy(() => import("@/pages/Admin"));
 const Diagnostico = lazy(() => import("@/pages/Diagnostico"));
+const CasosConceptuales = lazy(() => import("@/pages/CasosConceptuales"));
+const CasoConceptual = lazy(() => import("@/pages/CasoConceptual"));
 
 const queryClient = new QueryClient();
 
@@ -33,6 +35,10 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/blog" component={Blog} />
         <Route path="/blog/:slug" component={BlogPost} />
+        {/* Casos conceptuales: listado estático (MDX) y detalle por slug.
+            El contenido vive en src/content/casos/*.mdx — sin base de datos. */}
+        <Route path="/casos-conceptuales" component={CasosConceptuales} />
+        <Route path="/casos-conceptuales/:slug" component={CasoConceptual} />
         {/* Ruta oculta de pagos: no enlazada en el menú */}
         <Route path="/checkout" component={Checkout} />
         {/* Panel de administración (incluye la pestaña de Facturas, Entregable A).

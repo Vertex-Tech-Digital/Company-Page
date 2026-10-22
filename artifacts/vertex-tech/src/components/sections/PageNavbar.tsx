@@ -1,8 +1,9 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function PageNavbar() {
   const { lang, setLang } = useLanguage();
+  const [location] = useLocation();
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
@@ -38,6 +39,18 @@ export function PageNavbar() {
             data-testid="nav-back-home"
           >
             {lang === "es" ? "Volver al inicio" : "Back to home"}
+          </Link>
+
+          <Link
+            href="/casos-conceptuales"
+            className={`hidden sm:inline-block text-sm font-medium transition-colors hover:text-primary ${
+              location.startsWith("/casos-conceptuales")
+                ? "text-primary"
+                : "text-muted-foreground"
+            }`}
+            data-testid="nav-link-casos-page"
+          >
+            {lang === "es" ? "Casos Conceptuales" : "Conceptual Cases"}
           </Link>
 
           <div className="flex items-center gap-1 text-xs tracking-widest uppercase">
