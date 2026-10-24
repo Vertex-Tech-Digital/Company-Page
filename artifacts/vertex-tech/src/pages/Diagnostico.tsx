@@ -615,7 +615,7 @@ export default function Diagnostico() {
                           setFreeTextValue(e.target.value);
                           if (validationError) setValidationError(null);
                         }}
-                        placeholder='Ej: "Los pedidos entran por la tablet de la app de delivery, pero no se sincronizan con nuestro TPV. El cajero tiene que teclear cada comanda a mano para que salga el ticket a cocina y se registre la venta, lo que genera retrasos y errores en horas pico."'
+                        placeholder='Ej: "Los pedidos entran por la tablet de la app de delivery (Glovo, Uber Eats, etc), pero no se sincronizan con nuestro TPV. Nosotros tenemos que teclear cada comando a mano para que registre la venta, lo que genera retrasos y errores en horas pico."'
                       />
                     </div>
 
