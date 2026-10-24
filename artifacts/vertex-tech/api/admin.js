@@ -25,11 +25,13 @@ const handlers = {
 
 module.exports = async function handler(req, res) {
   const action = req.query?.action;
-  const target = handlers[action];
 
-  if (!target) {
+  // Solo claves propias de handlers: con un lookup directo, acciones como
+  // "constructor" o "toString" resolverían a métodos de Object.prototype,
+  // que nunca responden y dejan la función colgada hasta el timeout.
+  if (typeof action !== "string" || !Object.hasOwn(handlers, action)) {
     return res.status(404).json({ error: "Not found" });
   }
 
-  return target(req, res);
+  return handlers[action](req, res);
 };
