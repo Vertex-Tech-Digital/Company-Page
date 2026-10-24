@@ -82,7 +82,7 @@ export function Navbar() {
           <img
             src="/logo.jpg"
             alt="Vertex Tech"
-            className="h-11 w-11 rounded-xl object-cover transition-transform group-hover:scale-105 drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]"
+            className="h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 rounded-xl object-cover transition-transform group-hover:scale-105 drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]"
           />
           <div className="flex flex-col leading-none">
             <span

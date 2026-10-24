@@ -13,6 +13,19 @@
 const { pool } = require("../server/db.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { kv } = require("@vercel/kv");
+const { Ratelimit } = require("@upstash/ratelimit");
+
+let loginRatelimit = null;
+
+if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  loginRatelimit = new Ratelimit({
+    redis: kv,
+    limiter: Ratelimit.slidingWindow(5, "15 m"),
+    analytics: true,
+    prefix: "ratelimit:admin-login",
+  });
+}
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -27,6 +40,35 @@ module.exports = async function handler(req, res) {
 
   if (!process.env.DATABASE_URL) {
     return res.status(500).json({ error: "Base de datos no configurada" });
+  }
+
+  const rawIp =
+    req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "127.0.0.1";
+  let clientIp = (Array.isArray(rawIp) ? rawIp[0] : rawIp).split(",")[0].trim();
+  if (clientIp === "::1" || clientIp === "::ffff:127.0.0.1") {
+    clientIp = "127.0.0.1";
+  }
+
+  if (loginRatelimit) {
+    try {
+      const { success, limit, remaining, reset } = await loginRatelimit.limit(
+        `ip:${clientIp}`,
+      );
+      if (limit !== undefined) {
+        res.setHeader("X-RateLimit-Limit", limit);
+        res.setHeader("X-RateLimit-Remaining", remaining);
+        res.setHeader("X-RateLimit-Reset", reset);
+      }
+      if (!success) {
+        return res
+          .status(429)
+          .json({
+            error: "Demasiados intentos. Inténtalo de nuevo más tarde.",
+          });
+      }
+    } catch (err) {
+      console.error("Rate limit error en admin-login:", err);
+    }
   }
 
   const { username, password } = req.body ?? {};
