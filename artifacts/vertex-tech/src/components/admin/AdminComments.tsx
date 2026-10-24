@@ -21,11 +21,7 @@ interface Comment {
   post_slug: string;
 }
 
-interface AdminCommentsProps {
-  token: string;
-}
-
-export function AdminComments({ token }: AdminCommentsProps) {
+export function AdminComments() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +32,7 @@ export function AdminComments({ token }: AdminCommentsProps) {
     setError(null);
     try {
       const res = await fetch("/api/admin-moderation?resource=comments", {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Error al cargar comentarios");
       const data = await res.json();
@@ -46,7 +42,7 @@ export function AdminComments({ token }: AdminCommentsProps) {
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchComments();
@@ -59,10 +55,8 @@ export function AdminComments({ token }: AdminCommentsProps) {
         `/api/admin-moderation?resource=comments&id=${id}`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ status }),
         },
       );

@@ -1,5 +1,5 @@
-const { pool } = require("../server/db.js");
-const { verifyAuth } = require("./_auth");
+const { pool } = require("../../server/db.js");
+const { verifyAuth } = require("../_auth");
 const {
   enforceBodyLimit,
   moderationWordPreSchema,
@@ -7,11 +7,11 @@ const {
   moderationStatusSchema,
   formatZodError,
   sanitizeString,
-} = require("./_validation");
+} = require("../_validation");
 
 module.exports = async function handler(req, res) {
   // Verificar autenticación en todos los métodos
-  const payload = verifyAuth(req, res);
+  const payload = await verifyAuth(req, res);
   if (!payload) return;
 
   // Límite de tamaño del body

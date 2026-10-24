@@ -1,29 +1,43 @@
 // POST /api/admin-login
-// Autentica al administrador (Anier) y devuelve un JWT.
+// Autentica al administrador contra el hash bcrypt de admin_users y abre
+// sesión. La contraseña se define únicamente vía lib/db/seed.ts
+// (ADMIN_USERNAME/ADMIN_PASSWORD como argumentos del seed, no como env vars
+// permanentes de la app) — ver ese archivo para rotarla.
 //
 // Body esperado:
 // { "username": "anier", "password": "contraseña_real" }
 //
 // Respuesta exitosa:
-// { "token": "eyJ..." }
+// { "success": true, "username": "anier" }
 //
-// El token debe enviarse en el header Authorization de las rutas protegidas:
-// Authorization: Bearer eyJ...
+// La sesión viaja en una cookie httpOnly (Set-Cookie: admin_token=...),
+// nunca en el body — el frontend no debe (ni puede) leerla desde JS.
+// Las rutas protegidas la validan solas vía verifyAuth (ver _auth.js).
 
-const { pool } = require("../server/db.js");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { maskName } = require("./_validation");
+const { pool } = require("../../server/db.js");
+const { signSessionToken, setSessionCookie } = require("../_auth");
+const { createRateLimiter, getClientIp } = require("../_rate-limit.js");
+const { maskName } = require("../_validation");
 
-function getJwtSecret() {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) throw new Error("JWT_SECRET no está configurado");
-  return secret;
-}
+// 5 intentos cada 10 min por IP: frena fuerza bruta/credential stuffing sin
+// bloquear a un admin real que se equivoca de contraseña una o dos veces.
+const isRateLimited = createRateLimiter({
+  prefix: "admin-login",
+  count: 5,
+  window: "10 m",
+});
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const clientIp = getClientIp(req);
+  if (await isRateLimited(clientIp)) {
+    return res
+      .status(429)
+      .json({ error: "Demasiados intentos. Inténtalo de nuevo más tarde." });
   }
 
   if (!process.env.DATABASE_URL) {
@@ -42,12 +56,15 @@ module.exports = async function handler(req, res) {
   try {
     // Buscar el usuario en la base de datos
     const result = await pool.query(
-      "SELECT id, username, password_hash FROM admin_users WHERE username = $1 LIMIT 1",
+      "SELECT id, username, password_hash, session_version FROM admin_users WHERE username = $1 LIMIT 1",
       [username.toLowerCase().trim()],
     );
 
     // Respuesta genérica tanto si el usuario no existe como si la
-    // contraseña es incorrecta — no damos pistas sobre cuál falló
+    // contraseña es incorrecta — no damos pistas sobre cuál falló.
+    // bcrypt.compare ya es en sí mismo resistente a timing attacks: su
+    // costo depende del salt/rounds embebidos en el hash, no de en qué
+    // carácter difiere la comparación.
     if (result.rows.length === 0) {
       console.warn(
         JSON.stringify({
@@ -79,12 +96,12 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ error: "Credenciales incorrectas" });
     }
 
-    // Generar JWT con 8 horas de validez
-    const token = jwt.sign(
-      { userId: user.id, username: user.username },
-      getJwtSecret(),
-      { expiresIn: "8h" },
-    );
+    const token = signSessionToken({
+      id: user.id,
+      username: user.username,
+      sessionVersion: user.session_version,
+    });
+    setSessionCookie(res, token);
 
     console.info(
       JSON.stringify({
@@ -96,7 +113,7 @@ module.exports = async function handler(req, res) {
       }),
     );
 
-    return res.status(200).json({ token });
+    return res.status(200).json({ success: true, username: user.username });
   } catch (err) {
     console.error(
       JSON.stringify({

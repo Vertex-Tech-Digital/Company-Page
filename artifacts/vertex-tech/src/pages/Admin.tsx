@@ -15,25 +15,40 @@ import {
 type AdminView = "posts" | "comments" | "banned-words" | "invoices";
 
 export default function Admin() {
-  const [token, setToken] = useState<string | null>(null);
+  // null = todavía no se sabe (chequeando la cookie); true/false = resuelto.
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [view, setView] = useState<AdminView>("posts");
 
-  // Al cargar la página, verificar si ya hay un token guardado
+  // La sesión vive en una cookie httpOnly: JS no puede leerla directamente,
+  // así que preguntamos al servidor si la cookie que mande el navegador
+  // (si hay alguna) sigue siendo válida.
   useEffect(() => {
-    const saved = localStorage.getItem("admin_token");
-    if (saved) setToken(saved);
+    fetch("/api/admin-me", { credentials: "include" })
+      .then((res) => setIsAuthenticated(res.ok))
+      .catch(() => setIsAuthenticated(false));
   }, []);
 
-  function handleLogout() {
-    localStorage.removeItem("admin_token");
-    setToken(null);
+  async function handleLogout() {
+    try {
+      await fetch("/api/admin-logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } finally {
+      setIsAuthenticated(false);
+    }
   }
 
-  // Si no hay token, mostrar login
-  if (!token) {
+  // Todavía resolviendo si hay sesión activa
+  if (isAuthenticated === null) {
+    return <main className="min-h-screen bg-background" />;
+  }
+
+  // Sin sesión válida, mostrar login
+  if (!isAuthenticated) {
     return (
       <main className="min-h-screen bg-background text-foreground">
-        <AdminLogin onLoginSuccess={setToken} />
+        <AdminLogin onLoginSuccess={() => setIsAuthenticated(true)} />
       </main>
     );
   }
@@ -116,10 +131,10 @@ export default function Admin() {
 
       {/* Contenido */}
       <div className="max-w-4xl mx-auto px-6 py-8">
-        {view === "posts" && <AdminPosts token={token} />}
-        {view === "comments" && <AdminComments token={token} />}
-        {view === "banned-words" && <AdminBannedWords token={token} />}
-        {view === "invoices" && <AdminInvoices token={token} />}
+        {view === "posts" && <AdminPosts />}
+        {view === "comments" && <AdminComments />}
+        {view === "banned-words" && <AdminBannedWords />}
+        {view === "invoices" && <AdminInvoices />}
       </div>
     </main>
   );
