@@ -29,6 +29,7 @@ const LIST_ENDPOINT = `${import.meta.env.BASE_URL}api/admin-invoices`;
 
 type LineItem = { description: string; quantity: number; unitPrice: number };
 interface CreateInvoiceResponse {
+  id: number;
   invoiceNumber: string;
   status: string;
   issueDate: string;
@@ -37,7 +38,6 @@ interface CreateInvoiceResponse {
   total: number;
   emailSent?: boolean;
   pdfError?: boolean;
-  pdfBase64?: string;
 }
 interface InvoiceRow {
   id: number;
@@ -52,9 +52,17 @@ interface InvoiceRow {
 
 const emptyItem: LineItem = { description: "", quantity: 1, unitPrice: 0 };
 
-function downloadPdf(base64: string, invoiceNumber: string) {
-  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-  const blob = new Blob([bytes], { type: "application/pdf" });
+// El endpoint devuelve el PDF como application/pdf binario; los errores
+// siguen llegando en JSON.
+async function downloadInvoicePdf(id: number, invoiceNumber: string) {
+  const res = await fetch(`${LIST_ENDPOINT}?id=${id}&pdf=1`, {
+    credentials: "include",
+  });
+  if (!res.ok) {
+    const d = await res.json().catch(() => ({}));
+    throw new Error(d.error || "No se pudo generar el PDF.");
+  }
+  const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -115,6 +123,7 @@ function InvoiceForm() {
   const [lastInvoice, setLastInvoice] = useState<CreateInvoiceResponse | null>(
     null,
   );
+  const [downloadingLast, setDownloadingLast] = useState(false);
 
   const subtotal = items.reduce(
     (acc, it) => acc + it.quantity * it.unitPrice,
@@ -212,6 +221,22 @@ function InvoiceForm() {
       title: "Datos incompletos",
       description: message,
     });
+  }
+
+  async function downloadLast(invoice: CreateInvoiceResponse) {
+    setDownloadingLast(true);
+    try {
+      await downloadInvoicePdf(invoice.id, invoice.invoiceNumber);
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          e instanceof Error ? e.message : "No se pudo descargar el PDF.",
+      });
+    } finally {
+      setDownloadingLast(false);
+    }
   }
 
   return (
@@ -470,7 +495,7 @@ function InvoiceForm() {
         </Button>
       </form>
 
-      {lastInvoice?.pdfBase64 && (
+      {lastInvoice && !lastInvoice.pdfError && (
         <div className="mt-6 flex items-center justify-between bg-card/50 border border-border p-4 rounded-xl">
           <span className="text-sm text-white">
             Factura <b>{lastInvoice.invoiceNumber}</b> generada.
@@ -480,11 +505,15 @@ function InvoiceForm() {
             variant="outline"
             size="sm"
             className="gap-1"
-            onClick={() =>
-              downloadPdf(lastInvoice.pdfBase64!, lastInvoice.invoiceNumber)
-            }
+            disabled={downloadingLast}
+            onClick={() => downloadLast(lastInvoice)}
           >
-            <Download className="w-4 h-4" /> Descargar PDF
+            {downloadingLast ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4" />
+            )}{" "}
+            Descargar PDF
           </Button>
         </div>
       )}
@@ -512,13 +541,7 @@ function InvoicesList() {
   async function download(id: number, invoiceNumber: string) {
     setDownloadingId(id);
     try {
-      const res = await fetch(`${LIST_ENDPOINT}?id=${id}&pdf=1`, {
-        credentials: "include",
-      });
-      const d = await res.json().catch(() => ({}));
-      if (!res.ok || !d.pdfBase64)
-        throw new Error(d.error || "No se pudo generar el PDF.");
-      downloadPdf(d.pdfBase64, invoiceNumber);
+      await downloadInvoicePdf(id, invoiceNumber);
     } catch (e) {
       toast({
         variant: "destructive",
