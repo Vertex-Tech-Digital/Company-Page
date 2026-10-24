@@ -82,15 +82,11 @@ function score(lang: CaseLanguage, wanted: CaseLanguage): number {
 export async function getCasos(
   lang: CaseLanguage = "es",
 ): Promise<CasoPreviewData[]> {
-  console.log("[casos] fullModules keys:", Object.keys(fullModules));
-
   const loaded = await Promise.all(
     Object.entries(fullModules).map(async ([path, load]) => {
       try {
         const { slug, lang: fileLang } = parsePath(path);
-        console.log(`[casos] Loading from ${path}`);
         const mod = (await load()) as MdxModule;
-        console.log(`[casos] Loaded ${path}:`, mod);
 
         if (!mod?.meta) {
           console.warn(`[casos] Invalid meta in ${path}`);
@@ -124,12 +120,10 @@ export async function getCasos(
     }
   }
 
-  const result = [...bestBySlug.values()]
+  return [...bestBySlug.values()]
     .map(({ slug, meta }) => ({ slug, ...meta }))
     .filter((caso) => caso.date)
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-  console.log("[casos] Result:", result);
-  return result;
 }
 
 /**

@@ -40,7 +40,6 @@ export default function CasosConceptuales() {
     let alive = true;
     getCasos(lang)
       .then((casos) => {
-        console.log("[casos] Loaded:", casos);
         if (!alive) return;
         setPreviews(
           (casos || [])
@@ -56,8 +55,7 @@ export default function CasosConceptuales() {
             })),
         );
       })
-      .catch((err) => {
-        console.error("[casos] Error loading cases:", err);
+      .catch(() => {
         if (alive) setPreviews([]);
       });
     return () => {

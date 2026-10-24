@@ -9,13 +9,20 @@ import { CasoShare } from "@/components/sections/CasoShare";
 import { getCasoBySlug, type CasoEntry } from "@/content/casos";
 import { useLanguage } from "@/context/LanguageContext";
 
-function formatDate(dateStr: string, lang: string): string {
-  // dateStr es ISO (yyyy-mm-dd); se normaliza para evitar desfases de zona
-  const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d).toLocaleDateString(
-    lang === "es" ? "es-ES" : "en-US",
-    { day: "2-digit", month: "long", year: "numeric" },
-  );
+function formatDate(dateStr: string | undefined, lang: string): string {
+  if (!dateStr || typeof dateStr !== "string") return "";
+  try {
+    const parts = dateStr.split("-");
+    if (parts.length < 3) return dateStr;
+    const [y, m, d] = parts.map(Number);
+    if (!y) return dateStr;
+    return new Date(y, (m ?? 1) - 1, d || 1).toLocaleDateString(
+      lang === "es" ? "es-ES" : "en-US",
+      { day: "2-digit", month: "long", year: "numeric" },
+    );
+  } catch {
+    return dateStr;
+  }
 }
 
 // ── Vista individual de un Caso Conceptual ───────────────────────────────────
