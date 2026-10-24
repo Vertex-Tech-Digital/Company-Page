@@ -564,13 +564,45 @@ test("Diagnóstico: rechaza más de 20 problemas marcados o problemas inexistent
   assert.equal(post.success, false);
 });
 
-test("Diagnóstico: exige texto libre si se seleccionan menos de 3 problemas", () => {
+test("Diagnóstico: permite enviar con 1 solo problema marcado sin texto libre", () => {
   const raw = {
     company_name: "Tech Solutions SL",
     sector: "Tecnología",
     size: "10-49 empleados",
     email: "contacto@techsolutions.es",
     marked_problems: [1],
+    free_text: "   ",
+    contact_preference: "email",
+  };
+
+  const normalized = normalizeDiagnosticoInput(raw);
+  const post = diagnosticoPostSchema.safeParse(normalized);
+  assert.equal(post.success, true);
+});
+
+test("Diagnóstico: permite enviar con solo texto libre sin problemas marcados", () => {
+  const raw = {
+    company_name: "Tech Solutions SL",
+    sector: "Tecnología",
+    size: "10-49 empleados",
+    email: "contacto@techsolutions.es",
+    marked_problems: [],
+    free_text: "Mi web es lenta y se cae cuando hay picos de usuarios.",
+    contact_preference: "email",
+  };
+
+  const normalized = normalizeDiagnosticoInput(raw);
+  const post = diagnosticoPostSchema.safeParse(normalized);
+  assert.equal(post.success, true);
+});
+
+test("Diagnóstico: rechaza si tanto problemas marcados como texto libre están vacíos", () => {
+  const raw = {
+    company_name: "Tech Solutions SL",
+    sector: "Tecnología",
+    size: "10-49 empleados",
+    email: "contacto@techsolutions.es",
+    marked_problems: [],
     free_text: "   ", // Vacío
     contact_preference: "email",
   };

@@ -32,16 +32,24 @@ const validResponse = {
   services: [{ problem_id: 1, service: "Automatización con IA" }],
 };
 
-test("permite tres casillas sin texto libre", () => {
+test("permite una o varias casillas sin texto libre", () => {
+  assert.equal(validateInputRequirements([1], ""), null);
   assert.equal(validateInputRequirements([1, 2, 3], ""), null);
 });
 
-test("requiere texto libre con menos de tres casillas", () => {
+test("permite texto libre sin casillas marcadas", () => {
+  assert.equal(validateInputRequirements([], "Necesito ayuda"), null);
+});
+
+test("rechaza si no hay casillas ni texto libre", () => {
   assert.match(
-    validateInputRequirements([1, 2], ""),
-    /descripción libre es obligatoria/i,
+    validateInputRequirements([], ""),
+    /debes seleccionar al menos un problema o describir tu situación/i,
   );
-  assert.equal(validateInputRequirements([1, 2], "Necesito ayuda"), null);
+  assert.match(
+    validateInputRequirements([], "   "),
+    /debes seleccionar al menos un problema o describir tu situación/i,
+  );
 });
 
 test("rechaza una respuesta de IA con JSON corrupto", () => {
@@ -124,7 +132,7 @@ test("rechaza diagnosis vacía o tautológica (solo repite el nombre)", () => {
         problems: [
           {
             ...validResponse.problems[0],
-            diagnosis: "Tareas manuales repetitivas",
+            diagnosis: problemsData.find((p) => p.id === 1).name,
           },
         ],
       },

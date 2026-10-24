@@ -233,8 +233,12 @@ function validateInputRequirements(markedProblems, freeText) {
     return "Los problemas marcados deben ser una lista válida.";
   }
 
-  if (markedProblems.length < 3 && !freeText.trim()) {
-    return "La descripción libre es obligatoria si seleccionas menos de 3 problemas.";
+  const hasMarkedProblems = markedProblems.length > 0;
+  const hasFreeText =
+    typeof freeText === "string" && freeText.trim().length > 0;
+
+  if (!hasMarkedProblems && !hasFreeText) {
+    return "Debes seleccionar al menos un problema o describir tu situación con tus palabras.";
   }
 
   return null;
