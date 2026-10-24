@@ -70,6 +70,18 @@ export function PageNavbar() {
           </button>
 
           <Link
+            href="/diagnostico"
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              location.startsWith("/diagnostico")
+                ? "text-primary"
+                : "text-muted-foreground"
+            }`}
+            data-testid="nav-link-diagnostico-page"
+          >
+            {lang === "es" ? "Diagnóstico Gratis" : "Free Diagnosis"}
+          </Link>
+
+          <Link
             href="/casos-conceptuales"
             className={`text-sm font-medium transition-colors hover:text-primary ${
               location.startsWith("/casos-conceptuales")
@@ -109,7 +121,19 @@ export function PageNavbar() {
         </div>
 
         {/* Mobile: mantener navegación compacta */}
-        <div className="flex md:hidden items-center gap-4">
+        <div className="flex md:hidden items-center gap-3">
+          <Link
+            href="/diagnostico"
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              location.startsWith("/diagnostico")
+                ? "text-primary"
+                : "text-muted-foreground"
+            }`}
+            data-testid="nav-link-diagnostico-page-mobile"
+          >
+            {lang === "es" ? "Diagnóstico" : "Diagnosis"}
+          </Link>
+
           <Link
             href="/casos-conceptuales"
             className={`text-sm font-medium transition-colors hover:text-primary ${
