@@ -68,7 +68,8 @@ async function downloadInvoicePdf(id: number, invoiceNumber: string) {
   a.href = url;
   a.download = `Factura-${invoiceNumber}.pdf`;
   a.click();
-  URL.revokeObjectURL(url);
+  // Safari cancela la descarga si la URL se revoca en el mismo tick del click.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // "aaaa-mm-dd" -> "dd/mm/aaaa" para mostrar en el listado.
