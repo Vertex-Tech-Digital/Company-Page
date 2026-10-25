@@ -26,8 +26,25 @@ function createRateLimiter({ prefix, count, window }) {
   // call site: `if (await isRateLimited(clientIp)) return 429`).
   return async function isRateLimited(key) {
     if (!ratelimit) return false;
-    const { success } = await ratelimit.limit(key);
-    return !success;
+    try {
+      const { success } = await ratelimit.limit(key);
+      return !success;
+    } catch (err) {
+      // Si Upstash/KV falla, se deja pasar la request sin límite en vez de
+      // tumbar el endpoint con un 500 — mismo criterio que cuando faltan
+      // KV_REST_API_URL/KV_REST_API_TOKEN. No se loguea la key (es la IP).
+      console.error(
+        JSON.stringify({
+          logType: "technical",
+          action: "RATE_LIMIT",
+          status: "FAILURE",
+          prefix,
+          error: err instanceof Error ? err.message : "Unknown error",
+          timestamp: new Date().toISOString(),
+        }),
+      );
+      return false;
+    }
   };
 }
 
