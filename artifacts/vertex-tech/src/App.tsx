@@ -8,6 +8,7 @@ import { useEffect, Suspense, lazy } from "react";
 import { Loader2 } from "lucide-react";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CookieConsent } from "@/components/sections/CookieConsent";
+import { ScrollToTop } from "@/components/common/ScrollToTop";
 
 function RouteFallback() {
   return (
@@ -73,6 +74,7 @@ function App() {
           <WouterRouter
             base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}
           >
+            <ScrollToTop />
             <Router />
           </WouterRouter>
           <Toaster />

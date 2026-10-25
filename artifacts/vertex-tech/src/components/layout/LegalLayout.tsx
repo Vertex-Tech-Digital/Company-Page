@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "wouter";
 import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
@@ -21,6 +21,10 @@ export function LegalLayout({
   children,
 }: LegalLayoutProps) {
   const { lang } = useLanguage();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, []);
 
   return (
     <main className="min-h-screen text-foreground font-sans relative bg-background">
