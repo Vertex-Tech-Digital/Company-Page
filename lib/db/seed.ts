@@ -107,7 +107,10 @@ const bannedWords = [
 
 const MIN_ADMIN_PASSWORD_LENGTH = 16;
 
-const adminUsername = process.env.ADMIN_USERNAME;
+// En minúsculas y sin espacios: api/_admin/login.js busca el usuario con
+// username.toLowerCase().trim(), así que guardar "Sandy" haría imposible
+// el login.
+const adminUsername = process.env.ADMIN_USERNAME?.toLowerCase().trim();
 const adminPassword = process.env.ADMIN_PASSWORD;
 
 if (!adminUsername) {
