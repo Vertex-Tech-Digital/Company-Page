@@ -26,38 +26,40 @@ export function Hero() {
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="max-w-2xl"
+            className="max-w-2xl relative"
           >
+            {/* Sutil resplandor de contraste para aislar el texto frente a las partículas del canvas */}
+            <div className="absolute -inset-6 -z-10 rounded-3xl bg-background/65 blur-2xl pointer-events-none" />
+
             <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-tight"
+              className="text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] font-bold tracking-tight text-white mb-5 leading-[1.08] drop-shadow-[0_2px_12px_rgba(10,15,29,0.9)]"
               data-testid="hero-title"
             >
               {lang === "es" ? (
                 <>
                   Soluciones tecnológicas de alto{" "}
-                  <span className="text-primary">impacto</span> para los
-                  problemas de tu empresa
+                  <span className="text-primary">impacto</span> para tu empresa
                 </>
               ) : (
                 <>
                   High-impact tech{" "}
                   <span className="text-primary">solutions</span> for your
-                  business challenges
+                  business
                 </>
               )}
             </h1>
 
             <p
-              className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed"
+              className="text-base sm:text-lg md:text-xl text-slate-300 mb-6 leading-relaxed max-w-xl drop-shadow-[0_2px_10px_rgba(10,15,29,0.85)]"
               data-testid="hero-subtitle"
             >
               {t("hero.subheadline")}
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 items-center">
               <Button
-                onClick={() => scrollTo("#contacto")}
+                asChild
                 size="lg"
-                className="bg-primary text-white hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-8 h-14"
+                className="bg-primary text-white hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-7 h-12"
                 data-testid="hero-cta-primary"
               >
                 <Link href="/diagnostico">{t("hero.cta.audit")}</Link>
@@ -66,7 +68,7 @@ export function Hero() {
                 onClick={() => scrollTo("#contacto")}
                 variant="outline"
                 size="lg"
-                className="border-border hover:bg-white/5 text-base px-8 h-14"
+                className="border-border hover:bg-white/5 text-base px-7 h-12"
                 data-testid="hero-cta-secondary"
               >
                 {t("hero.cta.primary")}

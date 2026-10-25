@@ -93,7 +93,7 @@ export function Navbar() {
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.9)] ml-1 mb-0.5 align-middle"></span>
             </span>
             <span className="text-[10px] tracking-[0.2em] uppercase text-primary/70 font-medium">
-              Consultora Tecnológica
+              {t("nav.tagline")}
             </span>
           </div>
         </a>
