@@ -8,12 +8,12 @@ import {
 
 type Language = "es" | "en";
 
-const companyTaxId =
+export const companyTaxId =
   import.meta.env.VITE_COMPANY_TAX_ID || "[Identificación Fiscal / Tax ID]";
-const companyHolder =
-  import.meta.env.VITE_COMPANY_HOLDER || "[Titular Legal / Legal Holder]";
-const contactEmail =
-  import.meta.env.VITE_CONTACT_EMAIL || "[Correo de Contacto / Contact Email]";
+export const companyHolder =
+  import.meta.env.VITE_COMPANY_HOLDER || "Vertex Tech Digital S.L.";
+export const contactEmail =
+  import.meta.env.VITE_CONTACT_EMAIL || "contacto@vertextechdigital.com";
 
 interface LanguageContextType {
   lang: Language;
@@ -24,6 +24,7 @@ interface LanguageContextType {
 const translations: Record<Language, Record<string, string>> = {
   es: {
     // Nav
+    "nav.tagline": "Consultora Tecnológica",
     "nav.inicio": "Inicio",
     "nav.servicios": "Servicios",
     "nav.proyectos": "Proyectos",
@@ -121,7 +122,9 @@ const translations: Record<Language, Record<string, string>> = {
       "2026 Vertex Tech Digital. Todos los derechos reservados.",
     "footer.legal": "Aviso Legal",
     "footer.privacy": "Política de Privacidad",
+    "footer.terms": "Términos de Servicio",
     "footer.cookies": "Cookies",
+    "footer.cookies.settings": "Configuración de cookies",
     "footer.github": "GitHub",
     "footer.legal.title": "Aviso Legal",
     "footer.legal.body": `En cumplimiento del artículo 10 de la Ley 34/2002 (LSSI-CE), se informa que este sitio web es una plataforma de presentación comercial operada por ${companyHolder}, con identificación fiscal ${companyTaxId} y domicilio legal configurado. Para cualquier consulta o comunicación, puede dirigirse al correo electrónico oficial de contacto: ${contactEmail}.`,
@@ -131,6 +134,24 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies.body":
       "Esta web ha sido diseñada bajo principios de privacidad y rendimiento técnico. No utilizamos cookies de rastreo, analítica o marketing. Únicamente se emplean cookies técnicas esenciales para garantizar una navegación fluida y segura por el sitio.",
     "footer.close": "Cerrar",
+    // Cookies & Consent
+    "cookie.banner.title": "Privacidad y Cookies en Vertex Tech",
+    "cookie.banner.desc":
+      "Utilizamos almacenamiento local técnico para garantizar el funcionamiento del sitio y recordar tus preferencias. No activamos cookies analíticas ni de seguimiento sin tu consentimiento explícito.",
+    "cookie.banner.acceptAll": "Aceptar todas",
+    "cookie.banner.reject": "Rechazar no esenciales",
+    "cookie.banner.configure": "Configurar",
+    "cookie.modal.title": "Centro de Preferencias de Privacidad",
+    "cookie.modal.desc":
+      "Gestiona de forma granular qué datos y tecnologías de almacenamiento permites en este dispositivo de conformidad con el RGPD y la LSSI-CE.",
+    "cookie.modal.necessary.title": "Técnicas y Esenciales",
+    "cookie.modal.necessary.desc":
+      "Imprescindibles para que la plataforma funcione: recuerdan tu idioma preferido, tu sesión activa y este consentimiento. No se pueden desactivar.",
+    "cookie.modal.necessary.badge": "Siempre activas",
+    "cookie.modal.analytics.title": "Analíticas y Rendimiento",
+    "cookie.modal.analytics.desc":
+      "Permiten analizar de forma anónima métricas de uso y rendimiento técnico para mejorar la velocidad y estabilidad de nuestros servicios.",
+    "cookie.modal.save": "Guardar preferencias",
     // WhatsApp
     "whatsapp.cta": "Contáctanos por WhatsApp",
     "whatsapp.aria": "Contactar por WhatsApp",
@@ -139,6 +160,7 @@ const translations: Record<Language, Record<string, string>> = {
   },
   en: {
     // Nav
+    "nav.tagline": "Technology Consulting",
     "nav.inicio": "Home",
     "nav.servicios": "Services",
     "nav.proyectos": "Projects",
@@ -232,7 +254,9 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.copyright": "2026 Vertex Tech Digital. All rights reserved.",
     "footer.legal": "Legal Notice",
     "footer.privacy": "Privacy Policy",
+    "footer.terms": "Terms of Service",
     "footer.cookies": "Cookies",
+    "footer.cookies.settings": "Cookie Settings",
     "footer.github": "GitHub",
     "footer.legal.title": "Legal Notice",
     "footer.legal.body": `In compliance with Article 10 of Law 34/2002 (LSSI-CE), please be advised that this website is a commercial presentation platform operated by ${companyHolder}, with tax identification number ${companyTaxId} and a configured legal address. For any inquiries, please reach out to our official contact email: ${contactEmail}.`,
@@ -242,6 +266,24 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies.body":
       "This website has been designed under principles of privacy and technical performance. We do not use tracking, analytics, or marketing cookies. Only essential technical cookies are used to ensure smooth and secure navigation throughout the site.",
     "footer.close": "Close",
+    // Cookies & Consent
+    "cookie.banner.title": "Privacy & Cookies at Vertex Tech",
+    "cookie.banner.desc":
+      "We use essential local storage to ensure technical site operations and store your preferences. We do not enable analytical or tracking cookies without your explicit consent.",
+    "cookie.banner.acceptAll": "Accept all",
+    "cookie.banner.reject": "Reject non-essential",
+    "cookie.banner.configure": "Configure",
+    "cookie.modal.title": "Privacy Preferences Center",
+    "cookie.modal.desc":
+      "Granularly manage what data and storage technologies you allow on this device in accordance with GDPR and EU privacy regulations.",
+    "cookie.modal.necessary.title": "Technical & Essential",
+    "cookie.modal.necessary.desc":
+      "Required for core site operation: stores language choice, active session, and this consent decision. Cannot be disabled.",
+    "cookie.modal.necessary.badge": "Always active",
+    "cookie.modal.analytics.title": "Analytics & Performance",
+    "cookie.modal.analytics.desc":
+      "Allows anonymous measurement of usage metrics and technical performance to improve speed and platform stability.",
+    "cookie.modal.save": "Save preferences",
     // WhatsApp
     "whatsapp.cta": "Contact us on WhatsApp",
     "whatsapp.aria": "Contact via WhatsApp",
@@ -261,6 +303,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const savedLang = localStorage.getItem("vertex-tech-lang") as Language;
     if (savedLang === "es" || savedLang === "en") setLangState(savedLang);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const setLang = (newLang: Language) => {
     setLangState(newLang);

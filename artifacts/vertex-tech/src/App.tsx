@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import { useEffect, Suspense, lazy } from "react";
 import { Loader2 } from "lucide-react";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { CookieConsent } from "@/components/sections/CookieConsent";
 
 function RouteFallback() {
   return (
@@ -25,6 +26,10 @@ const Admin = lazy(() => import("@/pages/Admin"));
 const Diagnostico = lazy(() => import("@/pages/Diagnostico"));
 const CasosConceptuales = lazy(() => import("@/pages/CasosConceptuales"));
 const CasoConceptual = lazy(() => import("@/pages/CasoConceptual"));
+const LegalNotice = lazy(() => import("@/pages/LegalNotice"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
+const CookiePolicy = lazy(() => import("@/pages/CookiePolicy"));
 
 const queryClient = new QueryClient();
 
@@ -45,6 +50,11 @@ function Router() {
             Protegido con el login JWT; no enlazado en el menú. */}
         <Route path="/admin" component={Admin} />
         <Route path="/diagnostico" component={Diagnostico} />
+        {/* Páginas Legales y Cumplimiento Normativo (RGPD, LOPDGDD y LSSI-CE) */}
+        <Route path="/aviso-legal" component={LegalNotice} />
+        <Route path="/privacidad" component={PrivacyPolicy} />
+        <Route path="/terminos" component={TermsOfService} />
+        <Route path="/cookies" component={CookiePolicy} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
@@ -66,6 +76,7 @@ function App() {
             <Router />
           </WouterRouter>
           <Toaster />
+          <CookieConsent />
         </TooltipProvider>
       </QueryClientProvider>
     </LanguageProvider>
