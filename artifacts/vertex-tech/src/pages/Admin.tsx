@@ -61,7 +61,11 @@ export default function Admin() {
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src="/logo.jpg"
+              src="/logo-88.webp"
+              srcSet="/logo-44.webp 1x, /logo-88.webp 2x, /logo-132.webp 3x"
+              width={32}
+              height={32}
+              decoding="async"
               alt="Vertex Tech"
               className="h-8 w-8 rounded-lg object-cover"
             />
