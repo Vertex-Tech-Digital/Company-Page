@@ -30,6 +30,9 @@ const {
   invoiceCreatePreSchema,
   invoiceCreatePostSchema,
   normalizeInvoiceCreateInput,
+  ADMIN_USERNAME_MAX_LENGTH,
+  ADMIN_PASSWORD_MAX_LENGTH,
+  adminLoginSchema,
 } = require("../api/_validation");
 
 // ─── Validación de NIF / NIE / CIF ──────────────────────────────────────────
@@ -610,4 +613,47 @@ test("Diagnóstico: rechaza si tanto problemas marcados como texto libre están 
   const normalized = normalizeDiagnosticoInput(raw);
   const post = diagnosticoPostSchema.safeParse(normalized);
   assert.equal(post.success, false);
+});
+
+// ─── Endpoint Login Admin (/api/admin-login) ─────────────────────────────────
+
+test("Login admin: acepta usuario y contraseña dentro de los límites", () => {
+  const res = adminLoginSchema.safeParse({
+    username: "a".repeat(ADMIN_USERNAME_MAX_LENGTH),
+    password: "p".repeat(ADMIN_PASSWORD_MAX_LENGTH),
+  });
+  assert.equal(res.success, true);
+});
+
+test("Login admin: rechaza usuario o contraseña por encima del máximo", () => {
+  const longUser = adminLoginSchema.safeParse({
+    username: "a".repeat(ADMIN_USERNAME_MAX_LENGTH + 1),
+    password: "contraseña",
+  });
+  assert.equal(longUser.success, false);
+  assert.equal(longUser.error.issues[0].path[0], "username");
+
+  const longPassword = adminLoginSchema.safeParse({
+    username: "anier",
+    password: "p".repeat(ADMIN_PASSWORD_MAX_LENGTH + 1),
+  });
+  assert.equal(longPassword.success, false);
+  assert.equal(longPassword.error.issues[0].path[0], "password");
+});
+
+test("Login admin: rechaza campos ausentes, vacíos o de otro tipo", () => {
+  const missing = adminLoginSchema.safeParse({ password: "contraseña" });
+  assert.equal(missing.success, false);
+  assert.equal(missing.error.issues[0].message, "Usuario requerido");
+
+  const empty = adminLoginSchema.safeParse({ username: "anier", password: "" });
+  assert.equal(empty.success, false);
+  assert.equal(empty.error.issues[0].message, "Contraseña requerida");
+
+  const wrongType = adminLoginSchema.safeParse({ username: 42, password: [] });
+  assert.equal(wrongType.success, false);
+
+  const notObject = adminLoginSchema.safeParse("anier:contraseña");
+  assert.equal(notObject.success, false);
+  assert.equal(notObject.error.issues[0].message, "Datos inválidos");
 });

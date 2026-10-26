@@ -106,6 +106,11 @@ const bannedWords = [
 //   ADMIN_USERNAME="usuario" ADMIN_PASSWORD="contraseña_real_y_larga" pnpm run seed
 
 const MIN_ADMIN_PASSWORD_LENGTH = 16;
+// Los mismos máximos que acepta el login (ADMIN_*_MAX_LENGTH en
+// artifacts/vertex-tech/api/_validation.js): por encima, la cuenta se
+// crearía pero el endpoint rechazaría cada intento de entrar.
+const MAX_ADMIN_USERNAME_LENGTH = 64;
+const MAX_ADMIN_PASSWORD_LENGTH = 128;
 
 // En minúsculas y sin espacios: api/_admin/login.js busca el usuario con
 // username.toLowerCase().trim(), así que guardar "Sandy" haría imposible
@@ -123,9 +128,19 @@ if (!adminPassword) {
     'ADMIN_PASSWORD no está definida. Corre: ADMIN_USERNAME="usuario" ADMIN_PASSWORD="contraseña_real_y_larga" pnpm run seed',
   );
 }
+if (adminUsername.length > MAX_ADMIN_USERNAME_LENGTH) {
+  throw new Error(
+    `ADMIN_USERNAME es demasiado largo (máximo ${MAX_ADMIN_USERNAME_LENGTH} caracteres).`,
+  );
+}
 if (adminPassword.length < MIN_ADMIN_PASSWORD_LENGTH) {
   throw new Error(
     `ADMIN_PASSWORD es demasiado corta (mínimo ${MIN_ADMIN_PASSWORD_LENGTH} caracteres).`,
+  );
+}
+if (adminPassword.length > MAX_ADMIN_PASSWORD_LENGTH) {
+  throw new Error(
+    `ADMIN_PASSWORD es demasiado larga (máximo ${MAX_ADMIN_PASSWORD_LENGTH} caracteres).`,
   );
 }
 
