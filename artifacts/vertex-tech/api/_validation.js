@@ -400,36 +400,6 @@ function normalizeDiagnosticoInput(raw) {
   };
 }
 
-// ─── 3. Esquemas para PAGOS (/api/create-payment-intent) ─────────────────────
-const MIN_PAYMENT_EUROS = 1; // 1,00 €
-const MAX_PAYMENT_EUROS = 50000; // 50.000,00 €
-
-const paymentIntentPreSchema = z.object({
-  name: z.string({ required_error: "Nombre requerido" }).min(2).max(100),
-  email: z.string({ required_error: "Email requerido" }).min(5).max(255),
-  amount: z.union([z.number(), z.string()], {
-    required_error: "Importe requerido",
-  }),
-});
-
-const paymentIntentPostSchema = z.object({
-  name: z.string().min(2, "Nombre inválido").max(100),
-  email: z.string().email("Email inválido").max(255),
-  amount: z
-    .number()
-    .finite("El importe debe ser un número finito")
-    .min(MIN_PAYMENT_EUROS, `El importe mínimo es ${MIN_PAYMENT_EUROS} €`)
-    .max(MAX_PAYMENT_EUROS, `El importe máximo es ${MAX_PAYMENT_EUROS} €`),
-});
-
-function normalizePaymentIntentInput(raw) {
-  return {
-    name: sanitizeString(raw.name),
-    email: sanitizeString(raw.email).toLowerCase(),
-    amount: typeof raw.amount === "number" ? raw.amount : Number(raw.amount),
-  };
-}
-
 // ─── 4. Esquemas para COMENTARIOS (/api/comments) ─────────────────────────────
 const commentPreSchema = z.object({
   postId: z.number({ required_error: "postId requerido" }).int().positive(),
@@ -680,10 +650,6 @@ module.exports = {
   diagnosticoPreSchema,
   diagnosticoPostSchema,
   normalizeDiagnosticoInput,
-  // Pagos
-  paymentIntentPreSchema,
-  paymentIntentPostSchema,
-  normalizePaymentIntentInput,
   // Comentarios
   commentPreSchema,
   commentPostSchema,
