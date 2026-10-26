@@ -80,7 +80,11 @@ export function Navbar() {
           data-testid="nav-logo"
         >
           <img
-            src="/logo.jpg"
+            src="/logo-88.webp"
+            srcSet="/logo-44.webp 1x, /logo-88.webp 2x, /logo-132.webp 3x"
+            width={44}
+            height={44}
+            decoding="async"
             alt="Vertex Tech"
             className="h-11 w-11 rounded-xl object-cover transition-transform group-hover:scale-105 drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]"
           />
