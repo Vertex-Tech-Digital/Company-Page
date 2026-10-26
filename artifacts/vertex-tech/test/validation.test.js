@@ -21,9 +21,6 @@ const {
   diagnosticoPreSchema,
   diagnosticoPostSchema,
   normalizeDiagnosticoInput,
-  paymentIntentPreSchema,
-  paymentIntentPostSchema,
-  normalizePaymentIntentInput,
   commentPreSchema,
   commentPostSchema,
   normalizeCommentInput,
@@ -297,37 +294,6 @@ test("Contacto: rechaza textos que superan límites o quedan vacíos", () => {
     message: "Corto", // Menor a 10
   });
   assert.equal(pre.success, false);
-});
-
-// ─── Endpoint Pagos (/api/create-payment-intent) ─────────────────────────────
-
-test("Pagos: valida importes finitos y dentro de rango permitido", () => {
-  const raw = {
-    name: "Cliente Empresa",
-    email: "cliente@empresa.com",
-    amount: 150.5,
-  };
-
-  const pre = paymentIntentPreSchema.safeParse(raw);
-  assert.equal(pre.success, true);
-
-  const normalized = normalizePaymentIntentInput(pre.data);
-  const post = paymentIntentPostSchema.safeParse(normalized);
-  assert.equal(post.success, true);
-  assert.equal(post.data.amount, 150.5);
-});
-
-test("Pagos: rechaza importes negativos, cero, infinitos o fuera de rango", () => {
-  const badAmounts = [-10, 0, 0.5, 50001, NaN, Infinity, -Infinity];
-  for (const amount of badAmounts) {
-    const normalized = normalizePaymentIntentInput({
-      name: "Cliente",
-      email: "cliente@empresa.com",
-      amount,
-    });
-    const post = paymentIntentPostSchema.safeParse(normalized);
-    assert.equal(post.success, false, `Debió rechazar importe ${amount}`);
-  }
 });
 
 // ─── Endpoint Comentarios (/api/comments) ───────────────────────────────────

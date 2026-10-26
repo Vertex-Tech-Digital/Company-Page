@@ -119,10 +119,6 @@ export default function PrivacyPolicy() {
               Inc. (Serverless PostgreSQL with SSL encryption and EU data
               residency guarantees).
             </li>
-            <li>
-              <strong className="text-slate-200">Payment Gateway:</strong>{" "}
-              Stripe Payments Europe Ltd. (PCI-DSS compliant).
-            </li>
           </ul>
         </section>
 
@@ -293,11 +289,6 @@ export default function PrivacyPolicy() {
               Base de Datos PostgreSQL:
             </strong>{" "}
             Neon Inc. (cifrado en reposo y en tránsito con protocolo TLS 1.3).
-          </li>
-          <li>
-            <strong className="text-slate-200">Pasarela de Pagos:</strong>{" "}
-            Stripe Payments Europe Ltd. (cumplimiento normativo PCI-DSS de Nivel
-            1).
           </li>
         </ul>
       </section>

@@ -7,7 +7,7 @@ import fs from "node:fs";
  * Plugin de Vite SOLO para `vite dev`.
  *
  * Monta las funciones serverless de `api/*.js` (formato Vercel) como middleware
- * del dev server, para poder probar el backend (Stripe, contacto, etc.) con
+ * del dev server, para poder probar el backend (contacto, diagnóstico, etc.) con
  * `pnpm dev`, sin necesidad de `vercel dev`.
  *
  * No afecta al build ni a producción: `apply: "serve"`.
@@ -22,7 +22,7 @@ export function devApiPlugin() {
       const root = server.config.root;
 
       // Carga TODAS las variables del .env (incluidas las que no llevan VITE_)
-      // en process.env, para que las funciones puedan leer STRIPE_SECRET_KEY.
+      // en process.env, para que las funciones puedan leer DATABASE_URL, etc.
       const env = loadEnv(server.config.mode, root, "");
       for (const [key, value] of Object.entries(env)) {
         if (process.env[key] === undefined) process.env[key] = value;
