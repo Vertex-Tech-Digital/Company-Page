@@ -621,6 +621,40 @@ const moderationStatusSchema = z.object({
   }),
 });
 
+// ─── 7. Esquema para LOGIN ADMIN (/api/admin-login) ───────────────────────────
+// Los mismos máximos se aplican en lib/db/seed.ts (para no poder crear una
+// cuenta que luego no pueda entrar) y como maxLength en AdminLogin.tsx.
+// bcrypt solo usa los primeros 72 bytes de la contraseña: el máximo no
+// cambia la seguridad del hash, solo acota lo que el endpoint acepta.
+const ADMIN_USERNAME_MAX_LENGTH = 64;
+const ADMIN_PASSWORD_MAX_LENGTH = 128;
+
+const adminLoginSchema = z.object(
+  {
+    username: z
+      .string({
+        required_error: "Usuario requerido",
+        invalid_type_error: "Usuario inválido",
+      })
+      .min(1, "Usuario requerido")
+      .max(
+        ADMIN_USERNAME_MAX_LENGTH,
+        `El usuario no puede superar los ${ADMIN_USERNAME_MAX_LENGTH} caracteres`,
+      ),
+    password: z
+      .string({
+        required_error: "Contraseña requerida",
+        invalid_type_error: "Contraseña inválida",
+      })
+      .min(1, "Contraseña requerida")
+      .max(
+        ADMIN_PASSWORD_MAX_LENGTH,
+        `La contraseña no puede superar los ${ADMIN_PASSWORD_MAX_LENGTH} caracteres`,
+      ),
+  },
+  { invalid_type_error: "Datos inválidos" },
+);
+
 module.exports = {
   DEFAULT_MAX_BODY_BYTES,
   INVOICE_MAX_BODY_BYTES,
@@ -662,4 +696,8 @@ module.exports = {
   moderationWordPreSchema,
   moderationWordPostSchema,
   moderationStatusSchema,
+  // Login admin
+  ADMIN_USERNAME_MAX_LENGTH,
+  ADMIN_PASSWORD_MAX_LENGTH,
+  adminLoginSchema,
 };

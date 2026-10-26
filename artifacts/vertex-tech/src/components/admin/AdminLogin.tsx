@@ -88,6 +88,8 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                 placeholder="nombre de usuario"
                 className="w-full bg-background border border-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
                 autoComplete="username"
+                // Mismos máximos que valida el servidor (api/_validation.js)
+                maxLength={64}
               />
             </div>
           </div>
@@ -107,6 +109,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                 placeholder="••••••••"
                 className="w-full bg-background border border-border rounded-lg pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
                 autoComplete="current-password"
+                maxLength={128}
               />
               <button
                 type="button"
