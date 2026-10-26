@@ -139,6 +139,7 @@ module.exports = async function handler(req, res) {
   // ── Persistencia: numeración atómica + upsert cliente + insert factura ──────
   const dbClient = await pool.connect();
   let invoiceNumber;
+  let invoiceId;
   try {
     await dbClient.query("BEGIN");
     const year = new Date().getFullYear();
@@ -161,12 +162,13 @@ module.exports = async function handler(req, res) {
     );
     const clientId = upserted.rows[0].id;
 
-    await dbClient.query(
+    const insertedInvoice = await dbClient.query(
       `INSERT INTO invoices
          (invoice_number, client_id, client_legal_name, client_nif, client_email,
           client_address, language, issue_date, due_date, items, tax_rate,
           subtotal, tax_amount, total, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'sent')`,
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'sent')
+       RETURNING id`,
       [
         invoiceNumber,
         clientId,
@@ -184,6 +186,7 @@ module.exports = async function handler(req, res) {
         totals.total,
       ],
     );
+    invoiceId = insertedInvoice.rows[0].id;
 
     await dbClient.query("COMMIT");
   } catch (err) {
@@ -213,6 +216,7 @@ module.exports = async function handler(req, res) {
     console.error("Invoice PDF error:", err);
     // La factura ya está guardada; se puede descargar/reenviar desde el listado.
     return res.status(200).json({
+      id: invoiceId,
       invoiceNumber,
       status: "sent",
       issueDate,
@@ -255,7 +259,10 @@ module.exports = async function handler(req, res) {
     }),
   );
 
+  // El PDF no va en la respuesta: ya salió por email y el panel lo descarga
+  // como application/pdf desde GET /api/admin-invoices?id=<id>&pdf=1.
   return res.status(200).json({
+    id: invoiceId,
     invoiceNumber,
     status: "sent",
     issueDate,
@@ -263,6 +270,5 @@ module.exports = async function handler(req, res) {
     taxAmount: totals.taxAmount,
     total: totals.total,
     emailSent,
-    pdfBase64: pdf.toString("base64"),
   });
 };
