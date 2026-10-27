@@ -188,6 +188,8 @@ export function Navbar() {
         <button
           className="md:hidden text-white"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={t(mobileMenuOpen ? "nav.closeMenu" : "nav.openMenu")}
+          aria-expanded={mobileMenuOpen}
           data-testid="nav-mobile-toggle"
         >
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
