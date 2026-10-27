@@ -23,8 +23,10 @@ const CONNECT_DIST = 180;
 // El chequeo de distancia entre partículas es O(n²) y cada nodo dibuja 3
 // gradientes radiales, así que en móvil (pantallas <768px) se reduce el
 // total para no saturar la GPU/batería en gama baja.
-function getParticleCounts() {
-  const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+// Recibe el ancho ya leído en init(): volver a leer window.innerWidth justo
+// después de escribir el tamaño del canvas puede forzar un reflow.
+function getParticleCounts(width: number) {
+  const isMobile = width < MOBILE_BREAKPOINT;
   return {
     total: isMobile ? TOTAL_MOBILE : TOTAL_DESKTOP,
     nodeCount: isMobile ? NODE_COUNT_MOBILE : NODE_COUNT_DESKTOP,
@@ -57,7 +59,7 @@ export function ParticleNetwork() {
       canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const { total, nodeCount } = getParticleCounts();
+      const { total, nodeCount } = getParticleCounts(W);
       particles = Array.from({ length: total }, (_, i) => {
         const isNode = i < nodeCount;
         return {
