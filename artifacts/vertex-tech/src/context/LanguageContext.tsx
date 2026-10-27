@@ -36,6 +36,8 @@ const translations: Record<Language, Record<string, string>> = {
     "casos.shareOn": "Compartir en",
     "casos.copyLink": "Copiar enlace",
     "nav.contactar": "Contactar",
+    "nav.openMenu": "Abrir menú",
+    "nav.closeMenu": "Cerrar menú",
     // Hero
     "hero.subheadline":
       "Consultoría tecnológica y soluciones a medida: automatizamos procesos, integramos sistemas y auditamos tu software para que tu empresa funcione más rápido, con menos errores y a menor coste.",
@@ -157,6 +159,8 @@ const translations: Record<Language, Record<string, string>> = {
     "whatsapp.aria": "Contactar por WhatsApp",
     "whatsapp.message":
       "Hola, me gustaría obtener más información sobre sus servicios.",
+    // Toasts
+    "toast.close": "Cerrar notificación",
   },
   en: {
     // Nav
@@ -172,6 +176,8 @@ const translations: Record<Language, Record<string, string>> = {
     "casos.shareOn": "Share on",
     "casos.copyLink": "Copy link",
     "nav.contactar": "Contact",
+    "nav.openMenu": "Open menu",
+    "nav.closeMenu": "Close menu",
     // Hero
     "hero.subheadline":
       "Technology consulting and custom solutions: we automate your processes, integrate your systems and audit your software — so your business runs faster, with fewer errors and at lower cost.",
@@ -289,6 +295,8 @@ const translations: Record<Language, Record<string, string>> = {
     "whatsapp.aria": "Contact via WhatsApp",
     "whatsapp.message":
       "Hello, I'd like to get more information about your services.",
+    // Toasts
+    "toast.close": "Close notification",
   },
 };
 
