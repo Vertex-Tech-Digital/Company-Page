@@ -580,7 +580,7 @@ export function AdminPosts() {
           <Button
             onClick={handleSave}
             disabled={saving || contentLoading}
-            className="bg-primary hover:bg-primary/90 text-white"
+            className="bg-primary-solid hover:bg-primary-solid-hover text-white"
           >
             {saving
               ? "Guardando..."
@@ -624,7 +624,7 @@ export function AdminPosts() {
           </button>
           <Button
             onClick={openCreateForm}
-            className="bg-primary hover:bg-primary/90 text-white gap-1.5 text-xs h-8 px-3"
+            className="bg-primary-solid hover:bg-primary-solid-hover text-white gap-1.5 text-xs h-8 px-3"
           >
             <Plus className="w-3.5 h-3.5" />
             Nuevo post

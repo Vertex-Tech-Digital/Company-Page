@@ -116,7 +116,7 @@ export function CookieConsent() {
                 <Button
                   onClick={handleAcceptAll}
                   size="sm"
-                  className="bg-primary text-white hover:bg-primary/90 h-10 text-xs font-medium shadow-[0_0_15px_rgba(59,130,246,0.25)]"
+                  className="bg-primary-solid text-white hover:bg-primary-solid-hover h-10 text-xs font-medium shadow-[0_0_15px_rgba(59,130,246,0.25)]"
                   data-testid="cookie-accept-all"
                 >
                   {t("cookie.banner.acceptAll")}
@@ -255,7 +255,7 @@ export function CookieConsent() {
                   <Button
                     onClick={handleSaveCustom}
                     size="sm"
-                    className="bg-primary text-white hover:bg-primary/90 text-xs flex-1 sm:flex-initial"
+                    className="bg-primary-solid text-white hover:bg-primary-solid-hover text-xs flex-1 sm:flex-initial"
                   >
                     {t("cookie.modal.save")}
                   </Button>

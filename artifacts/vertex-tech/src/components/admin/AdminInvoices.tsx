@@ -483,7 +483,7 @@ function InvoiceForm() {
         <Button
           type="submit"
           disabled={mutation.isPending}
-          className="w-full h-12 bg-primary text-white hover:bg-primary/90 text-md shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+          className="w-full h-12 bg-primary-solid text-white hover:bg-primary-solid-hover text-md shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
         >
           {mutation.isPending ? (
             <>

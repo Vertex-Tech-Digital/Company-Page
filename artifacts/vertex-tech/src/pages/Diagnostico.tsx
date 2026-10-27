@@ -449,7 +449,7 @@ export default function Diagnostico() {
                         </p>
                         <a
                           href={`tel:${import.meta.env.VITE_CONTACT_PHONE || ""}`}
-                          className="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary/90 transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                          className="flex items-center justify-center gap-2 w-full py-3 bg-primary-solid hover:bg-primary-solid-hover transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                         >
                           <Phone className="h-4 w-4" />
                           Llamar a Vertex Tech Digital
@@ -468,7 +468,7 @@ export default function Diagnostico() {
                         </p>
                         <a
                           href={`mailto:${import.meta.env.VITE_CONTACT_EMAIL || ""}?subject=Diagnóstico Tecnológico Completado`}
-                          className="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary/90 transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                          className="flex items-center justify-center gap-2 w-full py-3 bg-primary-solid hover:bg-primary-solid-hover transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                         >
                           <Mail className="h-4 w-4" />
                           Enviar Email de Consulta
@@ -486,7 +486,7 @@ export default function Diagnostico() {
                     </button>
                     <a
                       href="/"
-                      className="px-6 py-3 bg-primary text-white hover:bg-primary/90 transition-all duration-300 font-semibold rounded-lg text-sm flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                      className="px-6 py-3 bg-primary-solid text-white hover:bg-primary-solid-hover transition-all duration-300 font-semibold rounded-lg text-sm flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
                     >
                       Volver a Inicio <ArrowRight className="h-4 w-4" />
                     </a>
@@ -735,7 +735,7 @@ export default function Diagnostico() {
                     transition={{ duration: 0.4, delay: 0.2 }}
                   >
                     <button
-                      className="w-full md:w-auto px-8 py-3.5 bg-primary text-white hover:bg-primary/90 transition-all duration-300 font-bold rounded-lg text-sm md:text-base flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                      className="w-full md:w-auto px-8 py-3.5 bg-primary-solid text-white hover:bg-primary-solid-hover transition-all duration-300 font-bold rounded-lg text-sm md:text-base flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
                       type="submit"
                       disabled={loading}
                     >

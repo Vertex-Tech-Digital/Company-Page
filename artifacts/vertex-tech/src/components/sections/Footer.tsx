@@ -109,7 +109,7 @@ export function Footer() {
               onClick={() =>
                 window.dispatchEvent(new CustomEvent("open-cookie-preferences"))
               }
-              className="cursor-pointer text-xs text-primary/80 hover:text-primary transition-colors underline-offset-2 hover:underline"
+              className="cursor-pointer text-xs text-primary underline-offset-2 hover:underline"
               data-testid="footer-cookie-settings"
             >
               {t("footer.cookies.settings")}
