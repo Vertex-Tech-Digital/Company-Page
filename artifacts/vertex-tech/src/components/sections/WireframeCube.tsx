@@ -114,30 +114,45 @@ export function WireframeCube() {
     // de líneas finas.
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    function resize() {
-      if (!canvas || !container) return;
-      const rect = container.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      canvas.style.width = rect.width + "px";
-      canvas.style.height = rect.height + "px";
-      ctx!.scale(dpr, dpr);
+    let sized = false;
+    let isVisible = false;
+    let running = false;
+
+    // Un solo bucle de dibujo, y solo cuando ya hay tamaño y el cubo se ve.
+    function start() {
+      if (running || !sized || !isVisible) return;
+      running = true;
+      frameRef.current = requestAnimationFrame(draw);
     }
 
-    resize();
+    // El tamaño lo da el ResizeObserver: avisa una vez al empezar a observar
+    // y luego en cada cambio, con la medida que ya calculó el layout del
+    // navegador. Leerlo con getBoundingClientRect al montar obligaba a
+    // calcular el layout de toda la página dentro del efecto (forced reflow).
+    function resize([entry]: ResizeObserverEntry[]) {
+      if (!canvas) return;
+      const { width, height } = entry.contentRect;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = width + "px";
+      canvas.style.height = height + "px";
+      ctx!.scale(dpr, dpr);
+      // Hasta la primera medida el canvas mide 300×150 por defecto y las
+      // etiquetas saldrían mal colocadas, así que el bucle espera a tenerla.
+      sized = true;
+      start();
+    }
+
     const ro = new ResizeObserver(resize);
     ro.observe(container);
 
     // Evita quemar CPU dibujando 60fps mientras el cubo está fuera de
-    // viewport (p. ej. tras hacer scroll más allá del hero).
-    let isVisible = true;
+    // viewport (p. ej. tras hacer scroll más allá del hero). El observer
+    // siempre avisa una vez al empezar, así que fija el estado inicial.
     const io = new IntersectionObserver(
       ([entry]) => {
-        const wasVisible = isVisible;
         isVisible = entry.isIntersecting;
-        if (isVisible && !wasVisible) {
-          frameRef.current = requestAnimationFrame(draw);
-        }
+        start();
       },
       { threshold: 0 },
     );
@@ -226,10 +241,10 @@ export function WireframeCube() {
 
       if (isVisible) {
         frameRef.current = requestAnimationFrame(draw);
+      } else {
+        running = false;
       }
     }
-
-    frameRef.current = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(frameRef.current);
