@@ -215,7 +215,7 @@ export function AdminBannedWords() {
         <Button
           onClick={handleAdd}
           disabled={adding || !newWord.trim()}
-          className="bg-primary hover:bg-primary/90 text-white gap-1.5 shrink-0"
+          className="bg-primary-solid hover:bg-primary-solid-hover text-white gap-1.5 shrink-0"
         >
           <Plus className="w-4 h-4" />
           {adding ? "Agregando..." : "Agregar"}

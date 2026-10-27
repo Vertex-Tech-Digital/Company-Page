@@ -112,7 +112,7 @@ export default function CookiePolicy() {
           <div className="pt-2">
             <Button
               onClick={openCookiePreferences}
-              className="bg-primary text-white hover:bg-primary/90 flex items-center gap-2 h-11 px-5 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+              className="bg-primary-solid text-white hover:bg-primary-solid-hover flex items-center gap-2 h-11 px-5 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
             >
               <Settings2 className="w-4 h-4" />
               Open Cookie Preferences Center
@@ -278,7 +278,7 @@ export default function CookiePolicy() {
         <div className="pt-2">
           <Button
             onClick={openCookiePreferences}
-            className="bg-primary text-white hover:bg-primary/90 flex items-center gap-2 h-11 px-5 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+            className="bg-primary-solid text-white hover:bg-primary-solid-hover flex items-center gap-2 h-11 px-5 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
           >
             <Settings2 className="w-4 h-4" />
             Abrir Centro de Preferencias de Cookies

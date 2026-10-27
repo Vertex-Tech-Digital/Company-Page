@@ -177,7 +177,7 @@ export function Navbar() {
 
           <Button
             onClick={() => scrollTo("#contacto")}
-            className="bg-primary text-white hover:bg-primary/90 shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+            className="bg-primary-solid text-white hover:bg-primary-solid-hover shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
             data-testid="nav-cta"
           >
             {t("nav.contactar")}
@@ -274,7 +274,7 @@ export function Navbar() {
             */}
             <Button
               onClick={() => scrollTo("#contacto")}
-              className="bg-primary w-full text-white"
+              className="bg-primary-solid w-full text-white"
             >
               {t("nav.contactar")}
             </Button>

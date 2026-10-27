@@ -137,7 +137,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
           <Button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-primary hover:bg-primary/90 text-white font-medium"
+            className="w-full bg-primary-solid hover:bg-primary-solid-hover text-white font-medium"
           >
             {loading ? "Verificando..." : "Entrar"}
           </Button>

@@ -59,7 +59,7 @@ export function Hero() {
               <Button
                 asChild
                 size="lg"
-                className="bg-primary text-white hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-7 h-12"
+                className="bg-primary-solid text-white hover:bg-primary-solid-hover shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-7 h-12"
                 data-testid="hero-cta-primary"
               >
                 <Link href="/diagnostico">{t("hero.cta.audit")}</Link>

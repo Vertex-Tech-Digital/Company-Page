@@ -159,7 +159,7 @@ export default function Blog() {
               onClick={() => setSelectedCategory(null)}
               className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                 selectedCategory === null
-                  ? "bg-primary text-white border-primary"
+                  ? "bg-primary-solid text-white border-primary-solid"
                   : "border-border text-muted-foreground hover:border-primary/40 hover:text-white"
               }`}
             >
@@ -171,7 +171,7 @@ export default function Blog() {
                 onClick={() => setSelectedCategory(cat.slug)}
                 className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
                   selectedCategory === cat.slug
-                    ? "bg-primary text-white border-primary"
+                    ? "bg-primary-solid text-white border-primary-solid"
                     : "border-border text-muted-foreground hover:border-primary/40 hover:text-white"
                 }`}
               >
