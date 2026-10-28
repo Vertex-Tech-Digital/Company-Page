@@ -20,22 +20,19 @@ import {
   Sparkles,
   AlertTriangle,
   FileText,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 const problems = [
-  { id: 1, name: "Tareas manuales repetitivas" },
-  { id: 2, name: "Sistemas desconectados entre sí" },
-  { id: 3, name: "Lentitud o caídas de la web" },
-  { id: 4, name: "Respuesta tardía a clientes" },
-  { id: 5, name: "Facturación manual o uso de Excel" },
-  { id: 6, name: "Falta de visión global del negocio" },
-  { id: 7, name: "Errores humanos al copiar datos" },
-  { id: 8, name: "Software o sistemas obsoletos" },
-  { id: 9, name: "Métodos de cobro complicados" },
-  { id: 10, name: "Descontrol de stock/inventario" },
-  { id: 11, name: "Gestión de citas o reservas manual" },
-  { id: 12, name: "Falta de control en compras/ventas" },
-  { id: 13, name: "Software de terceros inestable" },
+  { id: 1, name: "Pierdo horas en tareas que podrían automatizarse" },
+  { id: 2, name: "Mis sistemas no se comunican entre ellos" },
+  { id: 3, name: "Mi web es lenta o se cae frecuentemente" },
+  { id: 4, name: "Tardo mucho en responder a clientes" },
+  { id: 5, name: "Facturo manualmente o con Excel" },
+  { id: 6, name: "No tengo datos claros para tomar decisiones" },
+  { id: 7, name: "Cometo errores al pasar datos entre sistemas" },
+  { id: 13, name: "El software que uso falla o es inestable" },
 ];
 
 function SectionTitle({
@@ -154,42 +151,38 @@ export default function Diagnostico() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [debugOutput, setDebugOutput] = useState<string | null>(null);
   const [preferenceSelected, setPreferenceSelected] = useState<string>("email");
-  const [markedCount, setMarkedCount] = useState(0);
-  const [showTextarea, setShowTextarea] = useState(false);
+  const [selectedProblems, setSelectedProblems] = useState<number[]>([]);
+  const [isPredefinedOpen, setIsPredefinedOpen] = useState(false);
+  const [freeTextValue, setFreeTextValue] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const handleCheckboxChange = () => {
-    const checkboxes = document.querySelectorAll(
-      ".problem-cb",
-    ) as NodeListOf<HTMLInputElement>;
-    let count = 0;
-    checkboxes.forEach((cb) => {
-      if (cb.checked) count++;
-    });
-    setMarkedCount(count);
-    if (count >= 3) {
-      setShowTextarea(false);
-    }
+  const toggleProblem = (id: number) => {
+    setValidationError(null);
+    setSelectedProblems((prev) =>
+      prev.includes(id) ? prev.filter((pId) => pId !== id) : [...prev, id],
+    );
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoading(true);
     setErrorMsg(null);
     setSuccessData(null);
     setDebugOutput(null);
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const freeText = (formData.get("free_text") as string) || "";
 
-    const markedProblems: number[] = [];
-    const checkboxes = form.querySelectorAll(
-      ".problem-cb",
-    ) as NodeListOf<HTMLInputElement>;
-    checkboxes.forEach((cb) => {
-      if (cb.checked) {
-        markedProblems.push(parseInt(cb.value, 10));
-      }
-    });
+    // Validación: El diagnóstico no puede irse vacío
+    if (selectedProblems.length === 0 && !freeText.trim()) {
+      setValidationError(
+        "Por favor, cuéntanos qué te está pasando o despliega y marca al menos una opción predefinida para generar tu diagnóstico.",
+      );
+      return;
+    }
+
+    setValidationError(null);
+    setLoading(true);
 
     const payload = {
       company_name: formData.get("company_name"),
@@ -198,8 +191,8 @@ export default function Diagnostico() {
       email: formData.get("email"),
       phone: formData.get("phone") || undefined,
       contact_preference: formData.get("contact_preference"),
-      marked_problems: markedProblems,
-      free_text: formData.get("free_text") || "",
+      marked_problems: selectedProblems,
+      free_text: freeText,
     };
 
     try {
@@ -233,8 +226,12 @@ export default function Diagnostico() {
           "El servidor devolvió un error inesperado. Consulta los logs del sistema.",
         );
       }
-    } catch (err: any) {
-      setErrorMsg(err.message || "Error de red al conectar con el servidor.");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Error de red al conectar con el servidor.";
+      setErrorMsg(message);
     } finally {
       setLoading(false);
     }
@@ -244,6 +241,10 @@ export default function Diagnostico() {
     setSuccessData(null);
     setErrorMsg(null);
     setDebugOutput(null);
+    setSelectedProblems([]);
+    setFreeTextValue("");
+    setIsPredefinedOpen(false);
+    setValidationError(null);
   };
 
   return (
@@ -590,118 +591,138 @@ export default function Diagnostico() {
                       Síntomas y Problemas Detectados
                     </SectionTitle>
 
-                    <p className="text-sm md:text-base text-muted-foreground mb-5 leading-relaxed">
-                      Selecciona todos los problemas que reconozcas actualmente
-                      en tu infraestructura digital o procesos:
-                    </p>
-
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        {markedCount > 0 && (
-                          <motion.span
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-bold"
-                          >
-                            {markedCount}
-                          </motion.span>
-                        )}
-                        {markedCount >= 3 && (
-                          <motion.span
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="text-xs text-primary font-medium"
-                          >
-                            ¡Perfecto! Puedes omitir la descripción
-                          </motion.span>
-                        )}
-                      </div>
-                      {markedCount > 0 && markedCount < 3 && (
-                        <motion.span
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="text-xs text-muted-foreground"
-                        >
-                          Selecciona al menos 3 para omitir la descripción
-                        </motion.span>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 bg-background/30 border border-border/50 rounded-xl p-4 md:p-6 mb-6">
-                      {problems.map((prob, index) => (
-                        <motion.label
-                          key={prob.id}
-                          htmlFor={`problem-${prob.id}`}
-                          className="group flex items-center gap-3 p-3 rounded-xl bg-card/30 border border-border/30 hover:border-primary/40 hover:bg-card/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.08)] transition-all duration-300 cursor-pointer select-none"
-                          initial={{ opacity: 0, y: 10 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 0.3, delay: index * 0.03 }}
-                        >
-                          <input
-                            type="checkbox"
-                            id={`problem-${prob.id}`}
-                            className="problem-cb h-4 w-4 rounded border-border bg-background/50 text-primary focus:ring-primary/30 focus:ring-offset-0 focus:outline-none transition-colors cursor-pointer shrink-0"
-                            value={prob.id}
-                            onChange={handleCheckboxChange}
-                          />
-                          <span className="text-muted-foreground text-xs md:text-sm font-medium group-hover:text-foreground transition-colors">
-                            {prob.name}
-                          </span>
-                        </motion.label>
-                      ))}
-                    </div>
-
-                    {/* Textarea condicional */}
-                    <AnimatePresence mode="wait">
-                      {(markedCount < 3 || showTextarea) && (
-                        <motion.div
-                          key="textarea"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="flex flex-col">
-                            <label
-                              className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2"
-                              htmlFor="free_text"
-                            >
-                              <FileText className="w-3.5 h-3.5 text-primary/70" />
-                              Descripción Libre / Necesidades
-                              {markedCount < 3 && (
-                                <span className="text-xs text-destructive font-normal">
-                                  (requerido)
-                                </span>
-                              )}
-                            </label>
-                            <textarea
-                              className="bg-background/50 border border-border/80 rounded-lg py-2.5 px-4 text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/30 focus:outline-none transition-all duration-200 text-sm"
-                              id="free_text"
-                              name="free_text"
-                              rows={4}
-                              required={markedCount < 3}
-                              placeholder="Escribe de forma libre lo que le ocurre a tu plataforma, software o procesos (nuestro motor inteligente detectará problemas adicionales)..."
-                            />
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* Botón "Agregar más detalles" cuando >= 3 y textarea oculto */}
-                    {markedCount >= 3 && !showTextarea && (
-                      <motion.button
-                        type="button"
-                        onClick={() => setShowTextarea(true)}
-                        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer mt-2"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
+                    {/* 1. Casilla de texto libre destacada */}
+                    <div className="flex flex-col mb-6">
+                      <label
+                        className="text-base font-semibold text-foreground mb-1.5 flex items-center gap-2"
+                        htmlFor="free_text"
                       >
-                        <FileText className="w-4 h-4" />
-                        ¿Deseas agregar más detalles?
-                      </motion.button>
+                        <FileText className="w-4 h-4 text-primary" />
+                        Cuéntanos qué te está pasando:
+                      </label>
+                      <p className="text-xs md:text-sm text-muted-foreground mb-3 leading-relaxed">
+                        Describe tu situación con tus propias palabras. Nuestro
+                        motor de IA analizará tu caso y detectará los problemas
+                        reales.
+                      </p>
+                      <textarea
+                        className="w-full bg-background/50 border border-border/80 rounded-xl p-4 text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/30 focus:outline-none transition-all duration-200 text-sm md:text-base leading-relaxed"
+                        id="free_text"
+                        name="free_text"
+                        rows={4}
+                        value={freeTextValue}
+                        onChange={(e) => {
+                          setFreeTextValue(e.target.value);
+                          if (validationError) setValidationError(null);
+                        }}
+                        placeholder='Ej: "Los pedidos entran por la tablet de la app de delivery (Glovo, Uber Eats, etc), pero no se sincronizan con nuestro TPV. Nosotros tenemos que teclear cada comando a mano para que registre la venta, lo que genera retrasos y errores en horas pico."'
+                      />
+                    </div>
+
+                    {/* 2. Lista desplegable plegada por defecto para problemas comunes */}
+                    <div className="border border-border/60 rounded-xl bg-card/20 overflow-hidden mb-6">
+                      <button
+                        type="button"
+                        onClick={() => setIsPredefinedOpen(!isPredefinedOpen)}
+                        className="w-full flex items-center justify-between p-4 md:p-5 text-left hover:bg-card/40 transition-colors cursor-pointer group"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+                          <span className="text-sm md:text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+                            ¿Prefieres marcar problemas comunes?{" "}
+                            <span className="text-muted-foreground font-normal text-xs md:text-sm">
+                              (opcional)
+                            </span>
+                          </span>
+                          {selectedProblems.length > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/20 text-primary border border-primary/30 w-fit">
+                              {selectedProblems.length}{" "}
+                              {selectedProblems.length === 1
+                                ? "seleccionado"
+                                : "seleccionados"}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs md:text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors shrink-0">
+                          <span>
+                            {isPredefinedOpen
+                              ? "Ocultar opciones predefinidas"
+                              : "Mostrar opciones predefinidas"}
+                          </span>
+                          {isPredefinedOpen ? (
+                            <ChevronUp className="w-4 h-4 transition-transform duration-200" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 transition-transform duration-200" />
+                          )}
+                        </div>
+                      </button>
+
+                      {/* Panel desplegable con las opciones predefinidas */}
+                      <AnimatePresence initial={false}>
+                        {isPredefinedOpen && (
+                          <motion.div
+                            key="predefined-options"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="overflow-hidden border-t border-border/40"
+                          >
+                            <div className="p-4 md:p-6 bg-background/30">
+                              <p className="text-xs text-muted-foreground mb-4">
+                                Marca las situaciones que reconozcas en tu
+                                negocio (puedes seleccionar tantas como desees):
+                              </p>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {problems.map((prob) => {
+                                  const isChecked = selectedProblems.includes(
+                                    prob.id,
+                                  );
+                                  return (
+                                    <label
+                                      key={prob.id}
+                                      htmlFor={`problem-${prob.id}`}
+                                      className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all duration-200 cursor-pointer select-none ${
+                                        isChecked
+                                          ? "bg-primary/10 border-primary/50 text-foreground shadow-[0_0_15px_rgba(59,130,246,0.1)]"
+                                          : "bg-card/30 border-border/40 hover:border-border hover:bg-card/50 text-muted-foreground"
+                                      }`}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        id={`problem-${prob.id}`}
+                                        className="h-4 w-4 mt-0.5 rounded border-border bg-background/50 text-primary focus:ring-primary/30 focus:ring-offset-0 focus:outline-none transition-colors cursor-pointer shrink-0"
+                                        checked={isChecked}
+                                        onChange={() => toggleProblem(prob.id)}
+                                      />
+                                      <span
+                                        className={`text-xs md:text-sm font-medium leading-snug ${
+                                          isChecked
+                                            ? "text-foreground font-semibold"
+                                            : "text-muted-foreground"
+                                        }`}
+                                      >
+                                        {prob.name}
+                                      </span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Mensaje de validación amigable si se intenta enviar vacío */}
+                    {validationError && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="p-4 mb-6 rounded-xl bg-destructive/10 border border-destructive/30 flex items-center gap-3 text-destructive text-sm"
+                      >
+                        <AlertCircle className="w-5 h-5 shrink-0" />
+                        <span>{validationError}</span>
+                      </motion.div>
                     )}
                   </motion.div>
 

@@ -1,7 +1,7 @@
 const problemsData = [
   {
     id: 1,
-    name: "Tareas manuales repetitivas",
+    name: "Pierdo horas en tareas que podrían automatizarse",
     keywords: [
       "manual",
       "repitiendo",
@@ -14,6 +14,11 @@ const problemsData = [
       "mecánico",
       "rutina",
       "tecleando",
+      "automatizar",
+      "horas",
+      "repetitivo",
+      "repetitiva",
+      "tareas",
     ],
     recommendation:
       "Eliminar el trabajo mecánico del personal. El equipo se centra en atender, no en copiar datos.",
@@ -21,7 +26,7 @@ const problemsData = [
   },
   {
     id: 2,
-    name: "Sistemas desconectados",
+    name: "Mis sistemas no se comunican entre ellos",
     keywords: [
       "no se habla",
       "separado",
@@ -35,6 +40,9 @@ const problemsData = [
       "desconectado",
       "aislado",
       "integrar",
+      "sistemas",
+      "conexión",
+      "conexion",
     ],
     recommendation:
       "Unificar las herramientas actuales sin sustituirlas. Construir puentes entre sistemas.",
@@ -42,7 +50,7 @@ const problemsData = [
   },
   {
     id: 3,
-    name: "Lentitud o caídas de la web",
+    name: "Mi web es lenta o se cae frecuentemente",
     keywords: [
       "lenta",
       "cae",
@@ -56,6 +64,8 @@ const problemsData = [
       "caídas",
       "servidor",
       "lento",
+      "web",
+      "frecuentemente",
     ],
     recommendation:
       "Auditoría de rendimiento y optimización de servidores/bases de datos para soportar picos reales.",
@@ -63,7 +73,7 @@ const problemsData = [
   },
   {
     id: 4,
-    name: "Respuesta tardía a clientes",
+    name: "Tardo mucho en responder a clientes",
     keywords: [
       "tardo",
       "no llego",
@@ -75,6 +85,8 @@ const problemsData = [
       "responder",
       "whatsapp",
       "espera",
+      "clientes",
+      "respuesta",
     ],
     recommendation:
       "Asistentes que responden en segundos. El equipo humano interviene solo cuando importa.",
@@ -82,7 +94,7 @@ const problemsData = [
   },
   {
     id: 5,
-    name: "Facturación manual / Excel",
+    name: "Facturo manualmente o con Excel",
     keywords: [
       "excel",
       "facturo a mano",
@@ -96,6 +108,7 @@ const problemsData = [
       "facturación",
       "iva",
       "igic",
+      "facturo",
     ],
     recommendation:
       "Sistemas de facturación propios con IGIC/IVA, cobro automático y conciliación bancaria.",
@@ -103,7 +116,7 @@ const problemsData = [
   },
   {
     id: 6,
-    name: "Falta de visión del negocio",
+    name: "No tengo datos claros para tomar decisiones",
     keywords: [
       "no sé",
       "no se",
@@ -119,6 +132,10 @@ const problemsData = [
       "reporte",
       "ventas",
       "compras",
+      "decisiones",
+      "datos",
+      "visión",
+      "vision",
     ],
     recommendation:
       "Cuadros de mando en tiempo real conectados a TPV, CRM y web. Saber qué se vende y qué se compra al instante.",
@@ -126,7 +143,7 @@ const problemsData = [
   },
   {
     id: 7,
-    name: "Errores humanos al copiar datos",
+    name: "Cometo errores al pasar datos entre sistemas",
     keywords: [
       "error",
       "equivoco",
@@ -139,6 +156,9 @@ const problemsData = [
       "despiste",
       "mal",
       "incorrecto",
+      "copiar",
+      "pasar datos",
+      "humano",
     ],
     recommendation:
       "Sincronización automática entre sistemas. Se elimina el factor humano del copiado repetitivo.",
@@ -244,7 +264,7 @@ const problemsData = [
   },
   {
     id: 13,
-    name: "Auditoría de software de terceros",
+    name: "El software que uso falla o es inestable",
     keywords: [
       "falla",
       "freelancer",
@@ -257,6 +277,7 @@ const problemsData = [
       "desarrollador",
       "auditoria",
       "auditoría",
+      "software",
     ],
     recommendation:
       "Revisión técnica completa: seguridad, legalidad (Veri*Factu, RGPD) y mantenimiento.",

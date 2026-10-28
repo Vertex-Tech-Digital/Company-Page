@@ -1,21 +1,9 @@
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/context/LanguageContext";
-import { Button } from "@/components/ui/button";
 
 export function PageNavbar() {
   const { lang, setLang } = useLanguage();
   const [location] = useLocation();
-
-  const scrollTo = (href: string) => {
-    if (location !== "/") {
-      window.location.href = "/" + href;
-      return;
-    }
-    const el = document.querySelector(href);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
@@ -44,46 +32,18 @@ export function PageNavbar() {
           </div>
         </Link>
 
-        <div className="hidden md:flex items-center gap-6">
+        <div className="flex items-center gap-6">
           <Link
             href="/"
             className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            data-testid="nav-link-inicio-page"
+            data-testid="nav-back-home"
           >
-            {lang === "es" ? "Inicio" : "Home"}
-          </Link>
-
-          <button
-            onClick={() => scrollTo("#servicios")}
-            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            data-testid="nav-link-servicios-page"
-          >
-            {lang === "es" ? "Servicios" : "Services"}
-          </button>
-
-          <button
-            onClick={() => scrollTo("#metodologia")}
-            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            data-testid="nav-link-metodologia-page"
-          >
-            {lang === "es" ? "Metodología" : "Methodology"}
-          </button>
-
-          <Link
-            href="/diagnostico"
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              location.startsWith("/diagnostico")
-                ? "text-primary"
-                : "text-muted-foreground"
-            }`}
-            data-testid="nav-link-diagnostico-page"
-          >
-            {lang === "es" ? "Diagnóstico Gratis" : "Free Diagnosis"}
+            {lang === "es" ? "Volver al inicio" : "Back to home"}
           </Link>
 
           <Link
             href="/casos-conceptuales"
-            className={`text-sm font-medium transition-colors hover:text-primary ${
+            className={`hidden sm:inline-block text-sm font-medium transition-colors hover:text-primary ${
               location.startsWith("/casos-conceptuales")
                 ? "text-primary"
                 : "text-muted-foreground"
@@ -106,67 +66,6 @@ export function PageNavbar() {
               onClick={() => setLang("en")}
               className={`${lang === "en" ? "text-white font-semibold" : "text-muted-foreground hover:text-white"}`}
               data-testid="lang-toggle-en"
-            >
-              EN
-            </button>
-          </div>
-
-          <Button
-            onClick={() => scrollTo("#contacto")}
-            className="bg-primary text-white hover:bg-primary/90 shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
-            data-testid="nav-cta-page"
-          >
-            {lang === "es" ? "Contactar" : "Contact"}
-          </Button>
-        </div>
-
-        {/* Mobile: mantener navegación compacta */}
-        <div className="flex md:hidden items-center gap-3">
-          <Link
-            href="/diagnostico"
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              location.startsWith("/diagnostico")
-                ? "text-primary"
-                : "text-muted-foreground"
-            }`}
-            data-testid="nav-link-diagnostico-page-mobile"
-          >
-            {lang === "es" ? "Diagnóstico" : "Diagnosis"}
-          </Link>
-
-          <Link
-            href="/casos-conceptuales"
-            className={`text-sm font-medium transition-colors hover:text-primary ${
-              location.startsWith("/casos-conceptuales")
-                ? "text-primary"
-                : "text-muted-foreground"
-            }`}
-            data-testid="nav-link-casos-page-mobile"
-          >
-            {lang === "es" ? "Casos" : "Cases"}
-          </Link>
-
-          <Link
-            href="/"
-            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            data-testid="nav-back-home-mobile"
-          >
-            {lang === "es" ? "Inicio" : "Home"}
-          </Link>
-
-          <div className="flex items-center gap-1 text-xs tracking-widest uppercase">
-            <button
-              onClick={() => setLang("es")}
-              className={`${lang === "es" ? "text-white font-semibold" : "text-muted-foreground hover:text-white"}`}
-              data-testid="lang-toggle-es-mobile"
-            >
-              ES
-            </button>
-            <span className="text-muted-foreground/50">|</span>
-            <button
-              onClick={() => setLang("en")}
-              className={`${lang === "en" ? "text-white font-semibold" : "text-muted-foreground hover:text-white"}`}
-              data-testid="lang-toggle-en-mobile"
             >
               EN
             </button>
