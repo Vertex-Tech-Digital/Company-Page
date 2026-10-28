@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminComments } from "@/components/admin/AdminComments";
 import { AdminBannedWords } from "@/components/admin/AdminBannedWords";
@@ -14,7 +16,21 @@ import {
 
 type AdminView = "posts" | "comments" | "banned-words" | "invoices";
 
+// react-query y los toasts solo se usan en el panel (pestaña Facturas): sus
+// providers se montan aquí y no en App para que su código viaje en el chunk
+// de /admin y no en el bundle de entrada de todas las páginas (VTD-37).
+const queryClient = new QueryClient();
+
 export default function Admin() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AdminPanel />
+      <Toaster />
+    </QueryClientProvider>
+  );
+}
+
+function AdminPanel() {
   // null = todavía no se sabe (chequeando la cookie); true/false = resuelto.
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [view, setView] = useState<AdminView>("posts");

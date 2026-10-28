@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Cookie, ShieldCheck, X, Settings2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
@@ -86,7 +86,7 @@ export function CookieConsent() {
       {/* Banner Principal de Consentimiento (Inferior Flotante) */}
       <AnimatePresence>
         {showBanner && !showPreferences && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
@@ -142,7 +142,7 @@ export function CookieConsent() {
                 </Button>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -150,7 +150,7 @@ export function CookieConsent() {
       <AnimatePresence>
         {showPreferences && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -158,7 +158,7 @@ export function CookieConsent() {
               onClick={() => setShowPreferences(false)}
             />
 
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.95, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 16 }}
@@ -261,7 +261,7 @@ export function CookieConsent() {
                   </Button>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </AnimatePresence>

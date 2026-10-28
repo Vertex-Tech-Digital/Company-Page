@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Link } from "wouter";
 // import { ArrowRight } from "lucide-react"; // oculto temporalmente
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ export function Hero() {
     >
       <div className="container mx-auto px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
@@ -88,16 +88,16 @@ export function Hero() {
               </a>
               */}
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
             className="hidden lg:block"
           >
             <WireframeCube />
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -10,7 +10,7 @@ export function WhyUs() {
     <section className="py-24 bg-card/30 border-y border-border/50 relative z-10">
       <div className="container mx-auto px-6">
         <div className="max-w-4xl mx-auto">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -22,11 +22,11 @@ export function WhyUs() {
             >
               {t("whyus.title")}
             </h2>
-          </motion.div>
+          </m.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, index) => (
-              <motion.div
+              <m.div
                 key={index}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -37,7 +37,7 @@ export function WhyUs() {
               >
                 <CheckCircle2 className="w-6 h-6 text-primary shrink-0" />
                 <span className="text-white font-medium">{benefit}</span>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

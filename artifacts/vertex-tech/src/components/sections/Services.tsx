@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Code2, Link, ShieldCheck, Bot } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -21,7 +21,7 @@ export function Services() {
   return (
     <section id="servicios" className="py-24 relative z-10">
       <div className="container mx-auto px-6">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -34,11 +34,11 @@ export function Services() {
             {t("services.title")}
             <span className="absolute -bottom-2 left-0 w-1/2 h-1 bg-primary rounded-full" />
           </h2>
-        </motion.div>
+        </m.div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service, index) => (
-            <motion.div
+            <m.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -54,7 +54,7 @@ export function Services() {
               <p className="text-muted-foreground text-sm leading-relaxed">
                 {service.description}
               </p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link as WouterLink, useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
@@ -199,7 +199,7 @@ export function Navbar() {
       {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -280,7 +280,7 @@ export function Navbar() {
             >
               {t("nav.contactar")}
             </Button>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </nav>
