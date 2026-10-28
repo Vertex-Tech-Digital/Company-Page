@@ -117,10 +117,18 @@ export function WireframeCube() {
     let sized = false;
     let isVisible = false;
     let running = false;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
 
     // Un solo bucle de dibujo, y solo cuando ya hay tamaño y el cubo se ve.
     function start() {
-      if (running || !sized || !isVisible) return;
+      if (!sized || !isVisible) return;
+      if (prefersReducedMotion) {
+        draw();
+        return;
+      }
+      if (running) return;
       running = true;
       frameRef.current = requestAnimationFrame(draw);
     }
@@ -166,7 +174,9 @@ export function WireframeCube() {
       const H = canvas.height / dpr;
 
       ctx.clearRect(0, 0, W, H);
-      angleYRef.current += 0.004;
+      if (!prefersReducedMotion) {
+        angleYRef.current += 0.004;
+      }
       const ay = angleYRef.current;
 
       const rotated = VERTICES.map((v) =>
@@ -239,7 +249,7 @@ export function WireframeCube() {
         el.style.opacity = (0.6 + depthFactor * 0.4).toFixed(2);
       });
 
-      if (isVisible) {
+      if (isVisible && !prefersReducedMotion) {
         frameRef.current = requestAnimationFrame(draw);
       } else {
         running = false;
@@ -256,6 +266,7 @@ export function WireframeCube() {
   return (
     <div
       ref={containerRef}
+      aria-hidden="true"
       className="relative w-full h-[460px] mx-auto max-w-[520px]"
     >
       <div className="absolute inset-0 bg-primary/8 blur-[90px] rounded-full pointer-events-none" />

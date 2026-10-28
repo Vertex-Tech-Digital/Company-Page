@@ -29,7 +29,7 @@ export function Hero() {
             className="max-w-2xl relative"
           >
             {/* Sutil resplandor de contraste para aislar el texto frente a las partículas del canvas */}
-            <div className="absolute -inset-6 -z-10 rounded-3xl bg-background/65 blur-2xl pointer-events-none" />
+            <div className="absolute -inset-8 -z-10 rounded-3xl bg-slate-950/75 blur-3xl pointer-events-none" />
 
             <h1
               className="text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] font-bold tracking-tight text-white mb-5 leading-[1.08] drop-shadow-[0_2px_12px_rgba(10,15,29,0.9)]"
@@ -68,7 +68,7 @@ export function Hero() {
                 onClick={() => scrollTo("#contacto")}
                 variant="outline"
                 size="lg"
-                className="border-border hover:bg-white/5 text-base px-7 h-12"
+                className="border-white/20 text-white hover:bg-white/10 hover:border-white/40 focus-visible:ring-2 focus-visible:ring-primary text-base px-7 h-12"
                 data-testid="hero-cta-secondary"
               >
                 {t("hero.cta.primary")}
