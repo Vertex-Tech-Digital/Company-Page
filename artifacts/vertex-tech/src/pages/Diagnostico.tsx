@@ -4,6 +4,7 @@ import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ParticleNetwork } from "@/components/sections/ParticleNetwork";
 import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
+import { SkipToContent } from "@/components/common/SkipToContent";
 import {
   CheckCircle2,
   Mail,
@@ -17,7 +18,6 @@ import {
   Factory,
   Users,
   Send,
-  Sparkles,
   AlertTriangle,
   FileText,
   ChevronDown,
@@ -43,19 +43,22 @@ function SectionTitle({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-border pb-3 mb-6">
-      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 border border-primary/20">
-        <Icon className="w-4 h-4 text-primary" />
+    <div className="flex items-center gap-3.5 border-b border-white/10 pb-4 mb-6">
+      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 text-primary shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.12)]">
+        <Icon className="w-4 h-4" aria-hidden="true" />
       </div>
       <div>
         <h3
-          className="text-xl font-bold text-foreground tracking-wide"
+          className="text-lg md:text-xl font-bold text-white tracking-tight"
           style={{ fontFamily: "var(--app-font-heading)" }}
         >
           {children}
         </h3>
       </div>
-      <span className="ml-auto w-12 h-0.5 bg-primary/40 rounded-full" />
+      <span
+        className="ml-auto w-12 h-0.5 bg-gradient-to-r from-primary to-cyan-400 rounded-full"
+        aria-hidden="true"
+      />
     </div>
   );
 }
@@ -66,6 +69,7 @@ function FormInput({
   type = "text",
   required,
   placeholder,
+  autoComplete,
   icon: Icon,
 }: {
   label: string;
@@ -73,24 +77,34 @@ function FormInput({
   type?: string;
   required?: boolean;
   placeholder?: string;
+  autoComplete?: string;
   icon?: React.ElementType;
 }) {
   return (
     <div className="flex flex-col">
       <label
-        className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2"
+        className="text-sm font-medium text-slate-200 mb-2 flex items-center gap-2"
         htmlFor={id}
       >
-        {Icon && <Icon className="w-3.5 h-3.5 text-primary/70" />}
-        {label}
+        {Icon && (
+          <Icon className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+        )}
+        <span>{label}</span>
+        {required && (
+          <span className="text-primary text-xs" aria-hidden="true">
+            *
+          </span>
+        )}
       </label>
       <input
-        className="bg-background/50 border border-border/80 rounded-lg py-2.5 px-4 text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/30 focus:outline-none transition-all duration-200 text-sm"
+        className="bg-slate-950/60 border border-white/15 rounded-xl py-3 px-4 text-white placeholder:text-slate-500 focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-slate-950/80 focus:outline-none transition-all duration-200 text-sm"
         type={type}
         id={id}
         name={id}
         required={required}
+        aria-required={required ? "true" : undefined}
         placeholder={placeholder}
+        autoComplete={autoComplete}
       />
     </div>
   );
@@ -118,17 +132,25 @@ function FormSelect({
   return (
     <div className="flex flex-col">
       <label
-        className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2"
+        className="text-sm font-medium text-slate-200 mb-2 flex items-center gap-2"
         htmlFor={id}
       >
-        {Icon && <Icon className="w-3.5 h-3.5 text-primary/70" />}
-        {label}
+        {Icon && (
+          <Icon className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+        )}
+        <span>{label}</span>
+        {required && (
+          <span className="text-primary text-xs" aria-hidden="true">
+            *
+          </span>
+        )}
       </label>
       <select
-        className="bg-background/50 border border-border/80 rounded-lg py-2.5 px-4 text-foreground focus:border-primary focus:ring-1 focus:ring-primary/30 focus:outline-none transition-all duration-200 text-sm cursor-pointer"
+        className="bg-slate-950/60 border border-white/15 rounded-xl py-3 px-4 text-white focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-slate-950/80 focus:outline-none transition-all duration-200 text-sm cursor-pointer"
         id={id}
         name={id}
         required={required}
+        aria-required={required ? "true" : undefined}
         value={value}
         defaultValue={defaultValue}
         onChange={onChange}
@@ -216,7 +238,7 @@ export default function Diagnostico() {
           );
         }
       } else {
-        // En caso de que el servidor devuelva HTML o texto plano (p. ej., error 500 o timeout de Vercel)
+        // En caso de que el servidor devuelva HTML o texto plano
         const rawText = await response.text();
         if (import.meta.env.DEV) {
           console.error("[Diagnostico Non-JSON Response]:", rawText);
@@ -248,524 +270,587 @@ export default function Diagnostico() {
   };
 
   return (
-    <main className="min-h-screen text-foreground font-sans bg-background relative overflow-x-hidden">
+    <div className="min-h-screen text-foreground font-sans bg-background relative overflow-x-hidden selection:bg-primary/30 selection:text-white">
+      <SkipToContent />
       <ParticleNetwork />
 
-      <div className="relative" style={{ zIndex: 10 }}>
-        <Navbar />
+      {/* Capa oscura superpuesta con viñeta para contraste WCAG AAA idéntico a la portada */}
+      <div
+        className="fixed inset-0 pointer-events-none bg-gradient-to-b from-slate-950/40 via-background/70 to-background z-0"
+        aria-hidden="true"
+      />
 
-        <section className="pt-32 pb-16 px-4 md:px-8 max-w-5xl mx-auto">
-          {/* Hero */}
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-xs font-semibold text-primary tracking-wide uppercase">
-                Análisis Automatizado
-              </span>
-            </div>
-            <h1
-              className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-blue-600 bg-clip-text text-transparent mb-4"
-              style={{ fontFamily: "var(--app-font-heading)" }}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <header role="banner">
+          <Navbar />
+        </header>
+
+        <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+          <section className="pt-32 pb-20 px-4 md:px-8 max-w-5xl mx-auto">
+            {/* Header sin kickers */}
+            <motion.div
+              className="text-center mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              Diagnóstico Tecnológico
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Evalúa la infraestructura digital y procesos de tu empresa de
-              forma automatizada y recibe una hoja de ruta técnica a medida.
-            </p>
-          </motion.div>
+              <h1
+                className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4"
+                style={{ fontFamily: "var(--app-font-heading)" }}
+              >
+                Diagnóstico{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-400">
+                  Tecnológico
+                </span>
+              </h1>
+              <div
+                className="w-16 h-1 bg-gradient-to-r from-primary to-cyan-400 rounded-full mx-auto mb-6"
+                aria-hidden="true"
+              />
+              <p className="text-slate-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+                Evalúa la infraestructura digital y procesos de tu empresa de
+                forma automatizada y recibe una hoja de ruta técnica a medida.
+              </p>
+            </motion.div>
 
-          {/* Main Card */}
-          <motion.div
-            className="bg-card/50 backdrop-blur-md border border-border/50 rounded-2xl p-6 md:p-10 shadow-[0_0_30px_rgba(59,130,246,0.08)]"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <AnimatePresence mode="wait">
-              {/* Loading State */}
-              {loading && (
-                <motion.div
-                  key="loading"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="flex flex-col items-center justify-center py-20"
-                >
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
-                    <div className="relative bg-primary/10 p-5 rounded-full border border-primary/20">
-                      <RefreshCw className="h-10 w-10 text-primary animate-spin" />
-                    </div>
-                  </div>
-                  <h3
-                    className="text-xl font-semibold text-foreground tracking-wide"
-                    style={{ fontFamily: "var(--app-font-heading)" }}
-                  >
-                    Generando tu Diagnóstico...
-                  </h3>
-                  <p className="text-muted-foreground mt-2 text-center text-sm max-w-sm">
-                    Estamos analizando los síntomas de tu negocio, guardando el
-                    lead en base de datos y preparando tu reporte en PDF.
-                  </p>
-                  <div className="flex gap-1.5 mt-6">
-                    {[0, 1, 2].map((i) => (
-                      <motion.div
-                        key={i}
-                        className="w-2 h-2 rounded-full bg-primary"
-                        animate={{ opacity: [0.3, 1, 0.3] }}
-                        transition={{
-                          duration: 1.2,
-                          repeat: Infinity,
-                          delay: i * 0.2,
-                        }}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Error State */}
-              {!loading && errorMsg && (
-                <motion.div
-                  key="error"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="bg-destructive/10 border border-destructive/30 rounded-xl p-6"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="bg-destructive/10 p-2 rounded-lg border border-destructive/20 shrink-0">
-                      <AlertCircle className="h-5 w-5 text-destructive" />
-                    </div>
-                    <div>
-                      <h4
-                        className="text-lg font-semibold text-destructive"
-                        style={{ fontFamily: "var(--app-font-heading)" }}
-                      >
-                        Error en el proceso
-                      </h4>
-                      <p className="text-muted-foreground mt-1 text-sm">
-                        {errorMsg}
-                      </p>
-                      <button
-                        onClick={() => setErrorMsg(null)}
-                        className="mt-4 px-4 py-2 bg-destructive/10 text-destructive border border-destructive/20 rounded-lg hover:bg-destructive/20 transition-colors text-xs font-semibold cursor-pointer"
-                      >
-                        Entendido
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Success State */}
-              {!loading && successData && (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="text-center py-8"
-                >
+            {/* Main Glassmorphic Card */}
+            <motion.div
+              className="bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 md:p-10 shadow-2xl shadow-black/40"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <AnimatePresence mode="wait">
+                {/* Loading State */}
+                {loading && (
                   <motion.div
-                    className="flex justify-center mb-6"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 200,
-                      damping: 15,
-                      delay: 0.2,
-                    }}
+                    key="loading"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    role="status"
+                    aria-live="polite"
+                    className="flex flex-col items-center justify-center py-20"
                   >
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl" />
+                    <div className="relative mb-6">
+                      <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
                       <div className="relative bg-primary/10 p-5 rounded-full border border-primary/20">
-                        <CheckCircle2 className="h-14 w-14 text-primary" />
+                        <RefreshCw
+                          className="h-10 w-10 text-primary animate-spin"
+                          aria-hidden="true"
+                        />
                       </div>
                     </div>
-                  </motion.div>
-                  <h2
-                    className="text-2xl md:text-3xl font-bold text-foreground mb-3 tracking-wide"
-                    style={{ fontFamily: "var(--app-font-heading)" }}
-                  >
-                    ¡Diagnóstico Completado!
-                  </h2>
-                  <p className="text-muted-foreground text-sm max-w-lg mx-auto mb-8">
-                    {successData.emailSent && successData.pdfGenerated
-                      ? "Hemos enviado el reporte de diagnóstico detallado en PDF a tu dirección de correo electrónico."
-                      : successData.emailSent
-                        ? "Hemos registrado tu diagnóstico y te enviamos un correo de confirmación. Tu reporte en PDF se generará en breve."
-                        : "Hemos registrado tu diagnóstico en el sistema. Un consultor se pondrá en contacto contigo muy pronto."}
-                  </p>
-
-                  {/* Next Steps Card */}
-                  <div className="max-w-md mx-auto bg-background/50 border border-border/50 rounded-xl p-6 mb-8 text-left">
-                    <h4
-                      className="text-foreground font-semibold mb-4 flex items-center gap-2 text-sm"
+                    <h3
+                      className="text-xl font-semibold text-white tracking-wide"
                       style={{ fontFamily: "var(--app-font-heading)" }}
                     >
-                      <ClipboardList className="h-4 w-4 text-primary" />
-                      Siguientes Pasos
-                    </h4>
-
-                    {preferenceSelected === "cafe" && (
-                      <div className="flex flex-col gap-3">
-                        <p className="text-muted-foreground text-xs leading-relaxed">
-                          Has seleccionado{" "}
-                          <strong className="text-foreground">
-                            Café Presencial
-                          </strong>
-                          . Nos coordinaremos pronto para reunirnos en Canarias
-                          para detallar tu hoja de ruta.
-                        </p>
-                        <a
-                          href="https://wa.me/34600000000?text=Hola!%20Acabo%20de%20hacer%20el%20diagnóstico%20de%20mi%20empresa%20y%20elegí%20la%20opción%20de%20café%20presencial."
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center justify-center gap-2 w-full py-3 bg-[#25D366] hover:bg-[#20bd5a] transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_4px_24px_0_rgba(37,211,102,0.3)] hover:shadow-[0_4px_32px_0_rgba(37,211,102,0.5)]"
-                        >
-                          <Coffee className="h-4 w-4" />
-                          Coordinar Café por WhatsApp
-                        </a>
-                      </div>
-                    )}
-
-                    {preferenceSelected === "llamada" && (
-                      <div className="flex flex-col gap-3">
-                        <p className="text-muted-foreground text-xs leading-relaxed">
-                          Has seleccionado{" "}
-                          <strong className="text-foreground">
-                            Llamada telefónica
-                          </strong>
-                          . Un consultor experto te llamará para comentar la
-                          auditoría técnica.
-                        </p>
-                        <a
-                          href={`tel:${import.meta.env.VITE_CONTACT_PHONE || ""}`}
-                          className="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary/90 transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
-                        >
-                          <Phone className="h-4 w-4" />
-                          Llamar a Vertex Tech Digital
-                        </a>
-                      </div>
-                    )}
-
-                    {preferenceSelected === "email" && (
-                      <div className="flex flex-col gap-3">
-                        <p className="text-muted-foreground text-xs leading-relaxed">
-                          Has seleccionado{" "}
-                          <strong className="text-foreground">
-                            Correo Electrónico
-                          </strong>
-                          . Te responderemos directamente a tu email.
-                        </p>
-                        <a
-                          href={`mailto:${import.meta.env.VITE_CONTACT_EMAIL || ""}?subject=Diagnóstico Tecnológico Completado`}
-                          className="flex items-center justify-center gap-2 w-full py-3 bg-primary hover:bg-primary/90 transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
-                        >
-                          <Mail className="h-4 w-4" />
-                          Enviar Email de Consulta
-                        </a>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                    <button
-                      onClick={handleReset}
-                      className="px-6 py-3 bg-secondary border border-border text-muted-foreground hover:bg-secondary/80 hover:text-foreground transition-all duration-200 font-semibold rounded-lg text-sm cursor-pointer"
-                    >
-                      Hacer otro diagnóstico
-                    </button>
-                    <a
-                      href="/"
-                      className="px-6 py-3 bg-primary text-white hover:bg-primary/90 transition-all duration-300 font-semibold rounded-lg text-sm flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
-                    >
-                      Volver a Inicio <ArrowRight className="h-4 w-4" />
-                    </a>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Form State */}
-              {!loading && !successData && (
-                <motion.form
-                  key="form"
-                  id="diagnostico-form"
-                  onSubmit={handleSubmit}
-                  className="space-y-8"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  {/* Section 1: Ficha Técnica */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <SectionTitle icon={Building2}>
-                      Ficha Técnica de la Empresa
-                    </SectionTitle>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <FormInput
-                        label="Razón Social / Nombre"
-                        id="company_name"
-                        required
-                        placeholder="Ej: Mi Empresa S.L."
-                        icon={Building2}
-                      />
-                      <FormInput
-                        label="Sector Industrial"
-                        id="sector"
-                        required
-                        placeholder="Ej: Hostelería, Tecnología, Comercio"
-                        icon={Factory}
-                      />
-                      <FormSelect
-                        label="Tamaño de la Empresa"
-                        id="size"
-                        required
-                        icon={Users}
-                        defaultValue="1-9 empleados"
-                      >
-                        <option value="1-9 empleados">
-                          1-9 empleados (Microempresa)
-                        </option>
-                        <option value="10-49 empleados">
-                          10-49 empleados (Pequeña empresa)
-                        </option>
-                        <option value="50-249 empleados">
-                          50-249 empleados (Mediana empresa)
-                        </option>
-                        <option value="250+ empleados">
-                          250+ empleados (Gran empresa)
-                        </option>
-                      </FormSelect>
-                      <FormSelect
-                        label="Preferencia de Contacto"
-                        id="contact_preference"
-                        required
-                        icon={Phone}
-                        value={preferenceSelected}
-                        onChange={(e) => setPreferenceSelected(e.target.value)}
-                      >
-                        <option value="email">Email</option>
-                        <option value="llamada">Llamada telefónica</option>
-                        <option value="cafe">Café presencial (Canarias)</option>
-                      </FormSelect>
-                      <FormInput
-                        label="Correo Electrónico"
-                        id="email"
-                        type="email"
-                        required
-                        placeholder="ejemplo@correo.com"
-                        icon={Mail}
-                      />
-                      <FormInput
-                        label="Teléfono (Opcional)"
-                        id="phone"
-                        placeholder="Ej: 600123456"
-                        icon={Phone}
-                      />
+                      Generando tu Diagnóstico...
+                    </h3>
+                    <p className="text-slate-300 mt-2 text-center text-sm max-w-sm leading-relaxed">
+                      Estamos analizando los síntomas de tu negocio, guardando
+                      el lead en base de datos y preparando tu reporte en PDF.
+                    </p>
+                    <div className="flex gap-1.5 mt-6" aria-hidden="true">
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          className="w-2 h-2 rounded-full bg-primary"
+                          animate={{ opacity: [0.3, 1, 0.3] }}
+                          transition={{
+                            duration: 1.2,
+                            repeat: Infinity,
+                            delay: i * 0.2,
+                          }}
+                        />
+                      ))}
                     </div>
                   </motion.div>
+                )}
 
-                  {/* Section 2: Síntomas */}
+                {/* Error State */}
+                {!loading && errorMsg && (
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
+                    key="error"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    role="alert"
+                    aria-live="assertive"
+                    className="bg-destructive/10 border border-destructive/30 rounded-xl p-6"
                   >
-                    <SectionTitle icon={AlertTriangle}>
-                      Síntomas y Problemas Detectados
-                    </SectionTitle>
+                    <div className="flex items-start gap-3">
+                      <div className="bg-destructive/10 p-2 rounded-lg border border-destructive/20 shrink-0">
+                        <AlertCircle
+                          className="h-5 w-5 text-destructive"
+                          aria-hidden="true"
+                        />
+                      </div>
+                      <div>
+                        <h4
+                          className="text-lg font-semibold text-destructive"
+                          style={{ fontFamily: "var(--app-font-heading)" }}
+                        >
+                          Error en el proceso
+                        </h4>
+                        <p className="text-slate-300 mt-1 text-sm leading-relaxed">
+                          {errorMsg}
+                        </p>
+                        <button
+                          onClick={() => setErrorMsg(null)}
+                          className="mt-4 px-4 py-2 bg-destructive/10 text-destructive border border-destructive/20 rounded-lg hover:bg-destructive/20 transition-colors text-xs font-semibold cursor-pointer"
+                        >
+                          Entendido
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
-                    {/* 1. Casilla de texto libre destacada */}
-                    <div className="flex flex-col mb-6">
-                      <label
-                        className="text-base font-semibold text-foreground mb-1.5 flex items-center gap-2"
-                        htmlFor="free_text"
+                {/* Success State */}
+                {!loading && successData && (
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    role="status"
+                    aria-live="polite"
+                    className="text-center py-8"
+                  >
+                    <motion.div
+                      className="flex justify-center mb-6"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 15,
+                        delay: 0.2,
+                      }}
+                    >
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl" />
+                        <div className="relative bg-primary/10 p-5 rounded-full border border-primary/20">
+                          <CheckCircle2
+                            className="h-14 w-14 text-primary"
+                            aria-hidden="true"
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                    <h2
+                      className="text-2xl md:text-3xl font-bold text-white mb-3 tracking-wide"
+                      style={{ fontFamily: "var(--app-font-heading)" }}
+                    >
+                      ¡Diagnóstico Completado!
+                    </h2>
+                    <p className="text-slate-300 text-sm max-w-lg mx-auto mb-8 leading-relaxed">
+                      {successData.emailSent && successData.pdfGenerated
+                        ? "Hemos enviado el reporte de diagnóstico detallado en PDF a tu dirección de correo electrónico."
+                        : successData.emailSent
+                          ? "Hemos registrado tu diagnóstico y te enviamos un correo de confirmación. Tu reporte en PDF se generará en breve."
+                          : "Hemos registrado tu diagnóstico en el sistema. Un consultor se pondrá en contacto contigo muy pronto."}
+                    </p>
+
+                    {/* Next Steps Card */}
+                    <div className="max-w-md mx-auto bg-slate-950/60 border border-white/10 rounded-xl p-6 mb-8 text-left shadow-lg">
+                      <h4
+                        className="text-white font-semibold mb-4 flex items-center gap-2 text-sm"
+                        style={{ fontFamily: "var(--app-font-heading)" }}
                       >
-                        <FileText className="w-4 h-4 text-primary" />
-                        Cuéntanos qué te está pasando:
-                      </label>
-                      <p className="text-xs md:text-sm text-muted-foreground mb-3 leading-relaxed">
-                        Describe tu situación con tus propias palabras. Nuestro
-                        motor de IA analizará tu caso y detectará los problemas
-                        reales.
-                      </p>
-                      <textarea
-                        className="w-full bg-background/50 border border-border/80 rounded-xl p-4 text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/30 focus:outline-none transition-all duration-200 text-sm md:text-base leading-relaxed"
-                        id="free_text"
-                        name="free_text"
-                        rows={4}
-                        value={freeTextValue}
-                        onChange={(e) => {
-                          setFreeTextValue(e.target.value);
-                          if (validationError) setValidationError(null);
-                        }}
-                        placeholder='Ej: "Los pedidos entran por la tablet de la app de delivery (Glovo, Uber Eats, etc), pero no se sincronizan con nuestro TPV. Nosotros tenemos que teclear cada comando a mano para que registre la venta, lo que genera retrasos y errores en horas pico."'
-                      />
+                        <ClipboardList
+                          className="h-4 w-4 text-primary"
+                          aria-hidden="true"
+                        />
+                        Siguientes Pasos
+                      </h4>
+
+                      {preferenceSelected === "cafe" && (
+                        <div className="flex flex-col gap-3">
+                          <p className="text-slate-300 text-xs leading-relaxed">
+                            Has seleccionado{" "}
+                            <strong className="text-white">
+                              Café Presencial
+                            </strong>
+                            . Nos coordinaremos pronto para reunirnos en
+                            Canarias para detallar tu hoja de ruta.
+                          </p>
+                          <a
+                            href="https://wa.me/34600000000?text=Hola!%20Acabo%20de%20hacer%20el%20diagnóstico%20de%20mi%20empresa%20y%20elegí%20la%20opción%20de%20café%20presencial."
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center justify-center gap-2 w-full py-3 bg-[#25D366] hover:bg-[#20bd5a] transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_4px_24px_0_rgba(37,211,102,0.3)] hover:shadow-[0_4px_32px_0_rgba(37,211,102,0.5)]"
+                          >
+                            <Coffee className="h-4 w-4" aria-hidden="true" />
+                            Coordinar Café por WhatsApp
+                          </a>
+                        </div>
+                      )}
+
+                      {preferenceSelected === "llamada" && (
+                        <div className="flex flex-col gap-3">
+                          <p className="text-slate-300 text-xs leading-relaxed">
+                            Has seleccionado{" "}
+                            <strong className="text-white">
+                              Llamada telefónica
+                            </strong>
+                            . Un consultor experto te llamará para comentar la
+                            auditoría técnica.
+                          </p>
+                          <a
+                            href={`tel:${import.meta.env.VITE_CONTACT_PHONE || ""}`}
+                            className="flex items-center justify-center gap-2 w-full py-3 bg-primary-solid hover:bg-primary-solid-hover transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                          >
+                            <Phone className="h-4 w-4" aria-hidden="true" />
+                            Llamar a Vertex Tech Digital
+                          </a>
+                        </div>
+                      )}
+
+                      {preferenceSelected === "email" && (
+                        <div className="flex flex-col gap-3">
+                          <p className="text-slate-300 text-xs leading-relaxed">
+                            Has seleccionado{" "}
+                            <strong className="text-white">
+                              Correo Electrónico
+                            </strong>
+                            . Te responderemos directamente a tu email.
+                          </p>
+                          <a
+                            href={`mailto:${import.meta.env.VITE_CONTACT_EMAIL || ""}?subject=Diagnóstico Tecnológico Completado`}
+                            className="flex items-center justify-center gap-2 w-full py-3 bg-primary-solid hover:bg-primary-solid-hover transition-all duration-300 text-white font-bold rounded-lg text-sm cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                          >
+                            <Mail className="h-4 w-4" aria-hidden="true" />
+                            Enviar Email de Consulta
+                          </a>
+                        </div>
+                      )}
                     </div>
 
-                    {/* 2. Lista desplegable plegada por defecto para problemas comunes */}
-                    <div className="border border-border/60 rounded-xl bg-card/20 overflow-hidden mb-6">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                       <button
-                        type="button"
-                        onClick={() => setIsPredefinedOpen(!isPredefinedOpen)}
-                        className="w-full flex items-center justify-between p-4 md:p-5 text-left hover:bg-card/40 transition-colors cursor-pointer group"
+                        onClick={handleReset}
+                        className="px-6 py-3 bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-200 font-semibold rounded-lg text-sm cursor-pointer"
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                          <span className="text-sm md:text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-                            ¿Prefieres marcar problemas comunes?{" "}
-                            <span className="text-muted-foreground font-normal text-xs md:text-sm">
-                              (opcional)
-                            </span>
-                          </span>
-                          {selectedProblems.length > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/20 text-primary border border-primary/30 w-fit">
-                              {selectedProblems.length}{" "}
-                              {selectedProblems.length === 1
-                                ? "seleccionado"
-                                : "seleccionados"}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs md:text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors shrink-0">
-                          <span>
-                            {isPredefinedOpen
-                              ? "Ocultar opciones predefinidas"
-                              : "Mostrar opciones predefinidas"}
-                          </span>
-                          {isPredefinedOpen ? (
-                            <ChevronUp className="w-4 h-4 transition-transform duration-200" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4 transition-transform duration-200" />
-                          )}
-                        </div>
+                        Hacer otro diagnóstico
                       </button>
+                      <a
+                        href="/"
+                        className="px-6 py-3 bg-primary-solid text-white hover:bg-primary-solid-hover transition-all duration-300 font-semibold rounded-lg text-sm flex items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+                      >
+                        Volver a Inicio{" "}
+                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      </a>
+                    </div>
+                  </motion.div>
+                )}
 
-                      {/* Panel desplegable con las opciones predefinidas */}
-                      <AnimatePresence initial={false}>
-                        {isPredefinedOpen && (
-                          <motion.div
-                            key="predefined-options"
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3, ease: "easeInOut" }}
-                            className="overflow-hidden border-t border-border/40"
-                          >
-                            <div className="p-4 md:p-6 bg-background/30">
-                              <p className="text-xs text-muted-foreground mb-4">
-                                Marca las situaciones que reconozcas en tu
-                                negocio (puedes seleccionar tantas como desees):
-                              </p>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {problems.map((prob) => {
-                                  const isChecked = selectedProblems.includes(
-                                    prob.id,
-                                  );
-                                  return (
-                                    <label
-                                      key={prob.id}
-                                      htmlFor={`problem-${prob.id}`}
-                                      className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all duration-200 cursor-pointer select-none ${
-                                        isChecked
-                                          ? "bg-primary/10 border-primary/50 text-foreground shadow-[0_0_15px_rgba(59,130,246,0.1)]"
-                                          : "bg-card/30 border-border/40 hover:border-border hover:bg-card/50 text-muted-foreground"
-                                      }`}
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        id={`problem-${prob.id}`}
-                                        className="h-4 w-4 mt-0.5 rounded border-border bg-background/50 text-primary focus:ring-primary/30 focus:ring-offset-0 focus:outline-none transition-colors cursor-pointer shrink-0"
-                                        checked={isChecked}
-                                        onChange={() => toggleProblem(prob.id)}
-                                      />
-                                      <span
-                                        className={`text-xs md:text-sm font-medium leading-snug ${
+                {/* Form State */}
+                {!loading && !successData && (
+                  <motion.form
+                    key="form"
+                    id="diagnostico-form"
+                    onSubmit={handleSubmit}
+                    className="space-y-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    {/* Section 1: Ficha Técnica */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <SectionTitle icon={Building2}>
+                        Ficha Técnica de la Empresa
+                      </SectionTitle>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <FormInput
+                          label="Razón Social / Nombre"
+                          id="company_name"
+                          required
+                          autoComplete="organization"
+                          placeholder="Ej: Mi Empresa S.L."
+                          icon={Building2}
+                        />
+                        <FormInput
+                          label="Sector Industrial"
+                          id="sector"
+                          required
+                          placeholder="Ej: Hostelería, Tecnología, Comercio"
+                          icon={Factory}
+                        />
+                        <FormSelect
+                          label="Tamaño de la Empresa"
+                          id="size"
+                          required
+                          icon={Users}
+                          defaultValue="1-9 empleados"
+                        >
+                          <option value="1-9 empleados">
+                            1-9 empleados (Microempresa)
+                          </option>
+                          <option value="10-49 empleados">
+                            10-49 empleados (Pequeña empresa)
+                          </option>
+                          <option value="50-249 empleados">
+                            50-249 empleados (Mediana empresa)
+                          </option>
+                          <option value="250+ empleados">
+                            250+ empleados (Gran empresa)
+                          </option>
+                        </FormSelect>
+                        <FormSelect
+                          label="Preferencia de Contacto"
+                          id="contact_preference"
+                          required
+                          icon={Phone}
+                          value={preferenceSelected}
+                          onChange={(e) =>
+                            setPreferenceSelected(e.target.value)
+                          }
+                        >
+                          <option value="email">Email</option>
+                          <option value="llamada">Llamada telefónica</option>
+                          <option value="cafe">
+                            Café presencial (Canarias)
+                          </option>
+                        </FormSelect>
+                        <FormInput
+                          label="Correo Electrónico"
+                          id="email"
+                          type="email"
+                          required
+                          autoComplete="email"
+                          placeholder="ejemplo@correo.com"
+                          icon={Mail}
+                        />
+                        <FormInput
+                          label="Teléfono (Opcional)"
+                          id="phone"
+                          type="tel"
+                          autoComplete="tel"
+                          placeholder="Ej: 600123456"
+                          icon={Phone}
+                        />
+                      </div>
+                    </motion.div>
+
+                    {/* Section 2: Síntomas */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: 0.1 }}
+                    >
+                      <SectionTitle icon={AlertTriangle}>
+                        Síntomas y Problemas Detectados
+                      </SectionTitle>
+
+                      {/* 1. Casilla de texto libre destacada */}
+                      <div className="flex flex-col mb-6">
+                        <label
+                          className="text-base font-semibold text-white mb-1.5 flex items-center gap-2"
+                          htmlFor="free_text"
+                        >
+                          <FileText
+                            className="w-4 h-4 text-primary"
+                            aria-hidden="true"
+                          />
+                          <span>Cuéntanos qué te está pasando:</span>
+                        </label>
+                        <p className="text-xs md:text-sm text-slate-300 mb-3 leading-relaxed">
+                          Describe tu situación con tus propias palabras.
+                          Nuestro motor de IA analizará tu caso y detectará los
+                          problemas reales.
+                        </p>
+                        <textarea
+                          className="w-full bg-slate-950/60 border border-white/15 rounded-xl p-4 text-white placeholder:text-slate-500 focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-slate-950/80 focus:outline-none transition-all duration-200 text-sm md:text-base leading-relaxed"
+                          id="free_text"
+                          name="free_text"
+                          rows={4}
+                          value={freeTextValue}
+                          onChange={(e) => {
+                            setFreeTextValue(e.target.value);
+                            if (validationError) setValidationError(null);
+                          }}
+                          placeholder='Ej: "Los pedidos entran por la tablet de la app de delivery, pero no se sincronizan con nuestro TPV. Tenemos que teclear cada comanda a mano, lo que genera retrasos y descuadres."'
+                        />
+                      </div>
+
+                      {/* 2. Acordeón para problemas comunes */}
+                      <div className="border border-white/10 rounded-xl bg-slate-950/40 backdrop-blur-sm overflow-hidden mb-6">
+                        <button
+                          type="button"
+                          onClick={() => setIsPredefinedOpen(!isPredefinedOpen)}
+                          aria-expanded={isPredefinedOpen}
+                          aria-controls="predefined-problems-panel"
+                          className="w-full flex items-center justify-between p-4 md:p-5 text-left hover:bg-white/[0.03] transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        >
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+                            <span className="text-sm md:text-base font-semibold text-white group-hover:text-primary transition-colors">
+                              ¿Prefieres marcar problemas comunes?{" "}
+                              <span className="text-slate-400 font-normal text-xs md:text-sm">
+                                (opcional)
+                              </span>
+                            </span>
+                            {selectedProblems.length > 0 && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/20 text-primary border border-primary/30 w-fit">
+                                {selectedProblems.length}{" "}
+                                {selectedProblems.length === 1
+                                  ? "seleccionado"
+                                  : "seleccionados"}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs md:text-sm font-medium text-slate-400 group-hover:text-primary transition-colors shrink-0">
+                            <span>
+                              {isPredefinedOpen
+                                ? "Ocultar opciones predefinidas"
+                                : "Mostrar opciones predefinidas"}
+                            </span>
+                            {isPredefinedOpen ? (
+                              <ChevronUp
+                                className="w-4 h-4 transition-transform duration-200"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <ChevronDown
+                                className="w-4 h-4 transition-transform duration-200"
+                                aria-hidden="true"
+                              />
+                            )}
+                          </div>
+                        </button>
+
+                        {/* Panel desplegable con las opciones predefinidas */}
+                        <AnimatePresence initial={false}>
+                          {isPredefinedOpen && (
+                            <motion.div
+                              id="predefined-problems-panel"
+                              role="region"
+                              aria-label="Opciones predefinidas de problemas"
+                              key="predefined-options"
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3, ease: "easeInOut" }}
+                              className="overflow-hidden border-t border-white/10"
+                            >
+                              <div className="p-4 md:p-6 bg-slate-950/20">
+                                <p className="text-xs text-slate-300 mb-4">
+                                  Marca las situaciones que reconozcas en tu
+                                  negocio (puedes seleccionar tantas como
+                                  desees):
+                                </p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                  {problems.map((prob) => {
+                                    const isChecked = selectedProblems.includes(
+                                      prob.id,
+                                    );
+                                    return (
+                                      <label
+                                        key={prob.id}
+                                        htmlFor={`problem-${prob.id}`}
+                                        className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all duration-200 cursor-pointer select-none ${
                                           isChecked
-                                            ? "text-foreground font-semibold"
-                                            : "text-muted-foreground"
+                                            ? "bg-primary/15 border-primary/50 text-white shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+                                            : "bg-slate-900/40 border-white/10 hover:border-white/20 hover:bg-slate-900/60 text-slate-300"
                                         }`}
                                       >
-                                        {prob.name}
-                                      </span>
-                                    </label>
-                                  );
-                                })}
+                                        <input
+                                          type="checkbox"
+                                          id={`problem-${prob.id}`}
+                                          className="h-4 w-4 mt-0.5 rounded border-white/20 bg-slate-950/80 text-primary focus:ring-primary/40 focus:ring-offset-0 focus:outline-none transition-colors cursor-pointer shrink-0"
+                                          checked={isChecked}
+                                          onChange={() =>
+                                            toggleProblem(prob.id)
+                                          }
+                                        />
+                                        <span
+                                          className={`text-xs md:text-sm font-medium leading-snug ${
+                                            isChecked
+                                              ? "text-white font-semibold"
+                                              : "text-slate-300"
+                                          }`}
+                                        >
+                                          {prob.name}
+                                        </span>
+                                      </label>
+                                    );
+                                  })}
+                                </div>
                               </div>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
 
-                    {/* Mensaje de validación amigable si se intenta enviar vacío */}
-                    {validationError && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="p-4 mb-6 rounded-xl bg-destructive/10 border border-destructive/30 flex items-center gap-3 text-destructive text-sm"
-                      >
-                        <AlertCircle className="w-5 h-5 shrink-0" />
-                        <span>{validationError}</span>
-                      </motion.div>
-                    )}
-                  </motion.div>
+                      {/* Mensaje de validación amigable si se intenta enviar vacío */}
+                      {validationError && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          role="alert"
+                          aria-live="assertive"
+                          className="p-4 mb-6 rounded-xl bg-destructive/10 border border-destructive/30 flex items-center gap-3 text-destructive text-sm font-medium"
+                        >
+                          <AlertCircle
+                            className="w-5 h-5 shrink-0"
+                            aria-hidden="true"
+                          />
+                          <span>{validationError}</span>
+                        </motion.div>
+                      )}
+                    </motion.div>
 
-                  {/* Submit */}
-                  <motion.div
-                    className="pt-2"
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
-                  >
-                    <button
-                      className="w-full md:w-auto px-8 py-3.5 bg-primary text-white hover:bg-primary/90 transition-all duration-300 font-bold rounded-lg text-sm md:text-base flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
-                      type="submit"
-                      disabled={loading}
+                    {/* Submit */}
+                    <motion.div
+                      className="pt-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: 0.2 }}
                     >
-                      <Send className="w-4 h-4" />
-                      Generar Diagnóstico Técnico
-                    </button>
-                  </motion.div>
-                </motion.form>
+                      <button
+                        className="w-full md:w-auto px-8 py-3.5 bg-primary-solid text-white hover:bg-primary-solid-hover transition-all duration-300 font-semibold rounded-xl text-sm md:text-base flex items-center justify-center gap-2.5 cursor-pointer shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                        type="submit"
+                        disabled={loading}
+                      >
+                        <Send className="w-4 h-4" aria-hidden="true" />
+                        Generar Diagnóstico Técnico
+                      </button>
+                    </motion.div>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+
+              {/* Debug Output (Solo visible durante desarrollo local) */}
+              {import.meta.env.DEV && debugOutput && !loading && (
+                <div className="mt-8 border-t border-white/10 pt-6">
+                  <details className="cursor-pointer group">
+                    <summary className="text-xs text-slate-400 hover:text-white select-none outline-none">
+                      Ver salida de depuración API (Solo Dev)
+                    </summary>
+                    <pre className="mt-4 bg-slate-950/80 p-4 border border-white/10 rounded-xl text-[10px] text-primary/80 overflow-x-auto font-mono max-h-60">
+                      {debugOutput}
+                    </pre>
+                  </details>
+                </div>
               )}
-            </AnimatePresence>
+            </motion.div>
+          </section>
+        </main>
 
-            {/* Debug Output (Solo visible durante desarrollo local) */}
-            {import.meta.env.DEV && debugOutput && !loading && (
-              <div className="mt-8 border-t border-border pt-6">
-                <details className="cursor-pointer group">
-                  <summary className="text-xs text-muted-foreground hover:text-muted-foreground/80 select-none outline-none">
-                    Ver salida de depuración API (Solo Dev)
-                  </summary>
-                  <pre className="mt-4 bg-background/80 p-4 border border-border rounded-lg text-[10px] text-primary/70 overflow-x-auto font-mono max-h-60">
-                    {debugOutput}
-                  </pre>
-                </details>
-              </div>
-            )}
-          </motion.div>
-        </section>
-
-        <Footer />
+        <footer role="contentinfo">
+          <Footer />
+        </footer>
       </div>
       <WhatsAppButton />
-    </main>
+    </div>
   );
 }

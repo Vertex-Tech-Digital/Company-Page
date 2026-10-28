@@ -7,9 +7,11 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Toaster() {
   const { toasts } = useToast();
+  const { t } = useLanguage();
 
   return (
     <ToastProvider>
@@ -23,7 +25,7 @@ export function Toaster() {
               )}
             </div>
             {action}
-            <ToastClose />
+            <ToastClose aria-label={t("toast.close")} />
           </Toast>
         );
       })}

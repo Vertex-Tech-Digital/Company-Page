@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import "./fonts.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -23,6 +23,8 @@
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-primary-border: var(--primary-border);
+  --color-primary-solid: hsl(var(--primary-solid));
+  --color-primary-solid-hover: hsl(var(--primary-solid-hover));
 
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
@@ -62,10 +64,15 @@
   --popover-border: 222 30% 16%;
   --primary: 212 100% 56%;
   --primary-foreground: 0 0% 100%;
+  /* El texto blanco sobre --primary solo llega a 3.5:1. Los botones con texto
+     blanco usan este azul más oscuro (4.95:1, hover 5.97:1) para cumplir WCAG AA;
+     --primary sigue para texto y acentos sobre el fondo oscuro (5.5:1). */
+  --primary-solid: 212 100% 45%;
+  --primary-solid-hover: 212 100% 40%;
   --secondary: 222 30% 16%;
   --secondary-foreground: 210 20% 95%;
   --muted: 215 25% 15%;
-  --muted-foreground: 215 15% 55%;
+  --muted-foreground: 215 18% 68%;
   --accent: 212 100% 56%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
@@ -103,10 +110,12 @@
   --popover-border: 222 30% 16%;
   --primary: 212 100% 56%;
   --primary-foreground: 0 0% 100%;
+  --primary-solid: 212 100% 45%;
+  --primary-solid-hover: 212 100% 40%;
   --secondary: 222 30% 16%;
   --secondary-foreground: 210 20% 95%;
   --muted: 215 25% 15%;
-  --muted-foreground: 215 15% 55%;
+  --muted-foreground: 215 18% 68%;
   --accent: 212 100% 56%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;

@@ -22,6 +22,13 @@
       "when": 1787774122150,
       "tag": "0002_add_ai_diagnosis",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792778554932,
+      "tag": "0003_add_admin_session_version",
+      "breakpoints": true
     }
   ]
 }
