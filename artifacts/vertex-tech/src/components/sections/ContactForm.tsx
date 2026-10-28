@@ -66,16 +66,21 @@ export default function ContactForm() {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="h-full flex flex-col items-center justify-center text-center py-12"
+        role="status"
+        aria-live="polite"
         data-testid="contact-success"
       >
-        <CheckCircle2 className="w-16 h-16 text-primary mb-6" />
-        <h3 className="text-2xl font-bold text-white mb-2">
+        <CheckCircle2
+          className="w-16 h-16 text-primary mb-6"
+          aria-hidden="true"
+        />
+        <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">
           {t("contact.success.title")}
         </h3>
-        <p className="text-muted-foreground">{t("contact.success.desc")}</p>
+        <p className="text-slate-300">{t("contact.success.desc")}</p>
         <Button
           variant="outline"
-          className="mt-8 border-border"
+          className="mt-8 border-white/15 bg-white/5 hover:bg-white/10 text-white rounded-xl"
           onClick={() => {
             setIsSuccess(false);
             form.reset();
@@ -94,19 +99,24 @@ export default function ContactForm() {
         className="space-y-6"
         data-testid="contact-form"
       >
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-white/80">
+                <FormLabel className="text-slate-200 text-sm font-medium">
                   {t("contact.label.name")}
+                  <span className="text-primary ml-1" aria-hidden="true">
+                    *
+                  </span>
                 </FormLabel>
                 <FormControl>
                   <Input
                     placeholder={t("contact.placeholder.name")}
-                    className="bg-background/50 border-border/80 focus-visible:ring-primary/50"
+                    autoComplete="name"
+                    aria-required="true"
+                    className="bg-slate-950/60 border-white/15 text-white placeholder:text-slate-500 rounded-xl focus-visible:ring-primary/40 focus-visible:border-primary transition-colors"
                     data-testid="input-name"
                     {...field}
                   />
@@ -120,13 +130,19 @@ export default function ContactForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-white/80">
+                <FormLabel className="text-slate-200 text-sm font-medium">
                   {t("contact.label.email")}
+                  <span className="text-primary ml-1" aria-hidden="true">
+                    *
+                  </span>
                 </FormLabel>
                 <FormControl>
                   <Input
+                    type="email"
                     placeholder="tu@email.com"
-                    className="bg-background/50 border-border/80 focus-visible:ring-primary/50"
+                    autoComplete="email"
+                    aria-required="true"
+                    className="bg-slate-950/60 border-white/15 text-white placeholder:text-slate-500 rounded-xl focus-visible:ring-primary/40 focus-visible:border-primary transition-colors"
                     data-testid="input-email"
                     {...field}
                   />
@@ -141,13 +157,14 @@ export default function ContactForm() {
           name="company"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white/80">
+              <FormLabel className="text-slate-200 text-sm font-medium">
                 {t("contact.label.company")}
               </FormLabel>
               <FormControl>
                 <Input
                   placeholder={t("contact.placeholder.company")}
-                  className="bg-background/50 border-border/80 focus-visible:ring-primary/50"
+                  autoComplete="organization"
+                  className="bg-slate-950/60 border-white/15 text-white placeholder:text-slate-500 rounded-xl focus-visible:ring-primary/40 focus-visible:border-primary transition-colors"
                   data-testid="input-company"
                   {...field}
                 />
@@ -161,13 +178,17 @@ export default function ContactForm() {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-white/80">
+              <FormLabel className="text-slate-200 text-sm font-medium">
                 {t("contact.label.message")}
+                <span className="text-primary ml-1" aria-hidden="true">
+                  *
+                </span>
               </FormLabel>
               <FormControl>
                 <Textarea
                   placeholder={t("contact.placeholder.message")}
-                  className="bg-background/50 border-border/80 focus-visible:ring-primary/50 min-h-[120px] resize-none"
+                  aria-required="true"
+                  className="bg-slate-950/60 border-white/15 text-white placeholder:text-slate-500 rounded-xl focus-visible:ring-primary/40 focus-visible:border-primary min-h-[120px] resize-none transition-colors"
                   data-testid="input-message"
                   {...field}
                 />
@@ -177,12 +198,18 @@ export default function ContactForm() {
           )}
         />
         {serverError && (
-          <p className="text-sm text-destructive">{serverError}</p>
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="text-sm text-destructive font-medium"
+          >
+            {serverError}
+          </div>
         )}
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-primary-solid text-white hover:bg-primary-solid-hover shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] h-12 text-md"
+          className="w-full bg-primary-solid text-white hover:bg-primary-solid-hover shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] h-12 text-md rounded-xl font-medium"
           data-testid="contact-submit"
         >
           {isSubmitting ? (

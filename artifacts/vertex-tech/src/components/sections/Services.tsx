@@ -1,5 +1,5 @@
 import { m } from "framer-motion";
-import { Code2, Link, ShieldCheck, Bot } from "lucide-react";
+import { Code2, Network, ShieldCheck, Bot } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const icons = [

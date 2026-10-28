@@ -39,8 +39,7 @@ export function Methodology() {
           />
 
           {steps.map((step, index) => (
-      <m.li
-
+            <m.li
               key={index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -61,8 +60,7 @@ export function Methodology() {
               <p className="text-sm text-slate-300 leading-relaxed mt-auto">
                 {step.description}
               </p>
-    </m.li>
-
+            </m.li>
           ))}
         </ol>
       </div>

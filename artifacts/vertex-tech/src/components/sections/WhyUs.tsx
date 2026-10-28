@@ -1,5 +1,11 @@
 import { m } from "framer-motion";
-import { CheckCircle2, FileCode2, MessageSquareCode, Layers, Rocket } from "lucide-react";
+import {
+  CheckCircle2,
+  FileCode2,
+  MessageSquareCode,
+  Layers,
+  Rocket,
+} from "lucide-react";
 
 import { useLanguage } from "@/context/LanguageContext";
 

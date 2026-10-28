@@ -44,6 +44,7 @@ export function Contact() {
 
   return (
     <section
+      ref={sectionRef}
       id="contacto"
       className="py-20 lg:py-28 relative z-10 overflow-hidden"
     >
@@ -76,37 +77,16 @@ export function Contact() {
             viewport={{ once: true }}
             className="bg-slate-900/60 backdrop-blur-xl border border-white/10 p-8 sm:p-10 rounded-2xl shadow-2xl shadow-black/40"
           >
-            {isSuccess ? (
-              <m.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="h-full flex flex-col items-center justify-center text-center py-12"
-                role="status"
-                aria-live="polite"
-                data-testid="contact-success"
-              >
-                <CheckCircle2
-                  className="w-16 h-16 text-primary mb-6"
-                  aria-hidden="true"
-                />
-                <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">
-                  {t("contact.success.title")}
-                </h3>
-                <p className="text-slate-300">{t("contact.success.desc")}</p>
-                <Button
-                  variant="outline"
-                  className="mt-8 border-white/15 bg-white/5 hover:bg-white/10 text-white rounded-xl"
-                  onClick={() => {
-                    setIsSuccess(false);
-                    form.reset();
-                  }}
-                >
-                  {t("contact.success.another")}
-                </Button>
-             </m.div>
+            {loadForm ? (
+              <Suspense fallback={<ContactFormPlaceholder />}>
+                <ContactForm />
+              </Suspense>
             ) : (
-  <Suspense fallback={<ContactFormPlaceholder />}>
-    <ContactForm />
-  </Suspense>
-)}
-</m.div>      
+              <ContactFormPlaceholder />
+            )}
+          </m.div>
+        </div>
+      </div>
+    </section>
+  );
+}
