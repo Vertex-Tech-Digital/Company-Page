@@ -1,5 +1,5 @@
 import { Link as WouterLink } from "wouter";
-import { Github } from "lucide-react";
+import { Github, Mail, MapPin, ArrowUp } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function Footer() {
@@ -26,95 +26,230 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-border bg-background pt-14 pb-8">
+    <footer className="border-t border-white/10 bg-slate-950/90 backdrop-blur-md pt-16 pb-10 relative z-10">
       <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-10 mb-12">
-          {/* Brand */}
-          <div className="max-w-xs">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-14">
+          {/* Col 1: Brand & Location */}
+          <div className="space-y-4">
             <div
-              className="text-xl font-bold tracking-tight text-white flex items-center gap-2 mb-3"
+              className="text-xl font-bold tracking-tight text-white flex items-center gap-2.5"
               data-testid="footer-logo"
             >
-              Vertex Tech
+              <img
+                src="/logo-88.webp"
+                alt="Vertex Tech"
+                width="28"
+                height="28"
+                className="w-7 h-7 object-contain rounded-lg"
+              />
+              <span>Vertex Tech</span>
               <span className="w-2 h-2 rounded-full bg-primary" />
             </div>
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
               {t("footer.tagline")}
             </p>
+            <div className="flex items-center gap-2 text-xs text-slate-400 pt-1">
+              <MapPin
+                className="w-3.5 h-3.5 text-primary shrink-0"
+                aria-hidden="true"
+              />
+              <span>{t("footer.location")}</span>
+            </div>
           </div>
 
-          {/* Nav links */}
-          <div className="flex flex-wrap gap-6">
-            {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
-            <WouterLink
-              href="/blog"
-              className="cursor-pointer text-sm text-muted-foreground hover:text-white transition-colors"
-              data-testid="footer-link-blog"
-            >
-              {t("nav.blog")}
-            </WouterLink>
-            */}
-            {[
-              { href: "#servicios", label: t("nav.servicios") },
-              // { href: "#proyectos", label: t("nav.proyectos") }, // oculto temporalmente
-              { href: "#metodologia", label: t("nav.metodologia") },
-              { href: "#contacto", label: t("nav.contactar") },
-            ].map(({ href, label }) => (
+          {/* Col 2: Services */}
+          <div>
+            <h3 className="text-sm font-semibold tracking-wider uppercase text-white mb-4">
+              {t("footer.services.title")}
+            </h3>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <a
+                  href="#servicios"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollTo("#servicios");
+                  }}
+                  className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  {t("services.0.title")}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#servicios"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollTo("#servicios");
+                  }}
+                  className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  {t("services.1.title")}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#servicios"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollTo("#servicios");
+                  }}
+                  className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  {t("services.2.title")}
+                </a>
+              </li>
+              <li>
+                <WouterLink
+                  href="/diagnostico"
+                  className="text-blue-400 hover:text-blue-300 transition-colors inline-flex items-center gap-1.5"
+                >
+                  <span>Diagnóstico Técnico Gratuito</span>
+                  <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 text-blue-400">
+                    IA
+                  </span>
+                </WouterLink>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 3: Company & Navigation */}
+          <div>
+            <h3 className="text-sm font-semibold tracking-wider uppercase text-white mb-4">
+              {t("footer.company.title")}
+            </h3>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <a
+                  href="#metodologia"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollTo("#metodologia");
+                  }}
+                  className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  {t("nav.metodologia")}
+                </a>
+              </li>
+              <li>
+                <WouterLink
+                  href="/casos-conceptuales"
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  {t("nav.casos")}
+                </WouterLink>
+              </li>
+              <li>
+                <a
+                  href="#contacto"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollTo("#contacto");
+                  }}
+                  className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                >
+                  {t("nav.contactar")}
+                </a>
+              </li>
+              <li>
+                <WouterLink
+                  href="/aviso-legal"
+                  className="text-slate-400 hover:text-white transition-colors"
+                  data-testid="footer-legal"
+                >
+                  {t("footer.legal")}
+                </WouterLink>
+              </li>
+              <li>
+                <WouterLink
+                  href="/privacidad"
+                  className="text-slate-400 hover:text-white transition-colors"
+                  data-testid="footer-privacy"
+                >
+                  {t("footer.privacy")}
+                </WouterLink>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 4: Contact & Social */}
+          <div>
+            <h3 className="text-sm font-semibold tracking-wider uppercase text-white mb-4">
+              {t("footer.contact.title")}
+            </h3>
+            <div className="space-y-3.5 text-sm">
               <a
-                key={href}
-                href={href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollTo(href);
-                }}
-                className="cursor-pointer text-sm text-muted-foreground hover:text-white transition-colors"
+                href="mailto:contact@vertextech.dev"
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
               >
-                {label}
+                <Mail
+                  className="w-4 h-4 text-primary group-hover:scale-110 transition-transform"
+                  aria-hidden="true"
+                />
+                <span>contact@vertextech.dev</span>
               </a>
-            ))}
+              <a
+                href="https://github.com/Vertex-Tech-Digital"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
+                data-testid="footer-github"
+              >
+                <Github
+                  className="w-4 h-4 text-primary group-hover:scale-110 transition-transform"
+                  aria-hidden="true"
+                />
+                <span>{t("footer.github")}</span>
+              </a>
+            </div>
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
+                <WouterLink
+                  href="/terminos"
+                  className="text-slate-400 hover:text-white transition-colors"
+                  data-testid="footer-terms"
+                >
+                  {t("footer.terms")}
+                </WouterLink>
+                <WouterLink
+                  href="/cookies"
+                  className="text-slate-400 hover:text-white transition-colors"
+                  data-testid="footer-cookies"
+                >
+                  {t("footer.cookies")}
+                </WouterLink>
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.dispatchEvent(
+                      new CustomEvent("open-cookie-preferences"),
+                    )
+                  }
+                  className="cursor-pointer text-xs text-primary hover:text-blue-300 transition-colors underline-offset-2 hover:underline"
+                  data-testid="footer-cookie-settings"
+                >
+                  {t("footer.cookies.settings")}
+                </button>
+              </div>
+            </div>
           </div>
-
-          {/* GitHub */}
-          <a
-            href="https://github.com/Vertex-Tech-Digital"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors"
-            data-testid="footer-github"
-          >
-            <Github className="w-4 h-4" />
-            {t("footer.github")}
-          </a>
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-border/50 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-muted-foreground order-2 sm:order-1">
-            &copy; {t("footer.copyright")}
+        <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-400">
+          <p className="order-2 sm:order-1">
+            &copy; {new Date().getFullYear()} {t("footer.copyright")}
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 order-1 sm:order-2">
-            {legalLinks.map(({ href, label, testId }) => (
-              <WouterLink
-                key={href}
-                href={href}
-                className="cursor-pointer text-xs text-muted-foreground hover:text-white transition-colors underline-offset-2 hover:underline"
-                data-testid={testId}
-              >
-                {label}
-              </WouterLink>
-            ))}
-            <button
-              type="button"
-              onClick={() =>
-                window.dispatchEvent(new CustomEvent("open-cookie-preferences"))
-              }
-              className="cursor-pointer text-xs text-primary underline-offset-2 hover:underline"
-              data-testid="footer-cookie-settings"
-            >
-              {t("footer.cookies.settings")}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            aria-label={t("footer.backToTop")}
+            className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors order-1 sm:order-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-2 py-1"
+          >
+            <span>{t("footer.backToTop")}</span>
+            <ArrowUp className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+          </button>
         </div>
       </div>
     </footer>
