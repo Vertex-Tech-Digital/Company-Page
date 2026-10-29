@@ -10,13 +10,21 @@ import { useLanguage } from "@/context/LanguageContext";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function formatDate(dateStr: string, lang: string): string {
+function formatDate(dateStr: string | undefined, lang: string): string {
+  if (!dateStr || typeof dateStr !== "string") return "";
   // dateStr es ISO (yyyy-mm-dd); se normaliza para evitar desfases de zona
-  const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d).toLocaleDateString(
-    lang === "es" ? "es-ES" : "en-US",
-    { day: "2-digit", month: "short", year: "numeric" },
-  );
+  try {
+    const parts = dateStr.split("-");
+    if (parts.length < 3) return dateStr;
+    const [y, m, d] = parts.map(Number);
+    if (!y) return dateStr;
+    return new Date(y, (m ?? 1) - 1, d || 1).toLocaleDateString(
+      lang === "es" ? "es-ES" : "en-US",
+      { day: "2-digit", month: "short", year: "numeric" },
+    );
+  } catch {
+    return dateStr;
+  }
 }
 
 // ── Componente principal ─────────────────────────────────────────────────────
@@ -30,20 +38,26 @@ export default function CasosConceptuales() {
 
   useEffect(() => {
     let alive = true;
-    getCasos(lang).then((casos) => {
-      if (!alive) return;
-      setPreviews(
-        casos.map((caso) => ({
-          slug: caso.slug,
-          coverImage: caso.cover,
-          pseudonym: caso.pseudonym,
-          tags: caso.tags,
-          title: caso.title,
-          excerpt: caso.excerpt,
-          date: formatDate(caso.date, lang),
-        })),
-      );
-    });
+    getCasos(lang)
+      .then((casos) => {
+        if (!alive) return;
+        setPreviews(
+          (casos || [])
+            .filter((caso) => caso && caso.slug)
+            .map((caso) => ({
+              slug: caso.slug,
+              coverImage: caso.cover,
+              pseudonym: caso.pseudonym,
+              tags: caso.tags,
+              title: caso.title,
+              excerpt: caso.excerpt,
+              date: formatDate(caso.date, lang),
+            })),
+        );
+      })
+      .catch(() => {
+        if (alive) setPreviews([]);
+      });
     return () => {
       alive = false;
     };

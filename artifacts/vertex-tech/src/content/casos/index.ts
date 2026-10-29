@@ -83,10 +83,27 @@ export async function getCasos(
   lang: CaseLanguage = "es",
 ): Promise<CasoPreviewData[]> {
   const loaded = await Promise.all(
-    Object.entries(metaModules).map(async ([path, load]) => {
-      const { slug, lang: fileLang } = parsePath(path);
-      const { meta } = await load();
-      return { slug, lang: fileLang, meta };
+    Object.entries(fullModules).map(async ([path, load]) => {
+      try {
+        const { slug, lang: fileLang } = parsePath(path);
+        const mod = (await load()) as MdxModule;
+
+        if (!mod?.meta) {
+          console.warn(`[casos] Invalid meta in ${path}`);
+          return null;
+        }
+
+        const { meta } = mod;
+        if (!meta.title) {
+          console.warn(`[casos] Invalid meta in ${path}`);
+          return null;
+        }
+
+        return { slug, lang: fileLang, meta };
+      } catch (err) {
+        console.warn(`[casos] Failed to load meta from ${path}:`, err);
+        return null;
+      }
     }),
   );
 
@@ -94,7 +111,9 @@ export async function getCasos(
     string,
     { slug: string; meta: CasoMeta; lang: CaseLanguage }
   >();
-  for (const { slug, lang: fileLang, meta } of loaded) {
+  for (const entry of loaded) {
+    if (!entry) continue;
+    const { slug, lang: fileLang, meta } = entry;
     const current = bestBySlug.get(slug);
     if (!current || score(fileLang, lang) > score(current.lang, lang)) {
       bestBySlug.set(slug, { slug, meta, lang: fileLang });
@@ -103,7 +122,8 @@ export async function getCasos(
 
   return [...bestBySlug.values()]
     .map(({ slug, meta }) => ({ slug, ...meta }))
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .filter((caso) => caso.date)
+    .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 }
 
 /**
