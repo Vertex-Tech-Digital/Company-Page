@@ -1,5 +1,12 @@
-import { motion } from "framer-motion";
-import { FileCode2, MessageSquareCode, Layers, Rocket } from "lucide-react";
+import { m } from "framer-motion";
+import {
+  CheckCircle2,
+  FileCode2,
+  MessageSquareCode,
+  Layers,
+  Rocket,
+} from "lucide-react";
+
 import { useLanguage } from "@/context/LanguageContext";
 
 export function WhyUs() {
@@ -32,7 +39,7 @@ export function WhyUs() {
     <section className="py-20 lg:py-28 bg-slate-950/40 border-y border-white/5 relative z-10">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -45,11 +52,11 @@ export function WhyUs() {
               {t("whyus.title")}
             </h2>
             <div className="w-16 h-1 bg-gradient-to-r from-primary to-cyan-400 rounded-full mx-auto" />
-          </motion.div>
+          </m.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {items.map((item, index) => (
-              <motion.div
+              <m.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -67,7 +74,7 @@ export function WhyUs() {
                 <p className="text-sm text-slate-300 leading-relaxed mt-auto">
                   {item.desc}
                 </p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
