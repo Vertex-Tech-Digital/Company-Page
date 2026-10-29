@@ -1,11 +1,9 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import { useEffect, Suspense, lazy } from "react";
 import { Loader2 } from "lucide-react";
+import { LazyMotion, domAnimation } from "framer-motion";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CookieConsent } from "@/components/sections/CookieConsent";
 import { ScrollToTop } from "@/components/common/ScrollToTop";
@@ -31,8 +29,6 @@ const LegalNotice = lazy(() => import("@/pages/LegalNotice"));
 const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
 const CookiePolicy = lazy(() => import("@/pages/CookiePolicy"));
-
-const queryClient = new QueryClient();
 
 function Router() {
   return (
@@ -67,21 +63,23 @@ function App() {
     document.documentElement.classList.add("dark");
   }, []);
 
+  // Bundle de entrada (VTD-37):
+  // - react-query y los toasts solo los usa el panel admin, así que sus
+  //   providers viven en pages/Admin.tsx.
+  // - LazyMotion carga solo domAnimation (animaciones, exit, inView y
+  //   gestos). Los componentes que entran en este bundle (portada, Navbar,
+  //   CookieConsent) usan `m` en vez de `motion`: importar `motion` en
+  //   cualquiera de ellos vuelve a meter drag y animaciones de layout aquí.
   return (
-    <LanguageProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <WouterRouter
-            base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}
-          >
-            <ScrollToTop />
-            <Router />
-          </WouterRouter>
-          <Toaster />
-          <CookieConsent />
-        </TooltipProvider>
-      </QueryClientProvider>
-    </LanguageProvider>
+    <LazyMotion features={domAnimation}>
+      <LanguageProvider>
+        <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
+          <ScrollToTop />
+          <Router />
+        </WouterRouter>
+        <CookieConsent />
+      </LanguageProvider>
+    </LazyMotion>
   );
 }
 

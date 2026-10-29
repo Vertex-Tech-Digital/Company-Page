@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function Methodology() {
@@ -13,7 +13,7 @@ export function Methodology() {
   return (
     <section id="metodologia" className="py-20 lg:py-28 relative z-10">
       <div className="container mx-auto px-6">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -29,7 +29,7 @@ export function Methodology() {
           <p className="text-lg text-slate-300 leading-relaxed">
             {t("methodology.desc")}
           </p>
-        </motion.div>
+        </m.div>
 
         <ol className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mt-12 relative list-none p-0 m-0">
           {/* Connecting line on desktop */}
@@ -39,7 +39,7 @@ export function Methodology() {
           />
 
           {steps.map((step, index) => (
-            <motion.li
+            <m.li
               key={index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -60,7 +60,7 @@ export function Methodology() {
               <p className="text-sm text-slate-300 leading-relaxed mt-auto">
                 {step.description}
               </p>
-            </motion.li>
+            </m.li>
           ))}
         </ol>
       </div>
