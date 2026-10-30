@@ -116,17 +116,17 @@ export default function CasoConceptual() {
     <main className="min-h-screen text-foreground font-sans">
       <PageNavbar />
 
-      <article className="container mx-auto px-6 py-24 max-w-3xl">
+      <article className="container mx-auto px-4 sm:px-6 py-20 sm:py-24 max-w-3xl">
         {/* Volver al listado */}
         <motion.div
           initial={{ opacity: 0, x: -8 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
-          className="mb-12"
+          className="mb-8 sm:mb-12"
         >
           <button
             onClick={backToList}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors"
+            className="min-h-[44px] inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             {lang === "es" ? "Volver a los casos" : "Back to cases"}
@@ -138,7 +138,7 @@ export default function CasoConceptual() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-14 space-y-5"
+          className="mb-8 sm:mb-14 space-y-4 sm:space-y-5"
         >
           {/* Seudónimo de la empresa */}
           <div className="flex items-center gap-1.5 text-xs font-mono text-primary/80 uppercase tracking-widest">
@@ -147,12 +147,12 @@ export default function CasoConceptual() {
           </div>
 
           {/* Título */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
             {caso.title}
           </h1>
 
           {/* Resumen */}
-          <p className="text-lg text-muted-foreground leading-relaxed">
+          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
             {caso.excerpt}
           </p>
 
@@ -182,7 +182,7 @@ export default function CasoConceptual() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-14 rounded-2xl overflow-hidden aspect-video bg-card/40 border border-border/50"
+          className="mb-8 sm:mb-14 rounded-2xl overflow-hidden aspect-video bg-card/40 border border-border/50"
         >
           <img
             src={caso.cover}

@@ -91,7 +91,7 @@ export function CookieConsent() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-xl z-50 pointer-events-auto"
+            className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 right-3 sm:left-4 sm:right-4 md:left-auto md:right-6 md:max-w-xl z-50 pointer-events-auto"
             data-testid="cookie-banner"
             role="region"
             aria-label={t("cookie.banner.title")}
@@ -163,7 +163,7 @@ export function CookieConsent() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 16 }}
               transition={{ duration: 0.2 }}
-              className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl p-6 z-10 flex flex-col gap-6"
+              className="relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl p-5 sm:p-6 z-10 flex flex-col gap-5 sm:gap-6 max-h-[calc(100dvh-2rem)] overflow-y-auto"
               role="dialog"
               aria-modal="true"
               aria-labelledby="cookie-modal-title"
@@ -181,7 +181,7 @@ export function CookieConsent() {
                 </div>
                 <button
                   onClick={() => setShowPreferences(false)}
-                  className="text-muted-foreground hover:text-white rounded-lg p-1 transition-colors"
+                  className="text-muted-foreground hover:text-white rounded-lg p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors cursor-pointer"
                   aria-label="Cerrar modal de preferencias"
                 >
                   <X className="w-5 h-5" />

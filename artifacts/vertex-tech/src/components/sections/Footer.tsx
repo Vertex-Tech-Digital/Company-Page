@@ -26,9 +26,9 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-white/10 bg-slate-950/90 backdrop-blur-md pt-16 pb-10 relative z-10">
-      <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-14">
+    <footer className="border-t border-white/10 bg-slate-950/90 backdrop-blur-md pt-12 sm:pt-16 pb-[max(2.5rem,env(safe-area-inset-bottom))] relative z-10">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12 mb-12 sm:mb-14">
           {/* Col 1: Brand & Location */}
           <div className="space-y-4">
             <div
@@ -203,17 +203,17 @@ export function Footer() {
               </a>
             </div>
             <div className="mt-6 pt-6 border-t border-white/10">
-              <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
                 <WouterLink
                   href="/terminos"
-                  className="text-slate-400 hover:text-white transition-colors"
+                  className="text-slate-400 hover:text-white transition-colors inline-block py-1"
                   data-testid="footer-terms"
                 >
                   {t("footer.terms")}
                 </WouterLink>
                 <WouterLink
                   href="/cookies"
-                  className="text-slate-400 hover:text-white transition-colors"
+                  className="text-slate-400 hover:text-white transition-colors inline-block py-1"
                   data-testid="footer-cookies"
                 >
                   {t("footer.cookies")}
@@ -225,7 +225,7 @@ export function Footer() {
                       new CustomEvent("open-cookie-preferences"),
                     )
                   }
-                  className="cursor-pointer text-xs text-primary hover:text-blue-300 transition-colors underline-offset-2 hover:underline"
+                  className="cursor-pointer text-xs text-primary hover:text-blue-300 transition-colors underline-offset-2 hover:underline inline-block py-1"
                   data-testid="footer-cookie-settings"
                 >
                   {t("footer.cookies.settings")}
@@ -245,7 +245,7 @@ export function Footer() {
             type="button"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             aria-label={t("footer.backToTop")}
-            className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors order-1 sm:order-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-2 py-1"
+            className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors order-1 sm:order-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-2.5 py-2 min-h-[44px]"
           >
             <span>{t("footer.backToTop")}</span>
             <ArrowUp className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
