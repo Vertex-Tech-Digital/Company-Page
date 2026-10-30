@@ -46,19 +46,19 @@ export function Contact() {
     <section
       ref={sectionRef}
       id="contacto"
-      className="py-20 lg:py-28 relative z-10 overflow-hidden"
+      className="py-14 sm:py-20 lg:py-28 relative z-10 overflow-hidden"
     >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
           <m.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
             <h2
-              className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight tracking-tight"
+              className="text-3xl md:text-5xl font-bold text-white mb-4 sm:mb-6 leading-tight tracking-tight"
               data-testid="contact-title"
             >
               {t("contact.title")}{" "}
@@ -66,7 +66,7 @@ export function Contact() {
                 {t("contact.titleHighlight")}
               </span>
             </h2>
-            <p className="text-lg text-slate-300 leading-relaxed mb-8">
+            <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-6 sm:mb-8">
               {t("contact.subtitle")}
             </p>
           </m.div>
@@ -75,7 +75,7 @@ export function Contact() {
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-slate-900/60 backdrop-blur-xl border border-white/10 p-8 sm:p-10 rounded-2xl shadow-2xl shadow-black/40"
+            className="bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 sm:p-8 md:p-10 rounded-2xl shadow-2xl shadow-black/40"
           >
             {loadForm ? (
               <Suspense fallback={<ContactFormPlaceholder />}>
