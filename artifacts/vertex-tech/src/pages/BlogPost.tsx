@@ -12,6 +12,9 @@ import {
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
 import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
+import { ScrollTopButton } from "@/components/sections/ScrollTopButton";
+import { CasoShare } from "@/components/sections/CasoShare";
+import { BlogRelatedCases } from "@/components/sections/BlogRelatedCases";
 import { useLanguage } from "@/context/LanguageContext";
 import { RichTextRenderer } from "@/components/blog/RichTextRenderer";
 import { hasRichTextContent } from "@/lib/tiptap-content";
@@ -234,10 +237,25 @@ export default function BlogPost() {
         >
           <RichTextRenderer content={displayContent} />
         </motion.div>
+
+        {/* Compartir artículo */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mt-12"
+        >
+          <CasoShare title={displayTitle} />
+        </motion.div>
+
+        {/* Casos conceptuales relacionados */}
+        <BlogRelatedCases postTags={[]} postCategory={post.category_name} />
       </article>
 
       <Footer />
       <WhatsAppButton />
+      <ScrollTopButton />
     </main>
   );
 }
