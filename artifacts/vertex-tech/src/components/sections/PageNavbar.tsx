@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function PageNavbar() {
-  const { lang, setLang } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const [location] = useLocation();
 
   return (
@@ -31,7 +31,7 @@ export function PageNavbar() {
               <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(59,130,246,0.9)] ml-1 mb-0.5 align-middle"></span>
             </span>
             <span className="text-[9px] sm:text-[10px] tracking-[0.2em] uppercase text-primary/70 font-medium">
-              Consultora Tecnológica
+              {t("nav.tagline")}
             </span>
           </div>
         </Link>
@@ -51,20 +51,22 @@ export function PageNavbar() {
           </Link>
 
           <Link
-            href="/casos-conceptuales"
+            href="/blog"
             className={`hidden sm:inline-block text-sm font-medium transition-colors hover:text-primary ${
-              location.startsWith("/casos-conceptuales")
+              location.startsWith("/blog")
                 ? "text-primary"
                 : "text-muted-foreground"
             }`}
-            data-testid="nav-link-casos-page"
+            data-testid="nav-link-blog-page"
           >
-            {lang === "es" ? "Casos Conceptuales" : "Conceptual Cases"}
+            {t("nav.blog")}
           </Link>
 
           <div className="flex items-center gap-0.5 sm:gap-1 text-xs tracking-widest uppercase">
             <button
               onClick={() => setLang("es")}
+              aria-pressed={lang === "es"}
+              aria-label={t("nav.lang.es")}
               className={`min-h-[44px] min-w-[36px] flex items-center justify-center rounded px-1.5 py-1 ${lang === "es" ? "text-white font-semibold" : "text-muted-foreground hover:text-white"}`}
               data-testid="lang-toggle-es"
             >
@@ -78,6 +80,8 @@ export function PageNavbar() {
             </span>
             <button
               onClick={() => setLang("en")}
+              aria-pressed={lang === "en"}
+              aria-label={t("nav.lang.en")}
               className={`min-h-[44px] min-w-[36px] flex items-center justify-center rounded px-1.5 py-1 ${lang === "en" ? "text-white font-semibold" : "text-muted-foreground hover:text-white"}`}
               data-testid="lang-toggle-en"
             >

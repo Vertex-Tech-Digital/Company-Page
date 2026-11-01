@@ -133,8 +133,18 @@ export function Footer() {
               </li>
               <li>
                 <WouterLink
+                  href="/blog"
+                  className="text-slate-400 hover:text-white transition-colors inline-block py-1"
+                  data-testid="footer-blog"
+                >
+                  {t("nav.blog")}
+                </WouterLink>
+              </li>
+              <li>
+                <WouterLink
                   href="/casos-conceptuales"
-                  className="text-slate-400 hover:text-white transition-colors"
+                  className="text-slate-400 hover:text-white transition-colors inline-block py-1"
+                  data-testid="footer-casos"
                 >
                   {t("nav.casos")}
                 </WouterLink>

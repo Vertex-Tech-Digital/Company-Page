@@ -144,26 +144,16 @@ export function Navbar() {
           </WouterLink>
 
           <WouterLink
-            href="/casos-conceptuales"
+            href="/blog"
             className={`text-sm font-medium transition-colors hover:text-white ${
-              location.startsWith("/casos-conceptuales")
+              location.startsWith("/blog")
                 ? "text-primary font-semibold"
                 : "text-slate-300"
             }`}
-            data-testid="nav-link-casos"
-          >
-            {t("nav.casos")}
-          </WouterLink>
-
-          {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
-          <WouterLink
-            href="/blog"
-            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             data-testid="nav-link-blog"
           >
             {t("nav.blog")}
           </WouterLink>
-          */}
 
           <div className="flex items-center gap-1 text-xs tracking-widest uppercase">
             <button
@@ -289,16 +279,16 @@ export function Navbar() {
               {t("nav.diagnostico")}
             </WouterLink>
             <WouterLink
-              href="/casos-conceptuales"
+              href="/blog"
               onClick={() => setMobileMenuOpen(false)}
               className={`text-lg font-medium transition-colors hover:text-primary min-h-[44px] flex items-center ${
-                location.startsWith("/casos-conceptuales")
+                location.startsWith("/blog")
                   ? "text-primary font-semibold"
                   : "text-slate-300 hover:text-white"
               }`}
-              data-testid="nav-link-casos-mobile"
+              data-testid="nav-link-blog-mobile"
             >
-              {t("nav.casos")}
+              {t("nav.blog")}
             </WouterLink>
             <Button
               onClick={() => scrollTo("#contacto")}
