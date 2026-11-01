@@ -9,7 +9,6 @@ import {
   Tag,
   Pencil,
   ArrowRight,
-  Sparkles,
 } from "lucide-react";
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
@@ -248,11 +247,7 @@ export default function BlogPost() {
         <div className="mt-14 pt-8 border-t border-border/60">
           <div className="p-6 sm:p-8 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-xl">
             <div className="space-y-1.5 max-w-xl">
-              <span className="text-xs font-mono tracking-widest uppercase text-primary/80 inline-flex items-center gap-1.5">
-                <Sparkles
-                  className="w-3.5 h-3.5 text-primary"
-                  aria-hidden="true"
-                />
+              <span className="text-xs font-mono tracking-widest uppercase text-primary/80 inline-block">
                 {lang === "es" ? "Casos Conceptuales" : "Case Studies"}
               </span>
               <h3 className="text-lg font-bold text-white">

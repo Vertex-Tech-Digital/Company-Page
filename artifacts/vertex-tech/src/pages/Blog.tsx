@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import {
-  Loader2,
-  AlertCircle,
-  FileText,
-  ArrowRight,
-  Sparkles,
-} from "lucide-react";
+import { Loader2, AlertCircle, FileText, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
@@ -226,10 +220,6 @@ export default function Blog() {
               href="#casos-conceptuales"
               className="text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors inline-flex items-center gap-1.5 ml-auto cursor-pointer"
             >
-              <Sparkles
-                className="w-3.5 h-3.5 text-primary"
-                aria-hidden="true"
-              />
               <span>
                 {lang === "es" ? "Casos Conceptuales" : "Conceptual Cases"}
               </span>
@@ -297,11 +287,7 @@ export default function Blog() {
           <div className="container mx-auto px-4 sm:px-6">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 sm:mb-12">
               <div className="max-w-2xl">
-                <span className="text-xs font-mono tracking-widest uppercase text-primary/80 mb-3 inline-flex items-center gap-1.5">
-                  <Sparkles
-                    className="w-3.5 h-3.5 text-primary"
-                    aria-hidden="true"
-                  />
+                <span className="text-xs font-mono tracking-widest uppercase text-primary/80 mb-3 inline-block">
                   {lang === "es"
                     ? "Casos Conceptuales"
                     : "Conceptual Case Studies"}
