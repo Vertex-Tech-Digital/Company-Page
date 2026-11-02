@@ -1,4 +1,3 @@
-import { m } from "framer-motion";
 import {
   CheckCircle2,
   FileCode2,
@@ -7,6 +6,7 @@ import {
   Rocket,
 } from "lucide-react";
 
+import { Reveal } from "@/components/common/Reveal";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function WhyUs() {
@@ -39,12 +39,7 @@ export function WhyUs() {
     <section className="py-20 lg:py-28 bg-slate-950/40 border-y border-white/5 relative z-10">
       <div className="container mx-auto px-6">
         <div className="max-w-6xl mx-auto">
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
+          <Reveal y={20} className="text-center mb-16">
             <h2
               className="text-3xl md:text-4xl font-bold text-white tracking-tight mb-4"
               data-testid="whyus-title"
@@ -52,16 +47,14 @@ export function WhyUs() {
               {t("whyus.title")}
             </h2>
             <div className="w-16 h-1 bg-gradient-to-r from-primary to-cyan-400 rounded-full mx-auto" />
-          </m.div>
+          </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {items.map((item, index) => (
-              <m.div
+              <Reveal
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                y={20}
+                delay={index * 0.1}
                 className="bg-slate-900/40 border border-white/10 backdrop-blur-md rounded-2xl p-6 hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-black/20 flex flex-col group"
                 data-testid={`whyus-item-${index}`}
               >
@@ -74,7 +67,7 @@ export function WhyUs() {
                 <p className="text-sm text-slate-300 leading-relaxed mt-auto">
                   {item.desc}
                 </p>
-              </m.div>
+              </Reveal>
             ))}
           </div>
         </div>

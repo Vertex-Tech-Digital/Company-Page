@@ -1,4 +1,4 @@
-import { m } from "framer-motion";
+import { Reveal } from "@/components/common/Reveal";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function Methodology() {
@@ -13,12 +13,7 @@ export function Methodology() {
   return (
     <section id="metodologia" className="py-20 lg:py-28 relative z-10">
       <div className="container mx-auto px-6">
-        <m.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-14 max-w-3xl"
-        >
+        <Reveal y={20} className="mb-14 max-w-3xl">
           <h2
             className="text-3xl md:text-4xl font-bold text-white tracking-tight mb-4"
             data-testid="methodology-title"
@@ -29,7 +24,7 @@ export function Methodology() {
           <p className="text-lg text-slate-300 leading-relaxed">
             {t("methodology.desc")}
           </p>
-        </m.div>
+        </Reveal>
 
         <ol className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mt-12 relative list-none p-0 m-0">
           {/* Connecting line on desktop */}
@@ -39,12 +34,11 @@ export function Methodology() {
           />
 
           {steps.map((step, index) => (
-            <m.li
+            <Reveal
+              as="li"
               key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              y={30}
+              delay={index * 0.1}
               className="relative z-10 flex flex-col h-full bg-slate-900/40 border border-white/10 backdrop-blur-md rounded-2xl p-6 hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 shadow-lg shadow-black/20 group"
               data-testid={`methodology-step-${index}`}
             >
@@ -60,7 +54,7 @@ export function Methodology() {
               <p className="text-sm text-slate-300 leading-relaxed mt-auto">
                 {step.description}
               </p>
-            </m.li>
+            </Reveal>
           ))}
         </ol>
       </div>

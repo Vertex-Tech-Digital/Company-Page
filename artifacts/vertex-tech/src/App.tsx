@@ -1,9 +1,7 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
-import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import { useEffect, Suspense, lazy } from "react";
 import { Loader2 } from "lucide-react";
-import { LazyMotion, domAnimation } from "framer-motion";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { CookieConsent } from "@/components/sections/CookieConsent";
 import { ScrollToTop } from "@/components/common/ScrollToTop";
@@ -29,6 +27,7 @@ const LegalNotice = lazy(() => import("@/pages/LegalNotice"));
 const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
 const CookiePolicy = lazy(() => import("@/pages/CookiePolicy"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
 function Router() {
   return (
@@ -63,23 +62,23 @@ function App() {
     document.documentElement.classList.add("dark");
   }, []);
 
-  // Bundle de entrada (VTD-37):
+  // Bundle de entrada (VTD-37 y VTD-50):
   // - react-query y los toasts solo los usa el panel admin, así que sus
   //   providers viven en pages/Admin.tsx.
-  // - LazyMotion carga solo domAnimation (animaciones, exit, inView y
-  //   gestos). Los componentes que entran en este bundle (portada, Navbar,
-  //   CookieConsent) usan `m` en vez de `motion`: importar `motion` en
-  //   cualquiera de ellos vuelve a meter drag y animaciones de layout aquí.
+  // - framer-motion no entra en este bundle: pesa ~80 KiB y la portada solo
+  //   necesita fundidos y desplazamientos. Los componentes que se cargan aquí
+  //   (portada, Navbar, CookieConsent) animan con CSS (`Reveal`, `usePresence`
+  //   y las clases `vt-*` de index.css). Importar framer-motion desde
+  //   cualquiera de ellos lo vuelve a meter; las rutas con lazy() sí pueden
+  //   usarlo, porque lo cargan en su propio chunk.
   return (
-    <LazyMotion features={domAnimation}>
-      <LanguageProvider>
-        <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
-          <ScrollToTop />
-          <Router />
-        </WouterRouter>
-        <CookieConsent />
-      </LanguageProvider>
-    </LazyMotion>
+    <LanguageProvider>
+      <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
+        <ScrollToTop />
+        <Router />
+      </WouterRouter>
+      <CookieConsent />
+    </LanguageProvider>
   );
 }
 
