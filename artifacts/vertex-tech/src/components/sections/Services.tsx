@@ -1,5 +1,5 @@
-import { m } from "framer-motion";
 import { Code2, Network, ShieldCheck, Bot } from "lucide-react";
+import { Reveal } from "@/components/common/Reveal";
 import { useLanguage } from "@/context/LanguageContext";
 
 const icons = [
@@ -25,28 +25,21 @@ export function Services() {
   return (
     <section id="servicios" className="py-14 sm:py-20 lg:py-28 relative z-10">
       <div className="container mx-auto px-4 sm:px-6">
-        <m.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-10 sm:mb-16 max-w-3xl"
-        >
+        <Reveal y={20} className="mb-10 sm:mb-16 max-w-3xl">
           <h2
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight"
             data-testid="services-title"
           >
             {t("services.title")}
           </h2>
-        </m.div>
+        </Reveal>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {services.map((service, index) => (
-            <m.div
+            <Reveal
               key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              y={30}
+              delay={index * 0.1}
               className="group relative bg-slate-900/40 border border-white/10 backdrop-blur-md rounded-2xl p-5 sm:p-7 hover:border-primary/50 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_10px_35px_rgba(0,107,230,0.18)] flex flex-col justify-between"
               data-testid={`service-card-${index}`}
             >
@@ -61,7 +54,7 @@ export function Services() {
                   {service.description}
                 </p>
               </div>
-            </m.div>
+            </Reveal>
           ))}
         </div>
       </div>

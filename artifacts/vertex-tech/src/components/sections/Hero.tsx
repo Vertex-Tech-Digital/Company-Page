@@ -1,4 +1,3 @@
-import { m } from "framer-motion";
 import { Link } from "wouter";
 // import { ArrowRight } from "lucide-react"; // oculto temporalmente
 import { Button } from "@/components/ui/button";
@@ -22,12 +21,7 @@ export function Hero() {
     >
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <m.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="max-w-2xl relative"
-          >
+          <div className="max-w-2xl relative vt-enter [--vt-x:-50px] [--vt-dur:0.8s] [--vt-ease:ease-out]">
             {/* Sutil resplandor de contraste para aislar el texto frente a las partículas del canvas */}
             <div className="absolute -inset-8 -z-10 rounded-3xl bg-slate-950/75 blur-3xl pointer-events-none" />
 
@@ -88,16 +82,11 @@ export function Hero() {
               </a>
               */}
             </div>
-          </m.div>
+          </div>
 
-          <m.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="hidden lg:block"
-          >
+          <div className="hidden lg:block vt-enter [--vt-x:50px] [--vt-dur:0.8s] [--vt-ease:ease-out] [--vt-delay:0.2s]">
             <WireframeCube />
-          </m.div>
+          </div>
         </div>
       </div>
     </section>

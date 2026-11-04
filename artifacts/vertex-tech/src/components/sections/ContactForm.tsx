@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { m } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -62,10 +61,8 @@ export default function ContactForm() {
 
   if (isSuccess) {
     return (
-      <m.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="h-full flex flex-col items-center justify-center text-center py-12"
+      <div
+        className="h-full flex flex-col items-center justify-center text-center py-12 vt-enter [--vt-scale:0.9] [--vt-dur:0.3s]"
         role="status"
         aria-live="polite"
         data-testid="contact-success"
@@ -88,7 +85,7 @@ export default function ContactForm() {
         >
           {t("contact.success.another")}
         </Button>
-      </m.div>
+      </div>
     );
   }
 

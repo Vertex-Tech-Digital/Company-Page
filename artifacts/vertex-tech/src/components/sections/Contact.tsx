@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { m } from "framer-motion";
 import { Loader2 } from "lucide-react";
+import { Reveal } from "@/components/common/Reveal";
 import { useLanguage } from "@/context/LanguageContext";
 
 // El formulario (react-hook-form + zod) es lo más pesado de la portada y está
@@ -52,11 +52,7 @@ export function Contact() {
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
-          <m.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
+          <Reveal x={-30}>
             <h2
               className="text-3xl md:text-5xl font-bold text-white mb-4 sm:mb-6 leading-tight tracking-tight"
               data-testid="contact-title"
@@ -69,12 +65,10 @@ export function Contact() {
             <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-6 sm:mb-8">
               {t("contact.subtitle")}
             </p>
-          </m.div>
+          </Reveal>
 
-          <m.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+          <Reveal
+            x={30}
             className="bg-slate-900/60 backdrop-blur-xl border border-white/10 p-5 sm:p-8 md:p-10 rounded-2xl shadow-2xl shadow-black/40"
           >
             {loadForm ? (
@@ -84,7 +78,7 @@ export function Contact() {
             ) : (
               <ContactFormPlaceholder />
             )}
-          </m.div>
+          </Reveal>
         </div>
       </div>
     </section>

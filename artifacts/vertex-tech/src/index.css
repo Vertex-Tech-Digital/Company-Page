@@ -181,6 +181,93 @@
   }
 }
 
+/* Animaciones de entrada y salida de la portada (VTD-50).
+   Sustituyen a framer-motion en el bundle de entrada: las ejecuta el navegador
+   con CSS, así que no cuestan JS. Cada elemento fija su recorrido con variables:
+   --vt-x, --vt-y (desplazamiento), --vt-scale, --vt-dur, --vt-ease y --vt-delay.
+   La curva por defecto reproduce el spring de framer-motion para transformadas
+   (rigidez 500, amortiguación 25) con un rebote algo menor.
+   Las variables se registran sin herencia para que un bloque animado no le pase
+   su recorrido a otro animado que lleve dentro. */
+@property --vt-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --vt-y {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --vt-scale {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --vt-delay {
+  syntax: "<time>";
+  inherits: false;
+  initial-value: 0s;
+}
+
+@property --vt-dur {
+  syntax: "<time>";
+  inherits: false;
+  initial-value: 0.5s;
+}
+
+@property --vt-ease {
+  syntax: "*";
+  inherits: false;
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--vt-x), var(--vt-y), 0) scale(var(--vt-scale));
+  }
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translate3d(var(--vt-x), var(--vt-y), 0) scale(var(--vt-scale));
+  }
+}
+
+.vt-enter,
+.vt-reveal[data-in] {
+  animation: vt-in var(--vt-dur)
+    var(--vt-ease, cubic-bezier(0.36, 1.25, 0, 1.11)) var(--vt-delay) backwards;
+}
+
+/* Bloques que aparecen al entrar en pantalla: ocultos hasta que Reveal marca data-in. */
+.vt-reveal:not([data-in]) {
+  opacity: 0;
+}
+
+/* La salida dura lo mismo que la entrada (--vt-dur). usePresence desmonta el
+   elemento pasado su `exitMs`, que debe ser igual o mayor que --vt-dur. */
+.vt-exit {
+  animation: vt-out var(--vt-dur) var(--vt-ease, ease-out) forwards;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vt-enter,
+  .vt-reveal,
+  .vt-reveal[data-in],
+  .vt-exit {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 #replit-badge-container,
 [data-replit-badge],
 .replit-badge {

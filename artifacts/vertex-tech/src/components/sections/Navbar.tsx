@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link as WouterLink, useLocation } from "wouter";
-import { m, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePresence } from "@/hooks/use-presence";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenu = usePresence(mobileMenuOpen, 300);
   const [activeSection, setActiveSection] = useState("inicio");
   const { lang, setLang, t } = useLanguage();
   const [location] = useLocation();
@@ -214,91 +215,88 @@ export function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <m.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-0 w-full bg-slate-950/98 backdrop-blur-xl border-b border-white/10 p-5 sm:p-6 flex flex-col gap-4 sm:gap-5 md:hidden shadow-2xl max-h-[calc(100dvh-5rem)] overflow-y-auto pb-[max(2rem,env(safe-area-inset-bottom))]"
-            data-testid="nav-mobile-menu"
+      {mobileMenu.mounted && (
+        <div
+          className={`absolute top-20 left-0 w-full bg-slate-950/98 backdrop-blur-xl border-b border-white/10 p-5 sm:p-6 flex flex-col gap-4 sm:gap-5 md:hidden shadow-2xl max-h-[calc(100dvh-5rem)] overflow-y-auto pb-[max(2rem,env(safe-area-inset-bottom))] [--vt-y:-20px] [--vt-dur:0.3s] ${
+            mobileMenu.exiting ? "vt-exit" : "vt-enter"
+          }`}
+          data-testid="nav-mobile-menu"
+        >
+          <div className="flex justify-end items-center gap-2 text-sm tracking-widest uppercase mb-1">
+            <button
+              onClick={() => setLang("es")}
+              aria-pressed={lang === "es"}
+              aria-label={t("nav.lang.es")}
+              className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded px-2.5 py-1 ${lang === "es" ? "text-white font-semibold" : "text-slate-400 hover:text-white"}`}
+            >
+              ES
+            </button>
+            <span
+              className="text-muted-foreground/50 select-none"
+              aria-hidden="true"
+            >
+              |
+            </span>
+            <button
+              onClick={() => setLang("en")}
+              aria-pressed={lang === "en"}
+              aria-label={t("nav.lang.en")}
+              className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded px-2.5 py-1 ${lang === "en" ? "text-white font-semibold" : "text-slate-400 hover:text-white"}`}
+            >
+              EN
+            </button>
+          </div>
+
+          {navLinks.map((link) => (
+            <a
+              key={link.id}
+              href={link.href}
+              onClick={(e) => {
+                e.preventDefault();
+                scrollTo(link.href);
+              }}
+              className={`text-lg font-medium transition-colors min-h-[44px] flex items-center ${
+                location === "/" && activeSection === link.id
+                  ? "text-primary font-semibold"
+                  : "text-slate-300 hover:text-white"
+              }`}
+            >
+              {t(`nav.${link.id}`)}
+            </a>
+          ))}
+
+          <WouterLink
+            href="/diagnostico"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`text-lg font-medium transition-colors hover:text-primary min-h-[44px] flex items-center ${
+              location === "/diagnostico"
+                ? "text-primary font-semibold"
+                : "text-slate-300 hover:text-white"
+            }`}
+            data-testid="nav-link-diagnostico-mobile"
           >
-            <div className="flex justify-end items-center gap-2 text-sm tracking-widest uppercase mb-1">
-              <button
-                onClick={() => setLang("es")}
-                aria-pressed={lang === "es"}
-                aria-label={t("nav.lang.es")}
-                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded px-2.5 py-1 ${lang === "es" ? "text-white font-semibold" : "text-slate-400 hover:text-white"}`}
-              >
-                ES
-              </button>
-              <span
-                className="text-muted-foreground/50 select-none"
-                aria-hidden="true"
-              >
-                |
-              </span>
-              <button
-                onClick={() => setLang("en")}
-                aria-pressed={lang === "en"}
-                aria-label={t("nav.lang.en")}
-                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded px-2.5 py-1 ${lang === "en" ? "text-white font-semibold" : "text-slate-400 hover:text-white"}`}
-              >
-                EN
-              </button>
-            </div>
-
-            {navLinks.map((link) => (
-              <a
-                key={link.id}
-                href={link.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollTo(link.href);
-                }}
-                className={`text-lg font-medium transition-colors min-h-[44px] flex items-center ${
-                  location === "/" && activeSection === link.id
-                    ? "text-primary font-semibold"
-                    : "text-slate-300 hover:text-white"
-                }`}
-              >
-                {t(`nav.${link.id}`)}
-              </a>
-            ))}
-
-            <WouterLink
-              href="/diagnostico"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`text-lg font-medium transition-colors hover:text-primary min-h-[44px] flex items-center ${
-                location === "/diagnostico"
-                  ? "text-primary font-semibold"
-                  : "text-slate-300 hover:text-white"
-              }`}
-              data-testid="nav-link-diagnostico-mobile"
-            >
-              {t("nav.diagnostico")}
-            </WouterLink>
-            <WouterLink
-              href="/blog"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`text-lg font-medium transition-colors hover:text-primary min-h-[44px] flex items-center ${
-                location.startsWith("/blog")
-                  ? "text-primary font-semibold"
-                  : "text-slate-300 hover:text-white"
-              }`}
-              data-testid="nav-link-blog-mobile"
-            >
-              {t("nav.blog")}
-            </WouterLink>
-            <Button
-              onClick={() => scrollTo("#contacto")}
-              className="bg-primary-solid w-full h-12 text-base font-semibold text-white mt-1 cursor-pointer"
-            >
-              {t("nav.contactar")}
-            </Button>
-          </m.div>
-        )}
-      </AnimatePresence>
+            {t("nav.diagnostico")}
+          </WouterLink>
+          <WouterLink
+            href="/blog"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`text-lg font-medium transition-colors hover:text-primary min-h-[44px] flex items-center ${
+              location.startsWith("/blog")
+                ? "text-primary font-semibold"
+                : "text-slate-300 hover:text-white"
+            }`}
+            data-testid="nav-link-blog-mobile"
+          >
+            {t("nav.blog")}
+          </WouterLink>
+          <Button
+            onClick={() => scrollTo("#contacto")}
+            className="bg-primary-solid w-full h-12 text-base font-semibold text-white mt-1 cursor-pointer"
+          >
+            {t("nav.contactar")}
+          </Button>
+        </div>
+      )}
     </nav>
   );
 }
