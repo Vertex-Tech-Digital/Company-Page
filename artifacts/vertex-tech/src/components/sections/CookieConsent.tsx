@@ -88,7 +88,7 @@ export function CookieConsent() {
       {/* Banner Principal de Consentimiento (Inferior Flotante) */}
       {banner.mounted && (
         <div
-          className={`fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:max-w-xl z-50 pointer-events-auto [--vt-y:40px] [--vt-dur:0.3s] [--vt-ease:ease-out] ${
+          className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-3 right-3 sm:left-4 sm:right-4 md:left-auto md:right-6 md:max-w-xl z-50 pointer-events-auto [--vt-y:40px] [--vt-dur:0.3s] [--vt-ease:ease-out] ${
             banner.exiting ? "vt-exit" : "vt-enter"
           }`}
           data-testid="cookie-banner"
@@ -155,7 +155,7 @@ export function CookieConsent() {
           />
 
           <div
-            className={`relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl p-6 z-10 flex flex-col gap-6 [--vt-y:16px] [--vt-scale:0.95] [--vt-dur:0.2s] [--vt-ease:ease-out] ${
+            className={`relative w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl p-5 sm:p-6 z-10 flex flex-col gap-5 sm:gap-6 max-h-[calc(100dvh-2rem)] overflow-y-auto [--vt-y:16px] [--vt-scale:0.95] [--vt-dur:0.2s] [--vt-ease:ease-out] ${
               preferences.exiting ? "vt-exit" : "vt-enter"
             }`}
             role="dialog"
@@ -175,7 +175,7 @@ export function CookieConsent() {
               </div>
               <button
                 onClick={() => setShowPreferences(false)}
-                className="text-muted-foreground hover:text-white rounded-lg p-1 transition-colors"
+                className="text-muted-foreground hover:text-white rounded-lg p-2 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors cursor-pointer"
                 aria-label="Cerrar modal de preferencias"
               >
                 <X className="w-5 h-5" />

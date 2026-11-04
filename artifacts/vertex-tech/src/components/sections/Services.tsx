@@ -23,9 +23,9 @@ export function Services() {
   }));
 
   return (
-    <section id="servicios" className="py-20 lg:py-28 relative z-10">
-      <div className="container mx-auto px-6">
-        <Reveal y={20} className="mb-16 max-w-3xl">
+    <section id="servicios" className="py-14 sm:py-20 lg:py-28 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6">
+        <Reveal y={20} className="mb-10 sm:mb-16 max-w-3xl">
           <h2
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight"
             data-testid="services-title"
@@ -34,13 +34,13 @@ export function Services() {
           </h2>
         </Reveal>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {services.map((service, index) => (
             <Reveal
               key={index}
               y={30}
               delay={index * 0.1}
-              className="group relative bg-slate-900/40 border border-white/10 backdrop-blur-md rounded-2xl p-7 hover:border-primary/50 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_10px_35px_rgba(0,107,230,0.18)] flex flex-col justify-between"
+              className="group relative bg-slate-900/40 border border-white/10 backdrop-blur-md rounded-2xl p-5 sm:p-7 hover:border-primary/50 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-[0_10px_35px_rgba(0,107,230,0.18)] flex flex-col justify-between"
               data-testid={`service-card-${index}`}
             >
               <div>

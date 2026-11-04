@@ -15,7 +15,7 @@ export function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t("whatsapp.aria")}
-      className="fixed bottom-6 right-6 z-50 flex items-center gap-3 group focus:outline-none rounded-full"
+      className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 sm:right-6 z-50 flex items-center gap-3 group focus:outline-none rounded-full"
     >
       {/* Tooltip label */}
       <span className="opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-200 bg-[#1a1a2e]/95 text-white text-sm font-medium px-3.5 py-1.5 rounded-lg whitespace-nowrap border border-white/10 shadow-xl pointer-events-none">

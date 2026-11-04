@@ -22,6 +22,7 @@ import {
   FileText,
   ChevronDown,
   ChevronUp,
+  Check,
 } from "lucide-react";
 
 const problems = [
@@ -97,7 +98,7 @@ function FormInput({
         )}
       </label>
       <input
-        className="bg-slate-950/60 border border-white/15 rounded-xl py-3 px-4 text-white placeholder:text-slate-500 focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-slate-950/80 focus:outline-none transition-all duration-200 text-sm"
+        className="bg-slate-950/60 border border-white/15 rounded-xl py-3 px-4 text-white placeholder:text-slate-500 focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-slate-950/80 focus:outline-none transition-all duration-200 text-base sm:text-sm"
         type={type}
         id={id}
         name={id}
@@ -146,7 +147,7 @@ function FormSelect({
         )}
       </label>
       <select
-        className="bg-slate-950/60 border border-white/15 rounded-xl py-3 px-4 text-white focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-slate-950/80 focus:outline-none transition-all duration-200 text-sm cursor-pointer"
+        className="bg-slate-950/60 border border-white/15 rounded-xl py-3 px-4 text-white focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-slate-950/80 focus:outline-none transition-all duration-200 text-base sm:text-sm cursor-pointer"
         id={id}
         name={id}
         required={required}
@@ -286,7 +287,7 @@ export default function Diagnostico() {
         </header>
 
         <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
-          <section className="pt-32 pb-20 px-4 md:px-8 max-w-5xl mx-auto">
+          <section className="pt-28 sm:pt-32 pb-16 sm:pb-20 px-3.5 sm:px-6 md:px-8 max-w-5xl mx-auto">
             {/* Header sin kickers */}
             <motion.div
               className="text-center mb-12"
@@ -315,7 +316,7 @@ export default function Diagnostico() {
 
             {/* Main Glassmorphic Card */}
             <motion.div
-              className="bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 md:p-10 shadow-2xl shadow-black/40"
+              className="bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-7 md:p-10 shadow-2xl shadow-black/40"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -669,7 +670,7 @@ export default function Diagnostico() {
                           problemas reales.
                         </p>
                         <textarea
-                          className="w-full bg-slate-950/60 border border-white/15 rounded-xl p-4 text-white placeholder:text-slate-500 focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-slate-950/80 focus:outline-none transition-all duration-200 text-sm md:text-base leading-relaxed"
+                          className="w-full bg-slate-950/60 border border-white/15 rounded-xl p-3.5 sm:p-4 text-white placeholder:text-slate-500 focus:border-primary focus:ring-2 focus:ring-primary/30 focus:bg-slate-950/80 focus:outline-none transition-all duration-200 text-base sm:text-sm leading-relaxed"
                           id="free_text"
                           name="free_text"
                           rows={4}
@@ -678,7 +679,7 @@ export default function Diagnostico() {
                             setFreeTextValue(e.target.value);
                             if (validationError) setValidationError(null);
                           }}
-                          placeholder='Ej: "Los pedidos entran por la tablet de la app de delivery, pero no se sincronizan con nuestro TPV. Tenemos que teclear cada comanda a mano, lo que genera retrasos y descuadres."'
+                          placeholder='Ej: "Nuestros sistemas no se conectan entre sí y perdemos horas pasando pedidos a mano..."'
                         />
                       </div>
 
@@ -689,11 +690,11 @@ export default function Diagnostico() {
                           onClick={() => setIsPredefinedOpen(!isPredefinedOpen)}
                           aria-expanded={isPredefinedOpen}
                           aria-controls="predefined-problems-panel"
-                          className="w-full flex items-center justify-between p-4 md:p-5 text-left hover:bg-white/[0.03] transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                          className="w-full flex items-center justify-between p-3.5 sm:p-5 text-left hover:bg-white/[0.03] transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary gap-3"
                         >
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
                             <span className="text-sm md:text-base font-semibold text-white group-hover:text-primary transition-colors">
-                              ¿Prefieres marcar problemas comunes?{" "}
+                              Problemas comunes{" "}
                               <span className="text-slate-400 font-normal text-xs md:text-sm">
                                 (opcional)
                               </span>
@@ -708,10 +709,15 @@ export default function Diagnostico() {
                             )}
                           </div>
                           <div className="flex items-center gap-1.5 text-xs md:text-sm font-medium text-slate-400 group-hover:text-primary transition-colors shrink-0">
-                            <span>
+                            <span className="hidden sm:inline">
                               {isPredefinedOpen
                                 ? "Ocultar opciones predefinidas"
                                 : "Mostrar opciones predefinidas"}
+                            </span>
+                            <span className="sm:hidden">
+                              {isPredefinedOpen
+                                ? "Ocultar"
+                                : `Ver (${problems.length})`}
                             </span>
                             {isPredefinedOpen ? (
                               <ChevronUp
@@ -741,36 +747,51 @@ export default function Diagnostico() {
                               transition={{ duration: 0.3, ease: "easeInOut" }}
                               className="overflow-hidden border-t border-white/10"
                             >
-                              <div className="p-4 md:p-6 bg-slate-950/20">
-                                <p className="text-xs text-slate-300 mb-4">
+                              <div className="p-3 sm:p-5 md:p-6 bg-slate-950/20">
+                                <p className="text-xs text-slate-300 mb-3 sm:mb-4">
                                   Marca las situaciones que reconozcas en tu
                                   negocio (puedes seleccionar tantas como
                                   desees):
                                 </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                                   {problems.map((prob) => {
                                     const isChecked = selectedProblems.includes(
                                       prob.id,
                                     );
                                     return (
-                                      <label
+                                      <div
                                         key={prob.id}
-                                        htmlFor={`problem-${prob.id}`}
-                                        className={`flex items-start gap-3 p-3.5 rounded-xl border transition-all duration-200 cursor-pointer select-none ${
+                                        role="checkbox"
+                                        aria-checked={isChecked}
+                                        tabIndex={0}
+                                        onClick={() => toggleProblem(prob.id)}
+                                        onKeyDown={(e) => {
+                                          if (
+                                            e.key === " " ||
+                                            e.key === "Enter"
+                                          ) {
+                                            e.preventDefault();
+                                            toggleProblem(prob.id);
+                                          }
+                                        }}
+                                        className={`flex items-start gap-3 p-3 sm:p-3.5 rounded-xl border transition-all duration-200 cursor-pointer select-none min-h-[48px] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                                           isChecked
                                             ? "bg-primary/15 border-primary/50 text-white shadow-[0_0_15px_rgba(59,130,246,0.15)]"
                                             : "bg-slate-900/40 border-white/10 hover:border-white/20 hover:bg-slate-900/60 text-slate-300"
                                         }`}
                                       >
-                                        <input
-                                          type="checkbox"
-                                          id={`problem-${prob.id}`}
-                                          className="h-4 w-4 mt-0.5 rounded border-white/20 bg-slate-950/80 text-primary focus:ring-primary/40 focus:ring-offset-0 focus:outline-none transition-colors cursor-pointer shrink-0"
-                                          checked={isChecked}
-                                          onChange={() =>
-                                            toggleProblem(prob.id)
-                                          }
-                                        />
+                                        <div
+                                          aria-hidden="true"
+                                          className={`w-5 h-5 mt-0.5 rounded-md border flex items-center justify-center shrink-0 transition-colors ${
+                                            isChecked
+                                              ? "bg-primary border-primary text-white"
+                                              : "border-white/30 bg-slate-950/80"
+                                          }`}
+                                        >
+                                          {isChecked && (
+                                            <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                          )}
+                                        </div>
                                         <span
                                           className={`text-xs md:text-sm font-medium leading-snug ${
                                             isChecked
@@ -780,7 +801,7 @@ export default function Diagnostico() {
                                         >
                                           {prob.name}
                                         </span>
-                                      </label>
+                                      </div>
                                     );
                                   })}
                                 </div>
