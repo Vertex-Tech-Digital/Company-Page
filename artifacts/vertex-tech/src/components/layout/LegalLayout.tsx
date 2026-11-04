@@ -33,7 +33,7 @@ export function LegalLayout({
       <div className="relative z-10">
         <Navbar />
 
-        <div className="pt-28 pb-20 container mx-auto px-6 max-w-4xl">
+        <div className="pt-24 sm:pt-28 pb-16 sm:pb-20 container mx-auto px-4 sm:px-6 max-w-4xl">
           {/* Breadcrumbs */}
           <nav
             aria-label="Breadcrumb"
@@ -41,7 +41,7 @@ export function LegalLayout({
           >
             <Link
               href="/"
-              className="hover:text-primary transition-colors flex items-center gap-1"
+              className="hover:text-primary transition-colors flex items-center gap-1 min-h-[44px]"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               {lang === "es" ? "Inicio" : "Home"}
@@ -51,9 +51,9 @@ export function LegalLayout({
           </nav>
 
           {/* Encabezado Principal */}
-          <header className="mb-10 border-b border-border/60 pb-8">
+          <header className="mb-8 sm:mb-10 border-b border-border/60 pb-6 sm:pb-8">
             <h1
-              className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-3"
+              className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-3"
               style={{ fontFamily: "var(--app-font-heading)" }}
             >
               {title}

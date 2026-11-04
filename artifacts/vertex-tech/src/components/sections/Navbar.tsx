@@ -38,6 +38,17 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
   const navLinks = [
     { id: "inicio", href: "#inicio" },
     { id: "servicios", href: "#servicios" },
@@ -66,7 +77,7 @@ export function Navbar() {
           : "bg-slate-950/40 backdrop-blur-sm border-b border-transparent"
       }`}
     >
-      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
         <a
           href="#inicio"
           onClick={(e) => {
@@ -219,26 +230,29 @@ export function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="absolute top-20 left-0 w-full bg-slate-950/98 backdrop-blur-xl border-b border-white/10 p-6 flex flex-col gap-6 md:hidden shadow-2xl"
+            className="absolute top-20 left-0 w-full bg-slate-950/98 backdrop-blur-xl border-b border-white/10 p-5 sm:p-6 flex flex-col gap-4 sm:gap-5 md:hidden shadow-2xl max-h-[calc(100dvh-5rem)] overflow-y-auto pb-[max(2rem,env(safe-area-inset-bottom))]"
             data-testid="nav-mobile-menu"
           >
-            <div className="flex justify-end gap-2 text-sm tracking-widest uppercase mb-2">
+            <div className="flex justify-end items-center gap-2 text-sm tracking-widest uppercase mb-1">
               <button
                 onClick={() => setLang("es")}
                 aria-pressed={lang === "es"}
                 aria-label={t("nav.lang.es")}
-                className={`px-2 py-1 rounded ${lang === "es" ? "text-white font-semibold" : "text-slate-400 hover:text-white"}`}
+                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded px-2.5 py-1 ${lang === "es" ? "text-white font-semibold" : "text-slate-400 hover:text-white"}`}
               >
                 ES
               </button>
-              <span className="text-muted-foreground/50" aria-hidden="true">
+              <span
+                className="text-muted-foreground/50 select-none"
+                aria-hidden="true"
+              >
                 |
               </span>
               <button
                 onClick={() => setLang("en")}
                 aria-pressed={lang === "en"}
                 aria-label={t("nav.lang.en")}
-                className={`px-2 py-1 rounded ${lang === "en" ? "text-white font-semibold" : "text-slate-400 hover:text-white"}`}
+                className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded px-2.5 py-1 ${lang === "en" ? "text-white font-semibold" : "text-slate-400 hover:text-white"}`}
               >
                 EN
               </button>
@@ -252,7 +266,7 @@ export function Navbar() {
                   e.preventDefault();
                   scrollTo(link.href);
                 }}
-                className={`text-lg font-medium transition-colors ${
+                className={`text-lg font-medium transition-colors min-h-[44px] flex items-center ${
                   location === "/" && activeSection === link.id
                     ? "text-primary font-semibold"
                     : "text-slate-300 hover:text-white"
@@ -265,7 +279,7 @@ export function Navbar() {
             <WouterLink
               href="/diagnostico"
               onClick={() => setMobileMenuOpen(false)}
-              className={`text-lg font-medium transition-colors hover:text-primary ${
+              className={`text-lg font-medium transition-colors hover:text-primary min-h-[44px] flex items-center ${
                 location === "/diagnostico"
                   ? "text-primary font-semibold"
                   : "text-slate-300 hover:text-white"
@@ -277,7 +291,7 @@ export function Navbar() {
             <WouterLink
               href="/casos-conceptuales"
               onClick={() => setMobileMenuOpen(false)}
-              className={`text-lg font-medium transition-colors hover:text-primary ${
+              className={`text-lg font-medium transition-colors hover:text-primary min-h-[44px] flex items-center ${
                 location.startsWith("/casos-conceptuales")
                   ? "text-primary font-semibold"
                   : "text-slate-300 hover:text-white"
@@ -286,19 +300,9 @@ export function Navbar() {
             >
               {t("nav.casos")}
             </WouterLink>
-            {/* TODO: Reactivar cuando el blog esté listo (actualmente en desarrollo)
-            <WouterLink
-              href="/blog"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors"
-              data-testid="nav-link-blog-mobile"
-            >
-              {t("nav.blog")}
-            </WouterLink>
-            */}
             <Button
               onClick={() => scrollTo("#contacto")}
-              className="bg-primary-solid w-full text-white"
+              className="bg-primary-solid w-full h-12 text-base font-semibold text-white mt-1 cursor-pointer"
             >
               {t("nav.contactar")}
             </Button>

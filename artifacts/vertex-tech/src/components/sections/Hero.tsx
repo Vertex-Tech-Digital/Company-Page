@@ -18,9 +18,9 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center pt-20 overflow-hidden"
+      className="relative min-h-[calc(100dvh-5rem)] sm:min-h-screen flex items-center pt-24 sm:pt-20 pb-12 sm:pb-0 overflow-hidden"
     >
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <m.div
             initial={{ opacity: 0, x: -50 }}
@@ -32,7 +32,7 @@ export function Hero() {
             <div className="absolute -inset-8 -z-10 rounded-3xl bg-slate-950/75 blur-3xl pointer-events-none" />
 
             <h1
-              className="text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] font-bold tracking-tight text-white mb-5 leading-[1.08] drop-shadow-[0_2px_12px_rgba(10,15,29,0.9)]"
+              className="text-3xl sm:text-5xl lg:text-6xl xl:text-[4rem] font-bold tracking-tight text-white mb-4 sm:mb-5 leading-[1.12] sm:leading-[1.08] drop-shadow-[0_2px_12px_rgba(10,15,29,0.9)]"
               data-testid="hero-title"
             >
               {lang === "es" ? (
@@ -50,16 +50,16 @@ export function Hero() {
             </h1>
 
             <p
-              className="text-base sm:text-lg md:text-xl text-slate-300 mb-6 leading-relaxed max-w-xl drop-shadow-[0_2px_10px_rgba(10,15,29,0.85)]"
+              className="text-base sm:text-lg md:text-xl text-slate-300 mb-6 sm:mb-8 leading-relaxed max-w-xl drop-shadow-[0_2px_10px_rgba(10,15,29,0.85)]"
               data-testid="hero-subtitle"
             >
               {t("hero.subheadline")}
             </p>
-            <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">
               <Button
                 asChild
                 size="lg"
-                className="bg-primary-solid text-white hover:bg-primary-solid-hover shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-7 h-12"
+                className="bg-primary-solid text-white hover:bg-primary-solid-hover shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-7 h-12 w-full sm:w-auto flex items-center justify-center cursor-pointer"
                 data-testid="hero-cta-primary"
               >
                 <Link href="/diagnostico">{t("hero.cta.audit")}</Link>
@@ -68,7 +68,7 @@ export function Hero() {
                 onClick={() => scrollTo("#contacto")}
                 variant="outline"
                 size="lg"
-                className="border-white/20 text-white hover:bg-white/10 hover:border-white/40 focus-visible:ring-2 focus-visible:ring-primary text-base px-7 h-12"
+                className="border-white/20 text-white hover:bg-white/10 hover:border-white/40 focus-visible:ring-2 focus-visible:ring-primary text-base px-7 h-12 w-full sm:w-auto flex items-center justify-center cursor-pointer"
                 data-testid="hero-cta-secondary"
               >
                 {t("hero.cta.primary")}

@@ -68,7 +68,7 @@ export default function CasosConceptuales() {
       <PageNavbar />
 
       {/* Header / Hero de casos conceptuales */}
-      <section className="relative pt-40 pb-12 overflow-hidden">
+      <section className="relative pt-32 sm:pt-40 pb-10 sm:pb-12 overflow-hidden">
         <div
           className="absolute inset-0 -z-10 opacity-40"
           style={{
@@ -76,17 +76,17 @@ export default function CasosConceptuales() {
               "radial-gradient(circle at 50% 0%, hsl(212 100% 56% / 0.15), transparent 60%)",
           }}
         />
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <span className="text-xs font-mono tracking-widest uppercase text-primary/80 mb-4 inline-block">
+            <span className="text-xs font-mono tracking-widest uppercase text-primary/80 mb-3 sm:mb-4 inline-block">
               {lang === "es" ? "Casos Conceptuales" : "Conceptual Cases"}
             </span>
             <h1
-              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6 leading-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-4 sm:mb-6 leading-tight"
               data-testid="casos-title"
             >
               {lang === "es" ? (
@@ -102,7 +102,7 @@ export default function CasosConceptuales() {
               )}
             </h1>
             <p
-              className="text-lg text-muted-foreground leading-relaxed"
+              className="text-base sm:text-lg text-muted-foreground leading-relaxed"
               data-testid="casos-subtitle"
             >
               {lang === "es"
@@ -114,8 +114,8 @@ export default function CasosConceptuales() {
       </section>
 
       {/* Grid de casos */}
-      <section className="pb-24 relative z-10">
-        <div className="container mx-auto px-6">
+      <section className="pb-20 sm:pb-24 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6">
           {/* Estado: cargando chunks MDX */}
           {previews === null && (
             <div className="py-20 flex justify-center">
