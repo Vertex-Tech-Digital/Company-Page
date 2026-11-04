@@ -62,7 +62,7 @@ export default function CasoConceptual() {
   }, [slug]);
 
   function backToList() {
-    setLocation("/casos-conceptuales");
+    setLocation("/blog#casos-conceptuales");
   }
 
   // ── Estado: cargando ───────────────────────────────────────────────────────
@@ -98,10 +98,10 @@ export default function CasoConceptual() {
           </p>
           <button
             onClick={backToList}
-            className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+            className="inline-flex items-center gap-2 text-sm text-primary hover:underline cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            {lang === "es" ? "Volver a los casos" : "Back to cases"}
+            {lang === "es" ? "Volver al blog" : "Back to blog"}
           </button>
         </div>
         <Footer />
@@ -129,7 +129,7 @@ export default function CasoConceptual() {
             className="min-h-[44px] inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            {lang === "es" ? "Volver a los casos" : "Back to cases"}
+            {lang === "es" ? "Volver al blog" : "Back to blog"}
           </button>
         </motion.div>
 

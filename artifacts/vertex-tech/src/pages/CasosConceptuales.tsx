@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Briefcase, Loader2 } from "lucide-react";
+import { Briefcase, Loader2, ArrowLeft } from "lucide-react";
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
 import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
@@ -82,6 +83,18 @@ export default function CasosConceptuales() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
+            <div className="mb-4">
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-white transition-colors cursor-pointer"
+              >
+                <ArrowLeft
+                  className="w-3.5 h-3.5 text-primary"
+                  aria-hidden="true"
+                />
+                <span>{lang === "es" ? "Volver al Blog" : "Back to Blog"}</span>
+              </Link>
+            </div>
             <span className="text-xs font-mono tracking-widest uppercase text-primary/80 mb-3 sm:mb-4 inline-block">
               {lang === "es" ? "Casos Conceptuales" : "Conceptual Cases"}
             </span>
