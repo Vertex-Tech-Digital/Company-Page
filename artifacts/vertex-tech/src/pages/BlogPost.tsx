@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useRoute, useLocation, Link } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import {
   Loader2,
@@ -8,11 +8,9 @@ import {
   Calendar,
   Tag,
   Pencil,
-  ArrowRight,
 } from "lucide-react";
-import { PageNavbar } from "@/components/sections/PageNavbar";
+import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
-import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 import { ScrollTopButton } from "@/components/sections/ScrollTopButton";
 import { CasoShare } from "@/components/sections/CasoShare";
 import { BlogRelatedCases } from "@/components/sections/BlogRelatedCases";
@@ -67,28 +65,43 @@ export default function BlogPost() {
 
   useEffect(() => {
     if (!slug) return;
+    let alive = true;
 
     setLoading(true);
     setError(null);
 
-    fetch(`/api/post?slug=${encodeURIComponent(slug)}`)
-      .then((r) => {
+    const load = async () => {
+      try {
+        const r = await fetch(`/api/post?slug=${encodeURIComponent(slug)}`);
         if (r.status === 404) throw new Error("not_found");
         if (!r.ok) throw new Error("server_error");
-        return r.json();
-      })
-      .then((data) => setPost(data.post))
-      .catch((err) => {
-        setError(err.message === "not_found" ? "not_found" : "server_error");
-      })
-      .finally(() => setLoading(false));
+        const data = await r.json();
+        if (alive) setPost(data.post);
+      } catch (err) {
+        if (alive) {
+          setError(
+            err instanceof Error && err.message === "not_found"
+              ? "not_found"
+              : "server_error",
+          );
+        }
+      } finally {
+        if (alive) setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      alive = false;
+    };
   }, [slug]);
 
   // ── Estado: cargando ────────────────────────────────────────────────────────
   if (loading) {
     return (
       <main className="min-h-screen text-foreground font-sans">
-        <PageNavbar />
+        <Navbar />
         <div className="flex items-center justify-center py-40 text-muted-foreground">
           <Loader2 className="w-5 h-5 animate-spin mr-2" />
           {lang === "es" ? "Cargando artículo..." : "Loading article..."}
@@ -103,7 +116,7 @@ export default function BlogPost() {
     const isNotFound = error === "not_found";
     return (
       <main className="min-h-screen text-foreground font-sans">
-        <PageNavbar />
+        <Navbar />
         <div className="container mx-auto px-6 py-40 max-w-2xl text-center">
           <AlertCircle className="w-10 h-10 mx-auto mb-4 text-muted-foreground opacity-40" />
           <h1 className="text-2xl font-bold text-white mb-3">
@@ -153,9 +166,9 @@ export default function BlogPost() {
   // ── Vista del artículo ───────────────────────────────────────────────────────
   return (
     <main className="min-h-screen text-foreground font-sans">
-      <PageNavbar />
+      <Navbar />
 
-      <article className="container mx-auto px-6 py-24 max-w-3xl">
+      <article className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-24">
         {/* Volver al blog */}
         <motion.div
           initial={{ opacity: 0, x: -8 }}
@@ -257,40 +270,11 @@ export default function BlogPost() {
           <CasoShare title={displayTitle} />
         </motion.div>
 
-        {/* Descubrimiento hacia Casos Conceptuales */}
-        <div className="mt-14 pt-8 border-t border-border/60">
-          <div className="p-6 sm:p-8 rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6 shadow-xl">
-            <div className="space-y-1.5 max-w-xl">
-              <span className="text-xs font-mono tracking-widest uppercase text-primary/80 inline-block">
-                {lang === "es" ? "Casos Conceptuales" : "Case Studies"}
-              </span>
-              <h3 className="text-lg font-bold text-white">
-                {lang === "es"
-                  ? "¿Quieres ver cómo aplicamos la ingeniería en situaciones reales?"
-                  : "Want to see how we apply engineering in real-world scenarios?"}
-              </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                {lang === "es"
-                  ? "Revisa nuestros análisis sobre retos de sincronización, rendimiento y modernización tecnológica."
-                  : "Check our case studies on sync challenges, performance, and tech modernization."}
-              </p>
-            </div>
-            <Link
-              href="/blog#casos-conceptuales"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-primary-solid text-white hover:bg-primary-solid-hover text-sm font-semibold transition-all shadow-[0_0_15px_rgba(59,130,246,0.25)] shrink-0"
-            >
-              <span>{lang === "es" ? "Explorar Casos" : "Explore Cases"}</span>
-              <ArrowRight className="w-4 h-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-
         {/* Casos conceptuales relacionados */}
         <BlogRelatedCases postTags={[]} postCategory={post.category_name} />
       </article>
 
       <Footer />
-      <WhatsAppButton />
       <ScrollTopButton />
     </main>
   );
