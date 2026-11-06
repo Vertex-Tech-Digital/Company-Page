@@ -400,36 +400,6 @@ function normalizeDiagnosticoInput(raw) {
   };
 }
 
-// ─── 3. Esquemas para PAGOS (/api/create-payment-intent) ─────────────────────
-const MIN_PAYMENT_EUROS = 1; // 1,00 €
-const MAX_PAYMENT_EUROS = 50000; // 50.000,00 €
-
-const paymentIntentPreSchema = z.object({
-  name: z.string({ required_error: "Nombre requerido" }).min(2).max(100),
-  email: z.string({ required_error: "Email requerido" }).min(5).max(255),
-  amount: z.union([z.number(), z.string()], {
-    required_error: "Importe requerido",
-  }),
-});
-
-const paymentIntentPostSchema = z.object({
-  name: z.string().min(2, "Nombre inválido").max(100),
-  email: z.string().email("Email inválido").max(255),
-  amount: z
-    .number()
-    .finite("El importe debe ser un número finito")
-    .min(MIN_PAYMENT_EUROS, `El importe mínimo es ${MIN_PAYMENT_EUROS} €`)
-    .max(MAX_PAYMENT_EUROS, `El importe máximo es ${MAX_PAYMENT_EUROS} €`),
-});
-
-function normalizePaymentIntentInput(raw) {
-  return {
-    name: sanitizeString(raw.name),
-    email: sanitizeString(raw.email).toLowerCase(),
-    amount: typeof raw.amount === "number" ? raw.amount : Number(raw.amount),
-  };
-}
-
 // ─── 4. Esquemas para COMENTARIOS (/api/comments) ─────────────────────────────
 const commentPreSchema = z.object({
   postId: z.number({ required_error: "postId requerido" }).int().positive(),
@@ -621,6 +591,40 @@ const moderationStatusSchema = z.object({
   }),
 });
 
+// ─── 7. Esquema para LOGIN ADMIN (/api/admin-login) ───────────────────────────
+// Los mismos máximos se aplican en lib/db/seed.ts (para no poder crear una
+// cuenta que luego no pueda entrar) y como maxLength en AdminLogin.tsx.
+// bcrypt solo usa los primeros 72 bytes de la contraseña: el máximo no
+// cambia la seguridad del hash, solo acota lo que el endpoint acepta.
+const ADMIN_USERNAME_MAX_LENGTH = 64;
+const ADMIN_PASSWORD_MAX_LENGTH = 128;
+
+const adminLoginSchema = z.object(
+  {
+    username: z
+      .string({
+        required_error: "Usuario requerido",
+        invalid_type_error: "Usuario inválido",
+      })
+      .min(1, "Usuario requerido")
+      .max(
+        ADMIN_USERNAME_MAX_LENGTH,
+        `El usuario no puede superar los ${ADMIN_USERNAME_MAX_LENGTH} caracteres`,
+      ),
+    password: z
+      .string({
+        required_error: "Contraseña requerida",
+        invalid_type_error: "Contraseña inválida",
+      })
+      .min(1, "Contraseña requerida")
+      .max(
+        ADMIN_PASSWORD_MAX_LENGTH,
+        `La contraseña no puede superar los ${ADMIN_PASSWORD_MAX_LENGTH} caracteres`,
+      ),
+  },
+  { invalid_type_error: "Datos inválidos" },
+);
+
 module.exports = {
   DEFAULT_MAX_BODY_BYTES,
   INVOICE_MAX_BODY_BYTES,
@@ -646,10 +650,6 @@ module.exports = {
   diagnosticoPreSchema,
   diagnosticoPostSchema,
   normalizeDiagnosticoInput,
-  // Pagos
-  paymentIntentPreSchema,
-  paymentIntentPostSchema,
-  normalizePaymentIntentInput,
   // Comentarios
   commentPreSchema,
   commentPostSchema,
@@ -662,4 +662,8 @@ module.exports = {
   moderationWordPreSchema,
   moderationWordPostSchema,
   moderationStatusSchema,
+  // Login admin
+  ADMIN_USERNAME_MAX_LENGTH,
+  ADMIN_PASSWORD_MAX_LENGTH,
+  adminLoginSchema,
 };

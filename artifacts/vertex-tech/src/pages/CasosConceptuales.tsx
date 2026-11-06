@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Briefcase, Loader2 } from "lucide-react";
+import { Briefcase, Loader2, ArrowLeft } from "lucide-react";
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
 import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
@@ -10,13 +11,21 @@ import { useLanguage } from "@/context/LanguageContext";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function formatDate(dateStr: string, lang: string): string {
+function formatDate(dateStr: string | undefined, lang: string): string {
+  if (!dateStr || typeof dateStr !== "string") return "";
   // dateStr es ISO (yyyy-mm-dd); se normaliza para evitar desfases de zona
-  const [y, m, d] = dateStr.split("-").map(Number);
-  return new Date(y, (m ?? 1) - 1, d).toLocaleDateString(
-    lang === "es" ? "es-ES" : "en-US",
-    { day: "2-digit", month: "short", year: "numeric" },
-  );
+  try {
+    const parts = dateStr.split("-");
+    if (parts.length < 3) return dateStr;
+    const [y, m, d] = parts.map(Number);
+    if (!y) return dateStr;
+    return new Date(y, (m ?? 1) - 1, d || 1).toLocaleDateString(
+      lang === "es" ? "es-ES" : "en-US",
+      { day: "2-digit", month: "short", year: "numeric" },
+    );
+  } catch {
+    return dateStr;
+  }
 }
 
 // ── Componente principal ─────────────────────────────────────────────────────
@@ -30,20 +39,26 @@ export default function CasosConceptuales() {
 
   useEffect(() => {
     let alive = true;
-    getCasos(lang).then((casos) => {
-      if (!alive) return;
-      setPreviews(
-        casos.map((caso) => ({
-          slug: caso.slug,
-          coverImage: caso.cover,
-          pseudonym: caso.pseudonym,
-          tags: caso.tags,
-          title: caso.title,
-          excerpt: caso.excerpt,
-          date: formatDate(caso.date, lang),
-        })),
-      );
-    });
+    getCasos(lang)
+      .then((casos) => {
+        if (!alive) return;
+        setPreviews(
+          (casos || [])
+            .filter((caso) => caso && caso.slug)
+            .map((caso) => ({
+              slug: caso.slug,
+              coverImage: caso.cover,
+              pseudonym: caso.pseudonym,
+              tags: caso.tags,
+              title: caso.title,
+              excerpt: caso.excerpt,
+              date: formatDate(caso.date, lang),
+            })),
+        );
+      })
+      .catch(() => {
+        if (alive) setPreviews([]);
+      });
     return () => {
       alive = false;
     };
@@ -54,7 +69,7 @@ export default function CasosConceptuales() {
       <PageNavbar />
 
       {/* Header / Hero de casos conceptuales */}
-      <section className="relative pt-40 pb-12 overflow-hidden">
+      <section className="relative pt-32 sm:pt-40 pb-10 sm:pb-12 overflow-hidden">
         <div
           className="absolute inset-0 -z-10 opacity-40"
           style={{
@@ -62,17 +77,29 @@ export default function CasosConceptuales() {
               "radial-gradient(circle at 50% 0%, hsl(212 100% 56% / 0.15), transparent 60%)",
           }}
         />
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <span className="text-xs font-mono tracking-widest uppercase text-primary/80 mb-4 inline-block">
+            <div className="mb-4">
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-white transition-colors cursor-pointer"
+              >
+                <ArrowLeft
+                  className="w-3.5 h-3.5 text-primary"
+                  aria-hidden="true"
+                />
+                <span>{lang === "es" ? "Volver al Blog" : "Back to Blog"}</span>
+              </Link>
+            </div>
+            <span className="text-xs font-mono tracking-widest uppercase text-primary/80 mb-3 sm:mb-4 inline-block">
               {lang === "es" ? "Casos Conceptuales" : "Conceptual Cases"}
             </span>
             <h1
-              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6 leading-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-4 sm:mb-6 leading-tight"
               data-testid="casos-title"
             >
               {lang === "es" ? (
@@ -88,7 +115,7 @@ export default function CasosConceptuales() {
               )}
             </h1>
             <p
-              className="text-lg text-muted-foreground leading-relaxed"
+              className="text-base sm:text-lg text-muted-foreground leading-relaxed"
               data-testid="casos-subtitle"
             >
               {lang === "es"
@@ -100,8 +127,8 @@ export default function CasosConceptuales() {
       </section>
 
       {/* Grid de casos */}
-      <section className="pb-24 relative z-10">
-        <div className="container mx-auto px-6">
+      <section className="pb-20 sm:pb-24 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6">
           {/* Estado: cargando chunks MDX */}
           {previews === null && (
             <div className="py-20 flex justify-center">

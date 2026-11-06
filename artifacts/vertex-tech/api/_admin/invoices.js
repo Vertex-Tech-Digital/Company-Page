@@ -1,16 +1,17 @@
 // GET /api/admin-invoices            -> lista de facturas emitidas (metadatos)
-// GET /api/admin-invoices?id=5&pdf=1 -> regenera y devuelve el PDF (base64) de esa factura
+// GET /api/admin-invoices?id=5&pdf=1 -> regenera y devuelve el PDF de esa factura
+//                                       como application/pdf (binario, no base64)
 //
 // El PDF no se almacena: se regenera al vuelo desde los datos guardados.
-// Requiere: Authorization: Bearer <token>
+// Requiere sesión activa (cookie httpOnly admin_token, ver _auth.js)
 
-const { pool } = require("../server/db.js");
-const { verifyAuth } = require("./_auth");
+const { pool } = require("../../server/db.js");
+const { verifyAuth } = require("../_auth");
 const {
   getCompany,
   renderInvoicePdf,
   toEsDate,
-} = require("../server/invoice-pdf.js");
+} = require("../../server/invoice-pdf.js");
 
 // Lee un parámetro de la query. En `pnpm dev` el plugin no rellena req.query,
 // así que lo parseamos de req.url (funciona igual en Vercel).
@@ -23,7 +24,7 @@ function queryParam(req, name) {
 }
 
 module.exports = async function handler(req, res) {
-  const payload = verifyAuth(req, res);
+  const payload = await verifyAuth(req, res);
   if (!payload) return;
 
   if (!process.env.DATABASE_URL) {
@@ -72,10 +73,16 @@ module.exports = async function handler(req, res) {
         taxRate: Number(inv.tax_rate),
         totals,
       });
-      return res.status(200).json({
-        invoiceNumber: inv.invoice_number,
-        pdfBase64: pdf.toString("base64"),
-      });
+      // Binario en vez de base64 dentro de un JSON: evita inflar ~33% el
+      // tamaño y que un documento fiscal completo viaje en una respuesta JSON.
+      // Las cabeceras no-store las pone vercel.json para /api/admin*.
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="Factura-${inv.invoice_number}.pdf"`,
+      );
+      res.setHeader("Content-Length", pdf.length);
+      return res.status(200).end(pdf);
     }
 
     // ── Listado de facturas emitidas ──────────────────────────────────────────

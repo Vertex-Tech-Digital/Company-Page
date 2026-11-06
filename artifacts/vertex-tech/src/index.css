@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import "./fonts.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -23,6 +23,8 @@
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-primary-border: var(--primary-border);
+  --color-primary-solid: hsl(var(--primary-solid));
+  --color-primary-solid-hover: hsl(var(--primary-solid-hover));
 
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
@@ -62,10 +64,15 @@
   --popover-border: 222 30% 16%;
   --primary: 212 100% 56%;
   --primary-foreground: 0 0% 100%;
+  /* El texto blanco sobre --primary solo llega a 3.5:1. Los botones con texto
+     blanco usan este azul más oscuro (4.95:1, hover 5.97:1) para cumplir WCAG AA;
+     --primary sigue para texto y acentos sobre el fondo oscuro (5.5:1). */
+  --primary-solid: 212 100% 45%;
+  --primary-solid-hover: 212 100% 40%;
   --secondary: 222 30% 16%;
   --secondary-foreground: 210 20% 95%;
   --muted: 215 25% 15%;
-  --muted-foreground: 215 15% 55%;
+  --muted-foreground: 215 18% 68%;
   --accent: 212 100% 56%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
@@ -89,6 +96,8 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
   --radius: 0.5rem;
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sat: env(safe-area-inset-top, 0px);
 }
 
 .dark {
@@ -103,10 +112,12 @@
   --popover-border: 222 30% 16%;
   --primary: 212 100% 56%;
   --primary-foreground: 0 0% 100%;
+  --primary-solid: 212 100% 45%;
+  --primary-solid-hover: 212 100% 40%;
   --secondary: 222 30% 16%;
   --secondary-foreground: 210 20% 95%;
   --muted: 215 25% 15%;
-  --muted-foreground: 215 15% 55%;
+  --muted-foreground: 215 18% 68%;
   --accent: 212 100% 56%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
@@ -127,6 +138,12 @@
 @layer base {
   * {
     @apply border-border;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
@@ -152,6 +169,102 @@
   button:disabled,
   [role="button"][aria-disabled="true"] {
     cursor: not-allowed;
+  }
+
+  /* En pantallas móviles, las tablas Markdown en MDX hacen scroll horizontal
+     propio en vez de desbordar o romper el ancho del viewport. */
+  .prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Animaciones de entrada y salida de la portada (VTD-50).
+   Sustituyen a framer-motion en el bundle de entrada: las ejecuta el navegador
+   con CSS, así que no cuestan JS. Cada elemento fija su recorrido con variables:
+   --vt-x, --vt-y (desplazamiento), --vt-scale, --vt-dur, --vt-ease y --vt-delay.
+   La curva por defecto reproduce el spring de framer-motion para transformadas
+   (rigidez 500, amortiguación 25) con un rebote algo menor.
+   Las variables se registran sin herencia para que un bloque animado no le pase
+   su recorrido a otro animado que lleve dentro. */
+@property --vt-x {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --vt-y {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --vt-scale {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+@property --vt-delay {
+  syntax: "<time>";
+  inherits: false;
+  initial-value: 0s;
+}
+
+@property --vt-dur {
+  syntax: "<time>";
+  inherits: false;
+  initial-value: 0.5s;
+}
+
+@property --vt-ease {
+  syntax: "*";
+  inherits: false;
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--vt-x), var(--vt-y), 0) scale(var(--vt-scale));
+  }
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: translate3d(var(--vt-x), var(--vt-y), 0) scale(var(--vt-scale));
+  }
+}
+
+.vt-enter,
+.vt-reveal[data-in] {
+  animation: vt-in var(--vt-dur)
+    var(--vt-ease, cubic-bezier(0.36, 1.25, 0, 1.11)) var(--vt-delay) backwards;
+}
+
+/* Bloques que aparecen al entrar en pantalla: ocultos hasta que Reveal marca data-in. */
+.vt-reveal:not([data-in]) {
+  opacity: 0;
+}
+
+/* La salida dura lo mismo que la entrada (--vt-dur). usePresence desmonta el
+   elemento pasado su `exitMs`, que debe ser igual o mayor que --vt-dur. */
+.vt-exit {
+  animation: vt-out var(--vt-dur) var(--vt-ease, ease-out) forwards;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vt-enter,
+  .vt-reveal,
+  .vt-reveal[data-in],
+  .vt-exit {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 

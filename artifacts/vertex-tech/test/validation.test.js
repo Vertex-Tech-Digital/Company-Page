@@ -21,15 +21,15 @@ const {
   diagnosticoPreSchema,
   diagnosticoPostSchema,
   normalizeDiagnosticoInput,
-  paymentIntentPreSchema,
-  paymentIntentPostSchema,
-  normalizePaymentIntentInput,
   commentPreSchema,
   commentPostSchema,
   normalizeCommentInput,
   invoiceCreatePreSchema,
   invoiceCreatePostSchema,
   normalizeInvoiceCreateInput,
+  ADMIN_USERNAME_MAX_LENGTH,
+  ADMIN_PASSWORD_MAX_LENGTH,
+  adminLoginSchema,
 } = require("../api/_validation");
 
 // ─── Validación de NIF / NIE / CIF ──────────────────────────────────────────
@@ -297,37 +297,6 @@ test("Contacto: rechaza textos que superan límites o quedan vacíos", () => {
     message: "Corto", // Menor a 10
   });
   assert.equal(pre.success, false);
-});
-
-// ─── Endpoint Pagos (/api/create-payment-intent) ─────────────────────────────
-
-test("Pagos: valida importes finitos y dentro de rango permitido", () => {
-  const raw = {
-    name: "Cliente Empresa",
-    email: "cliente@empresa.com",
-    amount: 150.5,
-  };
-
-  const pre = paymentIntentPreSchema.safeParse(raw);
-  assert.equal(pre.success, true);
-
-  const normalized = normalizePaymentIntentInput(pre.data);
-  const post = paymentIntentPostSchema.safeParse(normalized);
-  assert.equal(post.success, true);
-  assert.equal(post.data.amount, 150.5);
-});
-
-test("Pagos: rechaza importes negativos, cero, infinitos o fuera de rango", () => {
-  const badAmounts = [-10, 0, 0.5, 50001, NaN, Infinity, -Infinity];
-  for (const amount of badAmounts) {
-    const normalized = normalizePaymentIntentInput({
-      name: "Cliente",
-      email: "cliente@empresa.com",
-      amount,
-    });
-    const post = paymentIntentPostSchema.safeParse(normalized);
-    assert.equal(post.success, false, `Debió rechazar importe ${amount}`);
-  }
 });
 
 // ─── Endpoint Comentarios (/api/comments) ───────────────────────────────────
@@ -610,4 +579,47 @@ test("Diagnóstico: rechaza si tanto problemas marcados como texto libre están 
   const normalized = normalizeDiagnosticoInput(raw);
   const post = diagnosticoPostSchema.safeParse(normalized);
   assert.equal(post.success, false);
+});
+
+// ─── Endpoint Login Admin (/api/admin-login) ─────────────────────────────────
+
+test("Login admin: acepta usuario y contraseña dentro de los límites", () => {
+  const res = adminLoginSchema.safeParse({
+    username: "a".repeat(ADMIN_USERNAME_MAX_LENGTH),
+    password: "p".repeat(ADMIN_PASSWORD_MAX_LENGTH),
+  });
+  assert.equal(res.success, true);
+});
+
+test("Login admin: rechaza usuario o contraseña por encima del máximo", () => {
+  const longUser = adminLoginSchema.safeParse({
+    username: "a".repeat(ADMIN_USERNAME_MAX_LENGTH + 1),
+    password: "contraseña",
+  });
+  assert.equal(longUser.success, false);
+  assert.equal(longUser.error.issues[0].path[0], "username");
+
+  const longPassword = adminLoginSchema.safeParse({
+    username: "anier",
+    password: "p".repeat(ADMIN_PASSWORD_MAX_LENGTH + 1),
+  });
+  assert.equal(longPassword.success, false);
+  assert.equal(longPassword.error.issues[0].path[0], "password");
+});
+
+test("Login admin: rechaza campos ausentes, vacíos o de otro tipo", () => {
+  const missing = adminLoginSchema.safeParse({ password: "contraseña" });
+  assert.equal(missing.success, false);
+  assert.equal(missing.error.issues[0].message, "Usuario requerido");
+
+  const empty = adminLoginSchema.safeParse({ username: "anier", password: "" });
+  assert.equal(empty.success, false);
+  assert.equal(empty.error.issues[0].message, "Contraseña requerida");
+
+  const wrongType = adminLoginSchema.safeParse({ username: 42, password: [] });
+  assert.equal(wrongType.success, false);
+
+  const notObject = adminLoginSchema.safeParse("anier:contraseña");
+  assert.equal(notObject.success, false);
+  assert.equal(notObject.error.issues[0].message, "Datos inválidos");
 });

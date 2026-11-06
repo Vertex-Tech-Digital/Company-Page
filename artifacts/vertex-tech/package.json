@@ -82,8 +82,6 @@
   },
   "dependencies": {
     "@google/genai": "^2.19.0",
-    "@stripe/react-stripe-js": "^6.6.0",
-    "@stripe/stripe-js": "^9.8.0",
     "@tiptap/extension-character-count": "^3.27.4",
     "@tiptap/extension-highlight": "^3.27.4",
     "@tiptap/extension-link": "^3.27.4",
@@ -100,7 +98,6 @@
     "drizzle-orm": "1.0.0-rc.4",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.21.0",
-    "stripe": "^22.2.3",
     "xss": "^1.0.15"
   }
 }

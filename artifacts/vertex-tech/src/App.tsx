@@ -1,12 +1,10 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import { useEffect, Suspense, lazy } from "react";
 import { Loader2 } from "lucide-react";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { CookieConsent } from "@/components/sections/CookieConsent";
+import { ScrollToTop } from "@/components/common/ScrollToTop";
 
 function RouteFallback() {
   return (
@@ -25,8 +23,11 @@ const Admin = lazy(() => import("@/pages/Admin"));
 const Diagnostico = lazy(() => import("@/pages/Diagnostico"));
 const CasosConceptuales = lazy(() => import("@/pages/CasosConceptuales"));
 const CasoConceptual = lazy(() => import("@/pages/CasoConceptual"));
-
-const queryClient = new QueryClient();
+const LegalNotice = lazy(() => import("@/pages/LegalNotice"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
+const CookiePolicy = lazy(() => import("@/pages/CookiePolicy"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
 function Router() {
   return (
@@ -45,6 +46,11 @@ function Router() {
             Protegido con el login JWT; no enlazado en el menú. */}
         <Route path="/admin" component={Admin} />
         <Route path="/diagnostico" component={Diagnostico} />
+        {/* Páginas Legales y Cumplimiento Normativo (RGPD, LOPDGDD y LSSI-CE) */}
+        <Route path="/aviso-legal" component={LegalNotice} />
+        <Route path="/privacidad" component={PrivacyPolicy} />
+        <Route path="/terminos" component={TermsOfService} />
+        <Route path="/cookies" component={CookiePolicy} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
@@ -56,18 +62,22 @@ function App() {
     document.documentElement.classList.add("dark");
   }, []);
 
+  // Bundle de entrada (VTD-37 y VTD-50):
+  // - react-query y los toasts solo los usa el panel admin, así que sus
+  //   providers viven en pages/Admin.tsx.
+  // - framer-motion no entra en este bundle: pesa ~80 KiB y la portada solo
+  //   necesita fundidos y desplazamientos. Los componentes que se cargan aquí
+  //   (portada, Navbar, CookieConsent) animan con CSS (`Reveal`, `usePresence`
+  //   y las clases `vt-*` de index.css). Importar framer-motion desde
+  //   cualquiera de ellos lo vuelve a meter; las rutas con lazy() sí pueden
+  //   usarlo, porque lo cargan en su propio chunk.
   return (
     <LanguageProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <WouterRouter
-            base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}
-          >
-            <Router />
-          </WouterRouter>
-          <Toaster />
-        </TooltipProvider>
-      </QueryClientProvider>
+      <WouterRouter base={import.meta.env.BASE_URL?.replace(/\/$/, "") || ""}>
+        <ScrollToTop />
+        <Router />
+      </WouterRouter>
+      <CookieConsent />
     </LanguageProvider>
   );
 }

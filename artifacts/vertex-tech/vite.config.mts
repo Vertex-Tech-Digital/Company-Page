@@ -5,6 +5,7 @@ import mdx from "@mdx-js/rollup";
 import remarkGfm from "remark-gfm";
 import path from "path";
 import { devApiPlugin } from "./dev-api-plugin.mjs";
+import { inlineCssPlugin } from "./inline-css-plugin.mjs";
 
 // Retorno anotado: aplica tipado contextual y evita que literales como
 // allowedHosts: true se ensanchen a boolean (incompatible con Vite 7).
@@ -24,6 +25,8 @@ export default defineConfig(async (): Promise<UserConfig> => {
     react(),
     tailwindcss(),
     devApiPlugin(),
+    // Solo en build: el CSS va inline en index.html (VTD-38).
+    inlineCssPlugin(),
   ];
 
   if (isReplit && !isVercel) {

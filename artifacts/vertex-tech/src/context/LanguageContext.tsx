@@ -8,12 +8,12 @@ import {
 
 type Language = "es" | "en";
 
-const companyTaxId =
+export const companyTaxId =
   import.meta.env.VITE_COMPANY_TAX_ID || "[Identificación Fiscal / Tax ID]";
-const companyHolder =
-  import.meta.env.VITE_COMPANY_HOLDER || "[Titular Legal / Legal Holder]";
-const contactEmail =
-  import.meta.env.VITE_CONTACT_EMAIL || "[Correo de Contacto / Contact Email]";
+export const companyHolder =
+  import.meta.env.VITE_COMPANY_HOLDER || "Vertex Tech Digital S.L.";
+export const contactEmail =
+  import.meta.env.VITE_CONTACT_EMAIL || "contacto@vertextechdigital.com";
 
 interface LanguageContextType {
   lang: Language;
@@ -24,6 +24,7 @@ interface LanguageContextType {
 const translations: Record<Language, Record<string, string>> = {
   es: {
     // Nav
+    "nav.tagline": "Consultora Tecnológica",
     "nav.inicio": "Inicio",
     "nav.servicios": "Servicios",
     "nav.proyectos": "Proyectos",
@@ -35,13 +36,20 @@ const translations: Record<Language, Record<string, string>> = {
     "casos.shareOn": "Compartir en",
     "casos.copyLink": "Copiar enlace",
     "nav.contactar": "Contactar",
+    "nav.openMenu": "Abrir menú",
+    "nav.closeMenu": "Cerrar menú",
+    "nav.skipToContent": "Saltar al contenido principal",
+    "nav.lang.es": "Cambiar idioma a Español",
+    "nav.lang.en": "Cambiar idioma a Inglés",
     // Hero
+    "hero.kicker": "Consultora Tecnológica de Alto Impacto",
     "hero.subheadline":
       "Consultoría tecnológica y soluciones a medida: automatizamos procesos, integramos sistemas y auditamos tu software para que tu empresa funcione más rápido, con menos errores y a menor coste.",
     "hero.cta.primary": "Solicitar consulta",
     "hero.cta.secondary": "Ver proyectos",
     "hero.cta.audit": "Solicitar auditoría",
     // Services
+    "services.kicker": "Capacidades y Soluciones",
     "services.title": "Servicios de Consultoría y Desarrollo Tecnológico",
     "services.0.title":
       "Aplicaciones Web a Medida y Optimización de Procesos (SaaS)",
@@ -72,6 +80,7 @@ const translations: Record<Language, Record<string, string>> = {
     "projects.2.desc":
       "Migración de software heredado a infraestructuras API modernas y adaptadas para entornos móviles.",
     // Methodology
+    "methodology.kicker": "Proceso de Ingeniería",
     "methodology.title": "Nuestra Metodología",
     "methodology.desc":
       "En Vertex Tech trabajamos con una metodología ágil orientada a resultados. Dividimos cada proyecto en etapas claras, priorizamos comunicación constante, control de calidad riguroso y entregas puntuales. Nuestro objetivo no es solo construir software, sino crear soluciones estables, mantenibles y preparadas para escalar.",
@@ -88,13 +97,23 @@ const translations: Record<Language, Record<string, string>> = {
     "methodology.3.desc":
       "Subida a la nube en servidores optimizados y mantenimiento técnico.",
     // WhyUs
+    "whyus.kicker": "Ventaja Competitiva",
     "whyus.title": "¿Por qué Vertex Tech?",
     "whyus.0": "Código auditable y sin sorpresas",
+    "whyus.0.desc":
+      "Escribimos software limpio, tipado y completamente transparente, sin cajas negras ni dependencias opacas.",
     "whyus.1": "Comunicación clara",
+    "whyus.1.desc":
+      "Canal directo con ingenieros senior, sprints claros y reportes continuos sin rodeos ni jerga confusa.",
     "whyus.2": "Ingeniería sólida de principio a fin",
+    "whyus.2.desc":
+      "Arquitectura modular cloud-native, control de calidad automatizado y resiliencia en producción.",
     "whyus.3": "Soluciones que crecen con tu empresa",
+    "whyus.3.desc":
+      "Infraestructuras preparadas para soportar picos de demanda y adaptarse al ritmo comercial de tu negocio.",
     "whyus.4": "Diseño moderno y profesional",
     // Contact
+    "contact.kicker": "Hablemos de tu Proyecto",
     "contact.title": "¿Hablamos de tu próximo",
     "contact.titleHighlight": "proyecto?",
     "contact.subtitle":
@@ -116,12 +135,20 @@ const translations: Record<Language, Record<string, string>> = {
     "contact.error.message": "El mensaje debe tener al menos 10 caracteres",
     "contact.error.server": "Error al enviar el mensaje",
     // Footer
-    "footer.tagline": "Desarrollo Fullstack para empresas modernas.",
-    "footer.copyright":
-      "2026 Vertex Tech Digital. Todos los derechos reservados.",
+    "footer.tagline":
+      "Desarrollo Fullstack y consultoría técnica de alto nivel para empresas modernas.",
+    "footer.services.title": "Servicios",
+    "footer.company.title": "Empresa",
+    "footer.contact.title": "Contacto",
+    "footer.status": "Disponibles para nuevos proyectos",
+    "footer.location": "Las Palmas de Gran Canaria, España",
+    "footer.backToTop": "Volver arriba",
+    "footer.copyright": "Vertex Tech Digital. Todos los derechos reservados.",
     "footer.legal": "Aviso Legal",
     "footer.privacy": "Política de Privacidad",
+    "footer.terms": "Términos de Servicio",
     "footer.cookies": "Cookies",
+    "footer.cookies.settings": "Configuración de cookies",
     "footer.github": "GitHub",
     "footer.legal.title": "Aviso Legal",
     "footer.legal.body": `En cumplimiento del artículo 10 de la Ley 34/2002 (LSSI-CE), se informa que este sitio web es una plataforma de presentación comercial operada por ${companyHolder}, con identificación fiscal ${companyTaxId} y domicilio legal configurado. Para cualquier consulta o comunicación, puede dirigirse al correo electrónico oficial de contacto: ${contactEmail}.`,
@@ -131,14 +158,35 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies.body":
       "Esta web ha sido diseñada bajo principios de privacidad y rendimiento técnico. No utilizamos cookies de rastreo, analítica o marketing. Únicamente se emplean cookies técnicas esenciales para garantizar una navegación fluida y segura por el sitio.",
     "footer.close": "Cerrar",
+    // Cookies & Consent
+    "cookie.banner.title": "Privacidad y Cookies en Vertex Tech",
+    "cookie.banner.desc":
+      "Utilizamos almacenamiento local técnico para garantizar el funcionamiento del sitio y recordar tus preferencias. No activamos cookies analíticas ni de seguimiento sin tu consentimiento explícito.",
+    "cookie.banner.acceptAll": "Aceptar todas",
+    "cookie.banner.reject": "Rechazar no esenciales",
+    "cookie.banner.configure": "Configurar",
+    "cookie.modal.title": "Centro de Preferencias de Privacidad",
+    "cookie.modal.desc":
+      "Gestiona de forma granular qué datos y tecnologías de almacenamiento permites en este dispositivo de conformidad con el RGPD y la LSSI-CE.",
+    "cookie.modal.necessary.title": "Técnicas y Esenciales",
+    "cookie.modal.necessary.desc":
+      "Imprescindibles para que la plataforma funcione: recuerdan tu idioma preferido, tu sesión activa y este consentimiento. No se pueden desactivar.",
+    "cookie.modal.necessary.badge": "Siempre activas",
+    "cookie.modal.analytics.title": "Analíticas y Rendimiento",
+    "cookie.modal.analytics.desc":
+      "Permiten analizar de forma anónima métricas de uso y rendimiento técnico para mejorar la velocidad y estabilidad de nuestros servicios.",
+    "cookie.modal.save": "Guardar preferencias",
     // WhatsApp
     "whatsapp.cta": "Contáctanos por WhatsApp",
     "whatsapp.aria": "Contactar por WhatsApp",
     "whatsapp.message":
       "Hola, me gustaría obtener más información sobre sus servicios.",
+    // Toasts
+    "toast.close": "Cerrar notificación",
   },
   en: {
     // Nav
+    "nav.tagline": "Technology Consulting",
     "nav.inicio": "Home",
     "nav.servicios": "Services",
     "nav.proyectos": "Projects",
@@ -150,13 +198,20 @@ const translations: Record<Language, Record<string, string>> = {
     "casos.shareOn": "Share on",
     "casos.copyLink": "Copy link",
     "nav.contactar": "Contact",
+    "nav.openMenu": "Open menu",
+    "nav.closeMenu": "Close menu",
+    "nav.skipToContent": "Skip to main content",
+    "nav.lang.es": "Switch language to Spanish",
+    "nav.lang.en": "Switch language to English",
     // Hero
+    "hero.kicker": "High-Impact Technology Consultancy",
     "hero.subheadline":
       "Technology consulting and custom solutions: we automate your processes, integrate your systems and audit your software — so your business runs faster, with fewer errors and at lower cost.",
     "hero.cta.primary": "Request a consultation",
     "hero.cta.secondary": "View projects",
     "hero.cta.audit": "Request audit",
     // Services
+    "services.kicker": "Capabilities & Solutions",
     "services.title": "Technology Consulting & Development Services",
     "services.0.title": "Custom Web Applications & Process Optimization (SaaS)",
     "services.0.desc":
@@ -184,6 +239,7 @@ const translations: Record<Language, Record<string, string>> = {
     "projects.2.desc":
       "Migration of legacy software to modern API infrastructures adapted for mobile environments.",
     // Methodology
+    "methodology.kicker": "Engineering Process",
     "methodology.title": "Our Methodology",
     "methodology.desc":
       "At Vertex Tech we work with an agile, results-oriented methodology. We divide each project into clear stages, prioritize constant communication, rigorous quality control, and on-time deliveries. Our goal is not just to build software, but to create stable, maintainable, and scalable solutions.",
@@ -200,13 +256,23 @@ const translations: Record<Language, Record<string, string>> = {
     "methodology.3.desc":
       "Cloud deployment on optimized servers and ongoing technical maintenance.",
     // WhyUs
+    "whyus.kicker": "Competitive Advantage",
     "whyus.title": "Why Vertex Tech?",
     "whyus.0": "Auditable code, no surprises",
+    "whyus.0.desc":
+      "We write clean, strictly-typed and transparent software with zero black boxes.",
     "whyus.1": "Clear communication",
+    "whyus.1.desc":
+      "Direct channel with senior engineers, clear sprints, and continuous updates without jargon.",
     "whyus.2": "Solid engineering from start to finish",
+    "whyus.2.desc":
+      "Cloud-native modular architecture, automated QA testing, and production resilience.",
     "whyus.3": "Solutions that grow with your business",
+    "whyus.3.desc":
+      "Infrastructures designed to handle demand spikes and scale with your business momentum.",
     "whyus.4": "Modern and professional design",
     // Contact
+    "contact.kicker": "Start the Conversation",
     "contact.title": "Shall we talk about your next",
     "contact.titleHighlight": "project?",
     "contact.subtitle":
@@ -228,11 +294,20 @@ const translations: Record<Language, Record<string, string>> = {
     "contact.error.message": "Message must be at least 10 characters",
     "contact.error.server": "Error sending message",
     // Footer
-    "footer.tagline": "Fullstack development for modern enterprises.",
-    "footer.copyright": "2026 Vertex Tech Digital. All rights reserved.",
+    "footer.tagline":
+      "Fullstack development and high-level tech consulting for modern enterprises.",
+    "footer.services.title": "Services",
+    "footer.company.title": "Company",
+    "footer.contact.title": "Contact",
+    "footer.status": "Available for new projects",
+    "footer.location": "Las Palmas de Gran Canaria, Spain",
+    "footer.backToTop": "Back to top",
+    "footer.copyright": "Vertex Tech Digital. All rights reserved.",
     "footer.legal": "Legal Notice",
     "footer.privacy": "Privacy Policy",
+    "footer.terms": "Terms of Service",
     "footer.cookies": "Cookies",
+    "footer.cookies.settings": "Cookie Settings",
     "footer.github": "GitHub",
     "footer.legal.title": "Legal Notice",
     "footer.legal.body": `In compliance with Article 10 of Law 34/2002 (LSSI-CE), please be advised that this website is a commercial presentation platform operated by ${companyHolder}, with tax identification number ${companyTaxId} and a configured legal address. For any inquiries, please reach out to our official contact email: ${contactEmail}.`,
@@ -242,11 +317,31 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies.body":
       "This website has been designed under principles of privacy and technical performance. We do not use tracking, analytics, or marketing cookies. Only essential technical cookies are used to ensure smooth and secure navigation throughout the site.",
     "footer.close": "Close",
+    // Cookies & Consent
+    "cookie.banner.title": "Privacy & Cookies at Vertex Tech",
+    "cookie.banner.desc":
+      "We use essential local storage to ensure technical site operations and store your preferences. We do not enable analytical or tracking cookies without your explicit consent.",
+    "cookie.banner.acceptAll": "Accept all",
+    "cookie.banner.reject": "Reject non-essential",
+    "cookie.banner.configure": "Configure",
+    "cookie.modal.title": "Privacy Preferences Center",
+    "cookie.modal.desc":
+      "Granularly manage what data and storage technologies you allow on this device in accordance with GDPR and EU privacy regulations.",
+    "cookie.modal.necessary.title": "Technical & Essential",
+    "cookie.modal.necessary.desc":
+      "Required for core site operation: stores language choice, active session, and this consent decision. Cannot be disabled.",
+    "cookie.modal.necessary.badge": "Always active",
+    "cookie.modal.analytics.title": "Analytics & Performance",
+    "cookie.modal.analytics.desc":
+      "Allows anonymous measurement of usage metrics and technical performance to improve speed and platform stability.",
+    "cookie.modal.save": "Save preferences",
     // WhatsApp
     "whatsapp.cta": "Contact us on WhatsApp",
     "whatsapp.aria": "Contact via WhatsApp",
     "whatsapp.message":
       "Hello, I'd like to get more information about your services.",
+    // Toasts
+    "toast.close": "Close notification",
   },
 };
 
@@ -261,6 +356,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const savedLang = localStorage.getItem("vertex-tech-lang") as Language;
     if (savedLang === "es" || savedLang === "en") setLangState(savedLang);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const setLang = (newLang: Language) => {
     setLangState(newLang);

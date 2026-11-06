@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Link } from "wouter";
 // import { ArrowRight } from "lucide-react"; // oculto temporalmente
 import { Button } from "@/components/ui/button";
@@ -18,46 +17,43 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      className="relative min-h-screen flex items-center pt-20 overflow-hidden"
+      className="relative min-h-[calc(100dvh-5rem)] sm:min-h-screen flex items-center pt-24 sm:pt-20 pb-12 sm:pb-0 overflow-hidden"
     >
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="max-w-2xl"
-          >
+          <div className="max-w-2xl relative vt-enter [--vt-x:-50px] [--vt-dur:0.8s] [--vt-ease:ease-out]">
+            {/* Sutil resplandor de contraste para aislar el texto frente a las partículas del canvas */}
+            <div className="absolute -inset-8 -z-10 rounded-3xl bg-slate-950/75 blur-3xl pointer-events-none" />
+
             <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-tight"
+              className="text-3xl sm:text-5xl lg:text-6xl xl:text-[4rem] font-bold tracking-tight text-white mb-4 sm:mb-5 leading-[1.12] sm:leading-[1.08] drop-shadow-[0_2px_12px_rgba(10,15,29,0.9)]"
               data-testid="hero-title"
             >
               {lang === "es" ? (
                 <>
                   Soluciones tecnológicas de alto{" "}
-                  <span className="text-primary">impacto</span> para los
-                  problemas de tu empresa
+                  <span className="text-primary">impacto</span> para tu empresa
                 </>
               ) : (
                 <>
                   High-impact tech{" "}
                   <span className="text-primary">solutions</span> for your
-                  business challenges
+                  business
                 </>
               )}
             </h1>
 
             <p
-              className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed"
+              className="text-base sm:text-lg md:text-xl text-slate-300 mb-6 sm:mb-8 leading-relaxed max-w-xl drop-shadow-[0_2px_10px_rgba(10,15,29,0.85)]"
               data-testid="hero-subtitle"
             >
               {t("hero.subheadline")}
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center w-full sm:w-auto">
               <Button
-                onClick={() => scrollTo("#contacto")}
+                asChild
                 size="lg"
-                className="bg-primary text-white hover:bg-primary/90 shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-8 h-14"
+                className="bg-primary-solid text-white hover:bg-primary-solid-hover shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] text-base px-7 h-12 w-full sm:w-auto flex items-center justify-center cursor-pointer"
                 data-testid="hero-cta-primary"
               >
                 <Link href="/diagnostico">{t("hero.cta.audit")}</Link>
@@ -66,7 +62,7 @@ export function Hero() {
                 onClick={() => scrollTo("#contacto")}
                 variant="outline"
                 size="lg"
-                className="border-border hover:bg-white/5 text-base px-8 h-14"
+                className="border-white/20 text-white hover:bg-white/10 hover:border-white/40 focus-visible:ring-2 focus-visible:ring-primary text-base px-7 h-12 w-full sm:w-auto flex items-center justify-center cursor-pointer"
                 data-testid="hero-cta-secondary"
               >
                 {t("hero.cta.primary")}
@@ -86,16 +82,11 @@ export function Hero() {
               </a>
               */}
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="hidden lg:block"
-          >
+          <div className="hidden lg:block vt-enter [--vt-x:50px] [--vt-dur:0.8s] [--vt-ease:ease-out] [--vt-delay:0.2s]">
             <WireframeCube />
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

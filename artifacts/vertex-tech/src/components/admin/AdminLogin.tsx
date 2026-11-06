@@ -4,7 +4,7 @@ import { Lock, User, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AdminLoginProps {
-  onLoginSuccess: (token: string) => void;
+  onLoginSuccess: () => void;
 }
 
 export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
@@ -27,6 +27,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       const res = await fetch("/api/admin-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ username: username.trim(), password }),
       });
 
@@ -37,9 +38,9 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
         return;
       }
 
-      // Guardar el token y notificar al padre
-      localStorage.setItem("admin_token", data.token);
-      onLoginSuccess(data.token);
+      // La sesión ya quedó en una cookie httpOnly (Set-Cookie de la
+      // respuesta) — no hay token que guardar del lado del cliente.
+      onLoginSuccess();
     } catch {
       setError("No se pudo conectar con el servidor");
     } finally {
@@ -87,6 +88,8 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                 placeholder="nombre de usuario"
                 className="w-full bg-background border border-border rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
                 autoComplete="username"
+                // Mismos máximos que valida el servidor (api/_validation.js)
+                maxLength={64}
               />
             </div>
           </div>
@@ -106,10 +109,14 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                 placeholder="••••••••"
                 className="w-full bg-background border border-border rounded-lg pl-10 pr-10 py-2.5 text-sm text-white placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
                 autoComplete="current-password"
+                maxLength={128}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={
+                  showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                }
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors"
               >
                 {showPassword ? (
@@ -133,7 +140,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
           <Button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-primary hover:bg-primary/90 text-white font-medium"
+            className="w-full bg-primary-solid hover:bg-primary-solid-hover text-white font-medium"
           >
             {loading ? "Verificando..." : "Entrar"}
           </Button>

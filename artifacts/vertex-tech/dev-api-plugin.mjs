@@ -7,7 +7,7 @@ import fs from "node:fs";
  * Plugin de Vite SOLO para `vite dev`.
  *
  * Monta las funciones serverless de `api/*.js` (formato Vercel) como middleware
- * del dev server, para poder probar el backend (Stripe, contacto, etc.) con
+ * del dev server, para poder probar el backend (contacto, diagnóstico, etc.) con
  * `pnpm dev`, sin necesidad de `vercel dev`.
  *
  * No afecta al build ni a producción: `apply: "serve"`.
@@ -22,7 +22,7 @@ export function devApiPlugin() {
       const root = server.config.root;
 
       // Carga TODAS las variables del .env (incluidas las que no llevan VITE_)
-      // en process.env, para que las funciones puedan leer STRIPE_SECRET_KEY.
+      // en process.env, para que las funciones puedan leer DATABASE_URL, etc.
       const env = loadEnv(server.config.mode, root, "");
       for (const [key, value] of Object.entries(env)) {
         if (process.env[key] === undefined) process.env[key] = value;
@@ -32,7 +32,23 @@ export function devApiPlugin() {
         const url = req.url || "";
         if (!url.startsWith("/api/")) return next();
 
-        const name = url.split("?")[0].replace(/^\/api\//, "");
+        const rawName = url.split("?")[0].replace(/^\/api\//, "");
+
+        // Réplica de los rewrites de vercel.json: los endpoints de admin
+        // viven consolidados en un único archivo (api/admin.js) para no
+        // pasarse del límite de funciones serverless de Vercel — ver ese
+        // archivo y vercel.json.
+        let name = rawName;
+        let injectedAction = null;
+        const adminMatch = rawName.match(/^admin-(.+)$/);
+        if (adminMatch) {
+          name = "admin";
+          injectedAction = adminMatch[1];
+        } else if (rawName === "invoices/create") {
+          name = "admin";
+          injectedAction = "invoices-create";
+        }
+
         let file = path.join(root, "api", `${name}.js`);
         let isTs = false;
         if (!fs.existsSync(file)) {
@@ -53,6 +69,9 @@ export function devApiPlugin() {
           req.query = Object.fromEntries(params.entries());
         } else {
           req.query = {};
+        }
+        if (injectedAction) {
+          req.query.action = injectedAction;
         }
 
         // Body JSON (las funciones esperan req.body ya parseado, estilo Vercel).
@@ -119,7 +138,7 @@ export function devApiPlugin() {
           const handler = handlerModule.default || handlerModule;
           await handler(req, res);
         } catch (err) {
-          console.error(`[dev-api] error en /api/${name}:`, err);
+          console.error(`[dev-api] error en /api/${rawName}:`, err);
           if (!res.headersSent) {
             res.statusCode = 500;
             res.end(JSON.stringify({ error: "Dev API error" }));

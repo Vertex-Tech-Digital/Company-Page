@@ -29,6 +29,7 @@ const LIST_ENDPOINT = `${import.meta.env.BASE_URL}api/admin-invoices`;
 
 type LineItem = { description: string; quantity: number; unitPrice: number };
 interface CreateInvoiceResponse {
+  id: number;
   invoiceNumber: string;
   status: string;
   issueDate: string;
@@ -37,7 +38,6 @@ interface CreateInvoiceResponse {
   total: number;
   emailSent?: boolean;
   pdfError?: boolean;
-  pdfBase64?: string;
 }
 interface InvoiceRow {
   id: number;
@@ -52,15 +52,24 @@ interface InvoiceRow {
 
 const emptyItem: LineItem = { description: "", quantity: 1, unitPrice: 0 };
 
-function downloadPdf(base64: string, invoiceNumber: string) {
-  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-  const blob = new Blob([bytes], { type: "application/pdf" });
+// El endpoint devuelve el PDF como application/pdf binario; los errores
+// siguen llegando en JSON.
+async function downloadInvoicePdf(id: number, invoiceNumber: string) {
+  const res = await fetch(`${LIST_ENDPOINT}?id=${id}&pdf=1`, {
+    credentials: "include",
+  });
+  if (!res.ok) {
+    const d = await res.json().catch(() => ({}));
+    throw new Error(d.error || "No se pudo generar el PDF.");
+  }
+  const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = `Factura-${invoiceNumber}.pdf`;
   a.click();
-  URL.revokeObjectURL(url);
+  // Safari cancela la descarga si la URL se revoca en el mismo tick del click.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // "aaaa-mm-dd" -> "dd/mm/aaaa" para mostrar en el listado.
@@ -69,7 +78,7 @@ function isoToEs(iso: string) {
   return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
 }
 
-export function AdminInvoices({ token }: { token: string }) {
+export function AdminInvoices() {
   const [tab, setTab] = useState<"emit" | "list">("emit");
 
   return (
@@ -93,16 +102,12 @@ export function AdminInvoices({ token }: { token: string }) {
         </Button>
       </div>
 
-      {tab === "emit" ? (
-        <InvoiceForm token={token} />
-      ) : (
-        <InvoicesList token={token} />
-      )}
+      {tab === "emit" ? <InvoiceForm /> : <InvoicesList />}
     </div>
   );
 }
 
-function InvoiceForm({ token }: { token: string }) {
+function InvoiceForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -119,6 +124,7 @@ function InvoiceForm({ token }: { token: string }) {
   const [lastInvoice, setLastInvoice] = useState<CreateInvoiceResponse | null>(
     null,
   );
+  const [downloadingLast, setDownloadingLast] = useState(false);
 
   const subtotal = items.reduce(
     (acc, it) => acc + it.quantity * it.unitPrice,
@@ -147,10 +153,8 @@ function InvoiceForm({ token }: { token: string }) {
     ): Promise<CreateInvoiceResponse> => {
       const res = await fetch(CREATE_ENDPOINT, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           client: { legalName, nif, email, address },
           items,
@@ -218,6 +222,22 @@ function InvoiceForm({ token }: { token: string }) {
       title: "Datos incompletos",
       description: message,
     });
+  }
+
+  async function downloadLast(invoice: CreateInvoiceResponse) {
+    setDownloadingLast(true);
+    try {
+      await downloadInvoicePdf(invoice.id, invoice.invoiceNumber);
+    } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          e instanceof Error ? e.message : "No se pudo descargar el PDF.",
+      });
+    } finally {
+      setDownloadingLast(false);
+    }
   }
 
   return (
@@ -463,7 +483,7 @@ function InvoiceForm({ token }: { token: string }) {
         <Button
           type="submit"
           disabled={mutation.isPending}
-          className="w-full h-12 bg-primary text-white hover:bg-primary/90 text-md shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+          className="w-full h-12 bg-primary-solid text-white hover:bg-primary-solid-hover text-md shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all hover:shadow-[0_0_20px_rgba(59,130,246,0.5)]"
         >
           {mutation.isPending ? (
             <>
@@ -476,7 +496,7 @@ function InvoiceForm({ token }: { token: string }) {
         </Button>
       </form>
 
-      {lastInvoice?.pdfBase64 && (
+      {lastInvoice && !lastInvoice.pdfError && (
         <div className="mt-6 flex items-center justify-between bg-card/50 border border-border p-4 rounded-xl">
           <span className="text-sm text-white">
             Factura <b>{lastInvoice.invoiceNumber}</b> generada.
@@ -486,11 +506,15 @@ function InvoiceForm({ token }: { token: string }) {
             variant="outline"
             size="sm"
             className="gap-1"
-            onClick={() =>
-              downloadPdf(lastInvoice.pdfBase64!, lastInvoice.invoiceNumber)
-            }
+            disabled={downloadingLast}
+            onClick={() => downloadLast(lastInvoice)}
           >
-            <Download className="w-4 h-4" /> Descargar PDF
+            {downloadingLast ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4" />
+            )}{" "}
+            Descargar PDF
           </Button>
         </div>
       )}
@@ -498,7 +522,7 @@ function InvoiceForm({ token }: { token: string }) {
   );
 }
 
-function InvoicesList({ token }: { token: string }) {
+function InvoicesList() {
   const { toast } = useToast();
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
@@ -506,7 +530,7 @@ function InvoicesList({ token }: { token: string }) {
     queryKey: ["admin-invoices"],
     queryFn: async (): Promise<InvoiceRow[]> => {
       const res = await fetch(LIST_ENDPOINT, {
-        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
       const d = await res.json().catch(() => ({}));
       if (!res.ok)
@@ -518,13 +542,7 @@ function InvoicesList({ token }: { token: string }) {
   async function download(id: number, invoiceNumber: string) {
     setDownloadingId(id);
     try {
-      const res = await fetch(`${LIST_ENDPOINT}?id=${id}&pdf=1`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const d = await res.json().catch(() => ({}));
-      if (!res.ok || !d.pdfBase64)
-        throw new Error(d.error || "No se pudo generar el PDF.");
-      downloadPdf(d.pdfBase64, invoiceNumber);
+      await downloadInvoicePdf(id, invoiceNumber);
     } catch (e) {
       toast({
         variant: "destructive",
