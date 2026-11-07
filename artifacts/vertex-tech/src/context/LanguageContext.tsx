@@ -150,6 +150,7 @@ const translations: Record<Language, Record<string, string>> = {
     "contact.titleHighlight": "proyecto?",
     "contact.subtitle":
       "Cuéntanos qué necesitamos y te ayudamos a diseñar e implementar la solución tecnológica a medida que tu empresa requiere.",
+    "contact.whatsapp.intro": "También nos puedes contactar mediante WhatsApp.",
     "contact.label.name": "Nombre",
     "contact.label.email": "Email",
     "contact.label.company": "Empresa (Opcional)",
@@ -341,6 +342,7 @@ const translations: Record<Language, Record<string, string>> = {
     "contact.titleHighlight": "project?",
     "contact.subtitle":
       "Tell us what you need and we'll help you design and implement the custom tech solution your business deserves.",
+    "contact.whatsapp.intro": "You can also reach us on WhatsApp.",
     "contact.label.name": "Name",
     "contact.label.email": "Email",
     "contact.label.company": "Company (Optional)",

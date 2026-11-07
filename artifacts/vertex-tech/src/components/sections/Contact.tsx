@@ -1,7 +1,9 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Reveal } from "@/components/common/Reveal";
+import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { useLanguage } from "@/context/LanguageContext";
+import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 // El formulario (react-hook-form + zod) es lo más pesado de la portada y está
 // al final de la página: se descarga cuando la sección se acerca al viewport,
@@ -62,9 +64,22 @@ export function Contact() {
                 {t("contact.titleHighlight")}
               </span>
             </h2>
-            <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-6 sm:mb-8">
+            <p className="text-base sm:text-lg text-slate-300 leading-relaxed mb-4 sm:mb-5">
               {t("contact.subtitle")}
             </p>
+            <p className="text-sm text-slate-400 mb-3">
+              {t("contact.whatsapp.intro")}
+            </p>
+            <a
+              href={getWhatsAppUrl(t("whatsapp.message"))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[44px] w-full items-center justify-center gap-2.5 rounded-xl border border-[#25D366]/30 bg-[#25D366]/10 px-5 py-3 text-sm font-semibold text-[#25D366] transition-all hover:border-[#25D366]/60 hover:bg-[#25D366]/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] sm:w-auto"
+              data-testid="contact-whatsapp"
+            >
+              <WhatsAppIcon className="h-5 w-5" />
+              {t("whatsapp.cta")}
+            </a>
           </Reveal>
 
           <Reveal
