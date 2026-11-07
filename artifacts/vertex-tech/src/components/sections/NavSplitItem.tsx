@@ -72,7 +72,7 @@ export function NavSplitItem({
 
   return (
     <div
-      className="relative inline-flex items-center"
+      className="group/split relative inline-flex items-center"
       data-testid={`nav-split-${id}`}
     >
       <a
@@ -95,7 +95,11 @@ export function NavSplitItem({
           <button
             type="button"
             aria-label={t(`nav.${id}.more`)}
-            className="group ml-1 inline-flex h-8 w-8 items-center justify-center rounded-md border-l border-white/10 pl-1.5 text-slate-400 transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className={`group ml-0.5 inline-flex h-8 w-6 items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              active
+                ? "text-primary/80 group-hover/split:text-primary data-[state=open]:text-primary"
+                : "text-slate-500 group-hover/split:text-white data-[state=open]:text-primary"
+            }`}
             data-testid={`nav-split-${id}-trigger`}
           >
             <ChevronDown
@@ -172,7 +176,11 @@ export function NavMobileSplitItem({
           aria-expanded={open}
           aria-controls={panelId}
           aria-label={t(`nav.${id}.more`)}
-          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className={`inline-flex min-h-[44px] min-w-[44px] items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            open
+              ? "text-primary"
+              : "text-slate-400 hover:text-white active:text-white"
+          }`}
           data-testid={`nav-split-${id}-trigger-mobile`}
         >
           <ChevronDown
