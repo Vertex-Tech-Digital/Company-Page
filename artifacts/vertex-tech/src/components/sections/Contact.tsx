@@ -46,7 +46,7 @@ export function Contact() {
     <section
       ref={sectionRef}
       id="contacto"
-      className="py-14 sm:py-20 lg:py-28 relative z-10 overflow-hidden"
+      className="py-14 sm:py-20 lg:py-28 relative z-10 overflow-hidden scroll-mt-24"
     >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 

@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link as WouterLink, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  NavMobileSplitItem,
+  NavSplitItem,
+  type NavSection,
+} from "@/components/sections/NavSplitItem";
 import { useLanguage } from "@/context/LanguageContext";
 import { usePresence } from "@/hooks/use-presence";
 
@@ -11,17 +16,20 @@ export function Navbar() {
   const mobileMenu = usePresence(mobileMenuOpen, 300);
   const [activeSection, setActiveSection] = useState("inicio");
   const { lang, setLang, t } = useLanguage();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
 
+      if (location !== "/") return;
+
       const sections = [
         "inicio",
         "servicios",
-        "proyectos",
         "metodologia",
+        "blog",
+        "diagnostico",
         "contacto",
       ];
       const current = sections.find((section) => {
@@ -35,9 +43,10 @@ export function Navbar() {
       if (current) setActiveSection(current);
     };
 
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [location]);
 
   useEffect(() => {
     if (mobileMenuOpen) {
@@ -50,23 +59,59 @@ export function Navbar() {
     };
   }, [mobileMenuOpen]);
 
-  const navLinks = [
+  type NavLink = { id: string; href: string; page?: string };
+
+  const navLinks: NavLink[] = [
     { id: "inicio", href: "#inicio" },
     { id: "servicios", href: "#servicios" },
     // { id: "proyectos", href: "#proyectos" }, // oculto temporalmente
     { id: "metodologia", href: "#metodologia" },
   ];
 
-  const scrollTo = (href: string) => {
+  const splitItems: Array<{ id: NavSection; page: string }> = [
+    { id: "blog", page: "/blog" },
+    { id: "diagnostico", page: "/diagnostico" },
+  ];
+
+  const isActive = (link: NavLink) => {
+    if (location === "/") return activeSection === link.id;
+    if (!link.page) return false;
+    if (link.page === "/blog") return location.startsWith("/blog");
+    return location === link.page;
+  };
+
+  const isSplitActive = (id: NavSection, page: string) =>
+    location === "/" ? activeSection === id : location.startsWith(page);
+
+  const scrollTo = (href: string, page?: string) => {
     setMobileMenuOpen(false);
     if (location !== "/") {
-      window.location.href = "/" + href;
+      if (page && location === page) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      navigate(page ?? `/${href}`);
       return;
     }
     const el = document.querySelector(href);
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     }
+  };
+
+  // La opción "resumen" siempre apunta a la sección de la portada.
+  const goToHomeSection = (hash: string) => {
+    setMobileMenuOpen(false);
+    if (location === "/") {
+      document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    navigate(`/${hash}`);
+  };
+
+  const goToPage = (page: string) => {
+    setMobileMenuOpen(false);
+    navigate(page);
   };
 
   return (
@@ -85,7 +130,7 @@ export function Navbar() {
             e.preventDefault();
             scrollTo("#inicio");
           }}
-          className="flex items-center gap-3 group"
+          className="flex items-center gap-3 group shrink-0"
           data-testid="nav-logo"
         >
           <img
@@ -112,19 +157,17 @@ export function Navbar() {
         </a>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-3 xl:gap-7">
           {navLinks.map((link) => (
             <a
               key={link.id}
               href={link.href}
               onClick={(e) => {
                 e.preventDefault();
-                scrollTo(link.href);
+                scrollTo(link.href, link.page);
               }}
-              className={`text-sm font-medium transition-colors hover:text-white ${
-                location === "/" && activeSection === link.id
-                  ? "text-primary font-semibold"
-                  : "text-slate-300"
+              className={`text-[13px] xl:text-sm font-medium transition-colors hover:text-white ${
+                isActive(link) ? "text-primary font-semibold" : "text-slate-300"
               }`}
               data-testid={`nav-link-${link.id}`}
             >
@@ -132,29 +175,16 @@ export function Navbar() {
             </a>
           ))}
 
-          <WouterLink
-            href="/diagnostico"
-            className={`text-sm font-medium transition-colors hover:text-white ${
-              location === "/diagnostico"
-                ? "text-primary font-semibold"
-                : "text-slate-300"
-            }`}
-            data-testid="nav-link-diagnostico"
-          >
-            {t("nav.diagnostico")}
-          </WouterLink>
-
-          <WouterLink
-            href="/blog"
-            className={`text-sm font-medium transition-colors hover:text-white ${
-              location.startsWith("/blog")
-                ? "text-primary font-semibold"
-                : "text-slate-300"
-            }`}
-            data-testid="nav-link-blog"
-          >
-            {t("nav.blog")}
-          </WouterLink>
+          {splitItems.map((item) => (
+            <NavSplitItem
+              key={item.id}
+              id={item.id}
+              active={isSplitActive(item.id, item.page)}
+              onLabel={() => scrollTo(`#${item.id}`, item.page)}
+              onSection={() => goToHomeSection(`#${item.id}`)}
+              onPage={() => goToPage(item.page)}
+            />
+          ))}
 
           <div className="flex items-center gap-1 text-xs tracking-widest uppercase">
             <button
@@ -199,7 +229,7 @@ export function Navbar() {
 
         {/* Mobile Nav Toggle */}
         <button
-          className="md:hidden text-white p-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="lg:hidden text-white p-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label={t(mobileMenuOpen ? "nav.closeMenu" : "nav.openMenu")}
           aria-expanded={mobileMenuOpen}
@@ -217,7 +247,7 @@ export function Navbar() {
       {/* Mobile Menu */}
       {mobileMenu.mounted && (
         <div
-          className={`absolute top-20 left-0 w-full bg-slate-950/98 backdrop-blur-xl border-b border-white/10 p-5 sm:p-6 flex flex-col gap-4 sm:gap-5 md:hidden shadow-2xl max-h-[calc(100dvh-5rem)] overflow-y-auto pb-[max(2rem,env(safe-area-inset-bottom))] [--vt-y:-20px] [--vt-dur:0.3s] ${
+          className={`absolute top-20 left-0 w-full bg-slate-950/98 backdrop-blur-xl border-b border-white/10 p-5 sm:p-6 flex flex-col gap-4 sm:gap-5 lg:hidden shadow-2xl max-h-[calc(100dvh-5rem)] overflow-y-auto pb-[max(2rem,env(safe-area-inset-bottom))] [--vt-y:-20px] [--vt-dur:0.3s] ${
             mobileMenu.exiting ? "vt-exit" : "vt-enter"
           }`}
           data-testid="nav-mobile-menu"
@@ -253,42 +283,30 @@ export function Navbar() {
               href={link.href}
               onClick={(e) => {
                 e.preventDefault();
-                scrollTo(link.href);
+                scrollTo(link.href, link.page);
               }}
               className={`text-lg font-medium transition-colors min-h-[44px] flex items-center ${
-                location === "/" && activeSection === link.id
+                isActive(link)
                   ? "text-primary font-semibold"
                   : "text-slate-300 hover:text-white"
               }`}
+              data-testid={`nav-link-${link.id}-mobile`}
             >
               {t(`nav.${link.id}`)}
             </a>
           ))}
 
-          <WouterLink
-            href="/diagnostico"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-primary min-h-[44px] flex items-center ${
-              location === "/diagnostico"
-                ? "text-primary font-semibold"
-                : "text-slate-300 hover:text-white"
-            }`}
-            data-testid="nav-link-diagnostico-mobile"
-          >
-            {t("nav.diagnostico")}
-          </WouterLink>
-          <WouterLink
-            href="/blog"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`text-lg font-medium transition-colors hover:text-primary min-h-[44px] flex items-center ${
-              location.startsWith("/blog")
-                ? "text-primary font-semibold"
-                : "text-slate-300 hover:text-white"
-            }`}
-            data-testid="nav-link-blog-mobile"
-          >
-            {t("nav.blog")}
-          </WouterLink>
+          {splitItems.map((item) => (
+            <NavMobileSplitItem
+              key={item.id}
+              id={item.id}
+              active={isSplitActive(item.id, item.page)}
+              onLabel={() => scrollTo(`#${item.id}`, item.page)}
+              onSection={() => goToHomeSection(`#${item.id}`)}
+              onPage={() => goToPage(item.page)}
+            />
+          ))}
+
           <Button
             onClick={() => scrollTo("#contacto")}
             className="bg-primary-solid w-full h-12 text-base font-semibold text-white mt-1 cursor-pointer"

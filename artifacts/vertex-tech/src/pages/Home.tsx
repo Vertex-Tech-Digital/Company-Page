@@ -4,6 +4,8 @@ import { Services } from "@/components/sections/Services";
 // import { Projects } from "@/components/sections/Projects"; // oculto temporalmente
 import { Methodology } from "@/components/sections/Methodology";
 import { WhyUs } from "@/components/sections/WhyUs";
+import { BlogSection } from "@/components/sections/BlogSection";
+import { DiagnosticoSection } from "@/components/sections/DiagnosticoSection";
 import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
 import { ParticleNetwork } from "@/components/sections/ParticleNetwork";
@@ -50,6 +52,8 @@ export default function Home() {
           {/* <Projects /> oculto temporalmente */}
           <Methodology />
           <WhyUs />
+          <BlogSection />
+          <DiagnosticoSection />
           <Contact />
         </main>
 
