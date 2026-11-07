@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Briefcase, Loader2, ArrowLeft } from "lucide-react";
 import { PageNavbar } from "@/components/sections/PageNavbar";
 import { Footer } from "@/components/sections/Footer";
-import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 import { CasoCard, type CasoPreview } from "@/components/sections/CasoCard";
 import { getCasos } from "@/content/casos";
 import { useLanguage } from "@/context/LanguageContext";
@@ -163,7 +162,6 @@ export default function CasosConceptuales() {
       </section>
 
       <Footer />
-      <WhatsAppButton />
     </main>
   );
 }

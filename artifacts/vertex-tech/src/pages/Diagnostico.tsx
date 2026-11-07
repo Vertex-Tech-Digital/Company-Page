@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ParticleNetwork } from "@/components/sections/ParticleNetwork";
-import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 import { SkipToContent } from "@/components/common/SkipToContent";
 import {
   CheckCircle2,
@@ -871,7 +870,6 @@ export default function Diagnostico() {
           <Footer />
         </footer>
       </div>
-      <WhatsAppButton />
     </div>
   );
 }
