@@ -23,7 +23,10 @@ export function Services() {
   }));
 
   return (
-    <section id="servicios" className="py-14 sm:py-20 lg:py-28 relative z-10">
+    <section
+      id="servicios"
+      className="py-14 sm:py-20 lg:py-28 relative z-10 scroll-mt-24"
+    >
       <div className="container mx-auto px-4 sm:px-6">
         <Reveal y={20} className="mb-10 sm:mb-16 max-w-3xl">
           <h2

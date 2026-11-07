@@ -3,7 +3,6 @@ import { Link } from "wouter";
 import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ParticleNetwork } from "@/components/sections/ParticleNetwork";
-import { WhatsAppButton } from "@/components/sections/WhatsAppButton";
 import { ChevronRight, Calendar, ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -79,8 +78,6 @@ export function LegalLayout({
 
         <Footer />
       </div>
-
-      <WhatsAppButton />
     </main>
   );
 }

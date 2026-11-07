@@ -31,6 +31,16 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.metodologia": "Metodología",
     "nav.diagnostico": "Diagnóstico Gratis",
     "nav.blog": "Blog",
+    "nav.blog.more": "Más opciones de Blog",
+    "nav.blog.section": "Resumen en la portada",
+    "nav.blog.sectionDesc": "Los últimos artículos del blog",
+    "nav.blog.all": "Ver todos los artículos",
+    "nav.blog.allDesc": "Explora el blog completo",
+    "nav.diagnostico.more": "Más opciones de Diagnóstico",
+    "nav.diagnostico.section": "Cómo funciona",
+    "nav.diagnostico.sectionDesc": "Ventajas y qué incluye",
+    "nav.diagnostico.all": "Hacer el diagnóstico",
+    "nav.diagnostico.allDesc": "Formulario gratuito · 5 minutos",
     "nav.casos": "Casos Conceptuales",
     "casos.share": "Compartir",
     "casos.shareOn": "Compartir en",
@@ -112,12 +122,35 @@ const translations: Record<Language, Record<string, string>> = {
     "whyus.3.desc":
       "Infraestructuras preparadas para soportar picos de demanda y adaptarse al ritmo comercial de tu negocio.",
     "whyus.4": "Diseño moderno y profesional",
+    // Home · Blog
+    "home.blog.kicker": "Conocimiento técnico",
+    "home.blog.title": "Ideas y aprendizajes de nuestro equipo",
+    "home.blog.desc":
+      "Artículos sobre desarrollo, QA, integraciones e inteligencia artificial para ayudarte a tomar mejores decisiones tecnológicas.",
+    "home.blog.cta": "Ver todos los artículos",
+    "home.blog.empty.title":
+      "Próximamente publicaremos nuevos artículos técnicos.",
+    "home.blog.empty.desc":
+      "Mientras tanto, puedes contarnos tu reto y te ayudamos a encontrar la solución.",
+    // Home · Diagnóstico
+    "home.diagnosis.kicker": "Diagnóstico gratuito",
+    "home.diagnosis.title": "Descubre qué está frenando a tu empresa",
+    "home.diagnosis.desc":
+      "Responde unas preguntas sobre tu operativa y recibe una hoja de ruta técnica con los puntos de mejora prioritarios. Sin compromiso.",
+    "home.diagnosis.benefit1": "100% gratuito",
+    "home.diagnosis.benefit2": "Solo 5 minutos",
+    "home.diagnosis.benefit3": "Informe en PDF",
+    "home.diagnosis.cta": "Hacer mi diagnóstico gratis",
+    "home.diagnosis.secondary": "Hablar con un experto",
+    "home.diagnosis.note":
+      "Sin permanencia ni compromiso. Tus datos solo se usan para preparar tu diagnóstico.",
     // Contact
     "contact.kicker": "Hablemos de tu Proyecto",
     "contact.title": "¿Hablamos de tu próximo",
     "contact.titleHighlight": "proyecto?",
     "contact.subtitle":
       "Cuéntanos qué necesitamos y te ayudamos a diseñar e implementar la solución tecnológica a medida que tu empresa requiere.",
+    "contact.whatsapp.intro": "También nos puedes contactar mediante WhatsApp.",
     "contact.label.name": "Nombre",
     "contact.label.email": "Email",
     "contact.label.company": "Empresa (Opcional)",
@@ -150,6 +183,7 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies": "Cookies",
     "footer.cookies.settings": "Configuración de cookies",
     "footer.github": "GitHub",
+    "footer.whatsapp": "WhatsApp",
     "footer.legal.title": "Aviso Legal",
     "footer.legal.body": `En cumplimiento del artículo 10 de la Ley 34/2002 (LSSI-CE), se informa que este sitio web es una plataforma de presentación comercial operada por ${companyHolder}, con identificación fiscal ${companyTaxId} y domicilio legal configurado. Para cualquier consulta o comunicación, puede dirigirse al correo electrónico oficial de contacto: ${contactEmail}.`,
     "footer.privacy.title": "Política de Privacidad",
@@ -193,6 +227,16 @@ const translations: Record<Language, Record<string, string>> = {
     "nav.metodologia": "Methodology",
     "nav.diagnostico": "Free Diagnosis",
     "nav.blog": "Blog",
+    "nav.blog.more": "More Blog options",
+    "nav.blog.section": "Overview on the homepage",
+    "nav.blog.sectionDesc": "The latest blog articles",
+    "nav.blog.all": "View all articles",
+    "nav.blog.allDesc": "Browse the full blog",
+    "nav.diagnostico.more": "More Free Diagnosis options",
+    "nav.diagnostico.section": "How it works",
+    "nav.diagnostico.sectionDesc": "Benefits and what's included",
+    "nav.diagnostico.all": "Take the diagnosis",
+    "nav.diagnostico.allDesc": "Free form · 5 minutes",
     "nav.casos": "Conceptual Cases",
     "casos.share": "Share",
     "casos.shareOn": "Share on",
@@ -271,12 +315,34 @@ const translations: Record<Language, Record<string, string>> = {
     "whyus.3.desc":
       "Infrastructures designed to handle demand spikes and scale with your business momentum.",
     "whyus.4": "Modern and professional design",
+    // Home · Blog
+    "home.blog.kicker": "Technical knowledge",
+    "home.blog.title": "Ideas and lessons from our team",
+    "home.blog.desc":
+      "Articles on development, QA, integrations and artificial intelligence to help you make better technology decisions.",
+    "home.blog.cta": "View all articles",
+    "home.blog.empty.title": "New technical articles are coming soon.",
+    "home.blog.empty.desc":
+      "In the meantime, tell us about your challenge and we'll help you find the right solution.",
+    // Home · Diagnosis
+    "home.diagnosis.kicker": "Free diagnosis",
+    "home.diagnosis.title": "Find out what is slowing your business down",
+    "home.diagnosis.desc":
+      "Answer a few questions about your operations and receive a technical roadmap with the priority improvements. No commitment.",
+    "home.diagnosis.benefit1": "100% free",
+    "home.diagnosis.benefit2": "Only 5 minutes",
+    "home.diagnosis.benefit3": "PDF report",
+    "home.diagnosis.cta": "Get my free diagnosis",
+    "home.diagnosis.secondary": "Talk to an expert",
+    "home.diagnosis.note":
+      "No subscription or commitment. Your data is only used to prepare your diagnosis.",
     // Contact
     "contact.kicker": "Start the Conversation",
     "contact.title": "Shall we talk about your next",
     "contact.titleHighlight": "project?",
     "contact.subtitle":
       "Tell us what you need and we'll help you design and implement the custom tech solution your business deserves.",
+    "contact.whatsapp.intro": "You can also reach us on WhatsApp.",
     "contact.label.name": "Name",
     "contact.label.email": "Email",
     "contact.label.company": "Company (Optional)",
@@ -309,6 +375,7 @@ const translations: Record<Language, Record<string, string>> = {
     "footer.cookies": "Cookies",
     "footer.cookies.settings": "Cookie Settings",
     "footer.github": "GitHub",
+    "footer.whatsapp": "WhatsApp",
     "footer.legal.title": "Legal Notice",
     "footer.legal.body": `In compliance with Article 10 of Law 34/2002 (LSSI-CE), please be advised that this website is a commercial presentation platform operated by ${companyHolder}, with tax identification number ${companyTaxId} and a configured legal address. For any inquiries, please reach out to our official contact email: ${contactEmail}.`,
     "footer.privacy.title": "Privacy Policy",

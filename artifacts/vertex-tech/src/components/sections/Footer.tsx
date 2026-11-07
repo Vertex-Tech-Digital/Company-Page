@@ -1,6 +1,8 @@
 import { Link as WouterLink } from "wouter";
 import { Github, Mail, MapPin, ArrowUp } from "lucide-react";
+import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { useLanguage } from "@/context/LanguageContext";
+import { getWhatsAppUrl } from "@/lib/whatsapp";
 
 export function Footer() {
   const { t } = useLanguage();
@@ -197,6 +199,17 @@ export function Footer() {
                   aria-hidden="true"
                 />
                 <span>contact@vertextech.dev</span>
+              </a>
+              <a
+                href={getWhatsAppUrl(t("whatsapp.message"))}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t("whatsapp.aria")}
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
+                data-testid="footer-whatsapp"
+              >
+                <WhatsAppIcon className="w-4 h-4 fill-[#25D366] group-hover:scale-110 transition-transform" />
+                <span>{t("footer.whatsapp")}</span>
               </a>
               <a
                 href="https://github.com/Vertex-Tech-Digital"
